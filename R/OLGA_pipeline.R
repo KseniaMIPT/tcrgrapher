@@ -85,20 +85,21 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
   }
 
   olga_commands <- paste0(
-    "olga-compute_pgen --", chain, " --display_off --time_updates_off	--seq_in 0
-    --v_in 1 --j_in 2 --lines_to_skip 1 -d 'tab' -i tmp", 1:cores,
-    ".tsv -o tmp_out", 1:cores, ".tsv"
+    "olga-compute_pgen --", chain,
+    " --display_off --time_updates_off	--seq_in 0 --v_in 1 --j_in 2 --lines_to_skip 1 -d 'tab' -i tmp",
+    1:cores, ".tsv -o tmp_out", 1:cores, ".tsv"
   )
   if (withoutVJ) {
     olga_commands <- paste0(
-      "olga-compute_pgen --", chain, " --display_off --time_updates_off
-      --seq_in 0  --lines_to_skip 1 -d 'tab' -i tmp", 1:cores, ".tsv -o tmp_out",
-      1:cores, ".tsv"
+      "olga-compute_pgen --", chain,
+      " --display_off --time_updates_off --seq_in 0  --lines_to_skip 1 -d 'tab' -i tmp",
+      1:cores, ".tsv -o tmp_out", 1:cores, ".tsv"
     )
   }
 
-  system(paste0(olga_commands, collapse = " & "), wait = T)
-  system("echo done", wait = T)
+  system(olga_commands, wait = T)
+  #system(paste0(olga_commands, collapse = " & "), wait = T)
+  #system("echo done", wait = T)
 
   # Pause before read
   Sys.sleep(60)
