@@ -1,6 +1,3 @@
-# # Надо аккуратно с путями разобраться
-# load("ALICE_for_mouses/OLGA_V_J_mouse_beta.rda")
-
 # Secondary functions -----------------------------------------------------
 
 calculate_nb_of_neighbors <- function(df, N_neighbors_thres = 1) {
@@ -61,10 +58,6 @@ all_other_variants_one_mismatch_regexp <- function(str) {
 olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
                                        withoutVJ = F, prompt = T) {
   # Calculate generation probability with OLGA
-
-  # TODO: разобраться как подгружать датасеты
-
-  load("/home/ksenia/ALICE_for_mouses/OLGA_V_J_mouse_beta.rda")
 
   # add ind column for sequence combining
   if (!("ind" %in% colnames(df))) df[, ind := 1:.N, ]
