@@ -16,6 +16,18 @@ pipeline_OLGA(
 }
 \arguments{
 \item{df}{data.table}
+
+\item{Q}{selection factor}
+
+\item{cores}{number of cores}
+
+\item{prompt}{smth}
+
+\item{Read_thres}{threshold 1}
+
+\item{Read_thres2}{threshold 2}
+
+\item{N_neighbors_thres}{threshold 3}
 }
 \description{
 Main function

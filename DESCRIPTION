@@ -16,4 +16,5 @@ RoxygenNote: 7.1.2
 Imports:
     data.table,
     stats,
-    utils
+    utils,
+    stringdist

@@ -3,4 +3,5 @@
 export(pipeline_OLGA)
 importFrom(stats,p.adjust)
 importFrom(stats,ppois)
+importFrom(stringdist,stringdistmatrix)
 importFrom(utils,write.table)

@@ -1,6 +1,7 @@
 #' @importFrom stats p.adjust
 #' @importFrom stats ppois
 #' @importFrom utils write.table
+#' @importFrom stringdist stringdistmatrix
 
 # Secondary functions -----------------------------------------------------
 
@@ -110,6 +111,12 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 #' Main function
 #'
 #' @param df data.table
+#' @param Q selection factor
+#' @param cores number of cores
+#' @param prompt smth
+#' @param Read_thres threshold 1
+#' @param Read_thres2 threshold 2
+#' @param N_neighbors_thres threshold 3
 #' @export
 pipeline_OLGA <- function(df, Q = 6.27, cores = 1, prompt = F, Read_thres = 0,
                           Read_thres2 = 1, N_neighbors_thres = 1) {
