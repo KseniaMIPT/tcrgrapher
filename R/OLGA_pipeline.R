@@ -103,7 +103,7 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 }
 
 # Main function -----------------------------------------------------------
-
+#' @export
 pipeline_OLGA <- function(df, Q = 6.27, cores = 1, prompt = F, Read_thres = 0,
                           Read_thres2 = 1, N_neighbors_thres = 1) {
   colnames(df) <- c(
