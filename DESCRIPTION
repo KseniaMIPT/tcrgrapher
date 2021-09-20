@@ -7,8 +7,8 @@ Authors@R:
            role = c("aut", "cre"),
            email = "kseniia.lupyr@skoltech.ru")
 Description: Package finds TCRs involved in immune response from single dataset
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    with statistic for mouses' TRB
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

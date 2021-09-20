@@ -2,6 +2,7 @@
 #' @importFrom stats ppois
 #' @importFrom utils write.table
 #' @importFrom stringdist stringdistmatrix
+#' @importFrom data.table :=
 
 # Secondary functions -----------------------------------------------------
 
