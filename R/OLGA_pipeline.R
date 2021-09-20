@@ -4,6 +4,9 @@
 #' @importFrom stringdist stringdistmatrix
 #' @importFrom data.table :=
 
+"VDJT"
+"OLGA_V_J_mouse_beta.rda"
+
 # Secondary functions -----------------------------------------------------
 
 calculate_nb_of_neighbors <- function(df, N_neighbors_thres = 1) {
@@ -35,11 +38,11 @@ filter_data_by_nb_of_neighbors <- function(df, N_neighbors_thres = 1) {
   # TODO: тут так-то отдельный трешхолд, надо разобраться с ними
 
   df[
-    , D_left := calculate_nb_of_neighbors(.SD, nei_read_thres = N_neighbors_thres),
+    , D_left := calculate_nb_of_neighbors(.SD, N_neighbors_thres = N_neighbors_thres),
     .(leftgr)
   ]
   df[
-    , D_right := calculate_nb_of_neighbors(.SD, nei_read_thres = N_neighbors_thres),
+    , D_right := calculate_nb_of_neighbors(.SD, N_neighbors_thres = N_neighbors_thres),
     .(rightgr)
   ]
   df[, D_id := .N, .(cdr3aa)]
@@ -133,7 +136,7 @@ pipeline_OLGA <- function(df, Q = 6.27, cores = 1, prompt = F, Read_thres = 0,
   # checking for unproductive sequences if it hasn't been made earlier
   df <- df[!grepl(cdr3aa, pattern = "*", fixed = T) & ((nchar(cdr3nt) %% 3) == 0)]
   # filter V and J for present in model
-  df < -df[Read.count > Read_thres][bestVGene %in% row.names(OLGAVJ) &
+  df <- df[Read.count > Read_thres,][bestVGene %in% row.names(OLGAVJ) &
     bestJGene %in% colnames(OLGAVJ)]
 
   df <- filter_data_by_nb_of_neighbors(df, N_neighbors_thres = 1)
