@@ -1,3 +1,7 @@
+#' @importFrom stats p.adjust
+#' @importFrom stats ppois
+#' @importFrom utils write.table
+
 # Secondary functions -----------------------------------------------------
 
 calculate_nb_of_neighbors <- function(df, N_neighbors_thres = 1) {
@@ -103,6 +107,9 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 }
 
 # Main function -----------------------------------------------------------
+#' Main function
+#'
+#' @param df data.table
 #' @export
 pipeline_OLGA <- function(df, Q = 6.27, cores = 1, prompt = F, Read_thres = 0,
                           Read_thres2 = 1, N_neighbors_thres = 1) {
