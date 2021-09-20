@@ -142,7 +142,7 @@ pipeline_OLGA <- function(df, Q = 6.27, cores = 1, prompt = F, Read_thres = 0,
   df <- filter_data_by_nb_of_neighbors(df, N_neighbors_thres = 1)
 
   df[Read.count > Read_thres2, n_total := .N, .(bestVGene, bestJGene)]
-  df <- df[D >= N_of_neigbors_thres][, ind := 1:.N, ]
+  df <- df[D >= N_neighbors_thres][, ind := 1:.N, ]
 
   df_with_mismatch <- df[, .(bestVGene, bestJGene,
     cdr3aa = all_other_variants_one_mismatch_regexp(cdr3aa)
