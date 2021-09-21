@@ -108,7 +108,7 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
   if (prompt) {
     readline(prompt = "Press [enter] to continue")
   }
-  # TODO вот тут беда
+  # TODO вот тут беда была
   fnt <- fread(paste0(path, fn2)) #do.call(rbind, lapply(paste0(path, fn2), fread))
   df$Pgen <- fnt$V2
   df
@@ -165,4 +165,5 @@ pipeline_OLGA <- function(df, Q = 6.27, cores = 1, prompt = F, Read_thres = 0,
     (OLGAVJ[cbind(bestVGene, bestJGene)]), lower.tail = F), ]
 
   df[, p_adjust := p.adjust(p_val, method = "BH")]
+  return(df)
 }
