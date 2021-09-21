@@ -114,9 +114,22 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 # Main function -----------------------------------------------------------
 #' Main function
 #'
-#' @param df data.table
-#' @param Q selection factor
-#' @param cores number of cores
+#' @param df data.table with the following columns (names of the colums are not
+#' important but the followig order is necessary)
+#' \describe{
+#' \item{Read.count}{Number of unique reads per cdr3 sequence}
+#' \item{freq}{Clonotype frequency in the clonoset}
+#' \item{cdr3nt}{CDR3 nucleotide sequence}
+#' \item{bestVGene}{TRBV segment}
+#' \item{bestVGene}{TRBD segment}
+#' \item{bestJGene}{TRBJ segment}
+#' \item{VEnd}{Position of the end of V segment in CDR3 sequence}
+#' \item{DStart}{Position of the start of D segment in CDR3 sequence}
+#' \item{DEnd}{Position of the end of D segment in CDR3 sequence}
+#' \item{JStart}{{Position of the start of J segment in CDR3 sequence}
+#' }
+#' @param Q selection factor. 1/Q sequences pass selection in thymus
+#' @param cores number of used cores
 #' @param prompt smth
 #' @param Read_thres threshold 1
 #' @param Read_thres2 threshold 2
@@ -125,7 +138,7 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 pipeline_OLGA <- function(df, Q = 6.27, cores = 1, prompt = F, Read_thres = 0,
                           Read_thres2 = 1, N_neighbors_thres = 1) {
   colnames(df) <- c(
-    "Read.count", "freq", "cdr3nt", "cdr3aa", "bestVGene", "d",
+    "Read.count", "freq", "cdr3nt", "cdr3aa", "bestVGene", "bestDGene",
     "bestJGene", "VEnd", "DStart", "DEnd", "JStart"
   )
 
