@@ -73,12 +73,11 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 
   fn <- paste0("tmp", 1:cores, ".tsv")
   fn2 <- paste0("tmp_out", 1:cores, ".tsv")
+  path <- tempdir()
 
-  for (f in c(fn, fn2)) if (file.exists(f)) file.remove(f)
+  for (f in c(paste0(path, fn), paste0(path,fn2))) if (file.exists(f)) file.remove(f)
 
   dfl <- split(df, sort((1:nrow(df) - 1) %% cores + 1))
-
-  path <- tempdir()
 
   for (i in 1:length(dfl)) {
     write.table(as.data.frame(dfl[[i]][, .(cdr3aa, bestVGene, bestJGene, ind), ]),
@@ -101,7 +100,7 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 
   system(olga_commands, wait = T)
   #system(paste0(olga_commands, collapse = " & "), wait = T)
-  #system("echo done", wait = T)
+  system("echo done", wait = T)
 
   # Pause before read
   Sys.sleep(60)
@@ -109,7 +108,8 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
   if (prompt) {
     readline(prompt = "Press [enter] to continue")
   }
-  fnt <- do.call(rbind, lapply(paste0(path, fn2), fread))
+  # TODO вот тут беда
+  fnt <- fread(paste0(path, fn2)) #do.call(rbind, lapply(paste0(path, fn2), fread))
   df$Pgen <- fnt$V2
   df
 }
