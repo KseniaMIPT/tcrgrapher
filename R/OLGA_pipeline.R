@@ -4,9 +4,6 @@
 #' @importFrom stringdist stringdistmatrix
 #' @importFrom data.table :=
 
-"VDJT"
-"OLGA_V_J_mouse_beta.rda"
-
 # Secondary functions -----------------------------------------------------
 
 calculate_nb_of_neighbors <- function(df, N_neighbors_thres = 1) {
@@ -19,7 +16,7 @@ calculate_nb_of_neighbors <- function(df, N_neighbors_thres = 1) {
       function(x) {
         sum(x[df$Read.count > N_neighbors_thres] <= 1, na.rm = T)
       }
-    ) - 0 # я не поняла зачем это действие нужно, но оставила на всякий случай
+    ) - 0
   } else {
     1
   }
