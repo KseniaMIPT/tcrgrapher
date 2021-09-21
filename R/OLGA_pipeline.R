@@ -133,12 +133,16 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 #' }
 #'
 #' @param df data.table
-#' @param Q selection factor. 1/Q sequences pass selection in thymus
-#' @param cores number of used cores
+#' @param Q selection factor. 1/Q sequences pass selection in thymus. Default
+#' value for mouses 6.27
+#' @param cores number of used cores, 1 by default
 #' @param prompt smth
 #' @param Read_thres threshold 1
 #' @param Read_thres2 threshold 2
 #' @param N_neighbors_thres threshold 3
+#' @param p_adjust_method one of the method from p.adjust from stats package
+#' possible options: "bonferroni", "holm", "hochberg", "hommel", "BH" or "fdr",
+#' "BY", "none". "BH" is a default method.
 #' @return Function returns tha same table that was in input with additional
 #' columns
 #' \itemize{
@@ -147,7 +151,8 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 #' }
 #' @export
 pipeline_OLGA <- function(df, Q = 6.27, cores = 1, prompt = F, Read_thres = 0,
-                          Read_thres2 = 1, N_neighbors_thres = 1) {
+                          Read_thres2 = 1, N_neighbors_thres = 1,
+                          p_adjust_method = "BH") {
   colnames(df) <- c(
     "Read.count", "freq", "cdr3nt", "cdr3aa", "bestVGene", "bestDGene",
     "bestJGene", "VEnd", "DStart", "DEnd", "JStart"
@@ -185,6 +190,6 @@ pipeline_OLGA <- function(df, Q = 6.27, cores = 1, prompt = F, Read_thres = 0,
   df[, p_val := ppois(D, lambda = 3 * Q * n_total * Pgen3 /
     (OLGAVJ[cbind(bestVGene, bestJGene)]), lower.tail = F), ]
 
-  df[, p_adjust := p.adjust(p_val, method = "BH")]
+  df[, p_adjust := p.adjust(p_val, method = p_adjust_method)]
   return(df)
 }

@@ -11,15 +11,17 @@ pipeline_OLGA(
   prompt = F,
   Read_thres = 0,
   Read_thres2 = 1,
-  N_neighbors_thres = 1
+  N_neighbors_thres = 1,
+  p_adjust_method = "BH"
 )
 }
 \arguments{
 \item{df}{data.table}
 
-\item{Q}{selection factor. 1/Q sequences pass selection in thymus}
+\item{Q}{selection factor. 1/Q sequences pass selection in thymus. Default
+value for mouses 6.27}
 
-\item{cores}{number of used cores}
+\item{cores}{number of used cores, 1 by default}
 
 \item{prompt}{smth}
 
@@ -28,6 +30,10 @@ pipeline_OLGA(
 \item{Read_thres2}{threshold 2}
 
 \item{N_neighbors_thres}{threshold 3}
+
+\item{p_adjust_method}{one of the method from p.adjust from stats package
+possible options: "bonferroni", "holm", "hochberg", "hommel", "BH" or "fdr",
+"BY", "none". "BH" is a default method.}
 }
 \value{
 Function returns tha same table that was in input with additional
