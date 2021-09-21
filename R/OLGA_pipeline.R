@@ -62,7 +62,7 @@ all_other_variants_one_mismatch_regexp <- function(str) {
 }
 
 olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
-                                       withoutVJ = F, prompt = T) {
+                                       withoutVJ = F) {
   # Calculate generation probability with OLGA
 
   # add ind column for sequence combining
@@ -99,12 +99,6 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
   #system(paste0(olga_commands, collapse = " & "), wait = T)
   system("echo done", wait = T)
 
-  # Pause before read
-  Sys.sleep(60)
-
-  if (prompt) {
-    readline(prompt = "Press [enter] to continue")
-  }
   # TODO вот тут беда была
   fnt <- fread(paste0(path, fn2)) #do.call(rbind, lapply(paste0(path, fn2), fread))
   df$Pgen <- fnt$V2
@@ -136,7 +130,6 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 #' @param Q selection factor. 1/Q sequences pass selection in thymus. Default
 #' value for mouses 6.27
 #' @param cores number of used cores, 1 by default
-#' @param prompt smth
 #' @param Read_thres threshold 1
 #' @param Read_thres2 threshold 2
 #' @param N_neighbors_thres threshold 3
@@ -150,7 +143,7 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 #' with one mismatch"}
 #' }
 #' @export
-pipeline_OLGA <- function(df, Q = 6.27, cores = 1, prompt = F, Read_thres = 0,
+pipeline_OLGA <- function(df, Q = 6.27, cores = 1, Read_thres = 0,
                           Read_thres2 = 1, N_neighbors_thres = 1,
                           p_adjust_method = "BH") {
   colnames(df) <- c(
@@ -177,11 +170,9 @@ pipeline_OLGA <- function(df, Q = 6.27, cores = 1, prompt = F, Read_thres = 0,
     cdr3aa = all_other_variants_one_mismatch_regexp(cdr3aa)
   ), ind]
 
-  df <- olga_parallel_wrapper_beta(df = df, cores = cores, prompt = prompt)
-  df_with_mismatch <- olga_parallel_wrapper_beta(
-    df = df_with_mismatch,
-    cores = cores, prompt = prompt
-  )
+  df <- olga_parallel_wrapper_beta(df = df, cores = cores)
+  df_with_mismatch <- olga_parallel_wrapper_beta(df = df_with_mismatch,
+    cores = cores)
 
   df$Pgen1 <- df_with_mismatch[, sum(Pgen), ind]$V1
   df[, Pgen3 := Pgen1 - Pgen * (nchar(cdr3aa) - 2), ]
