@@ -109,7 +109,7 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
   if (prompt) {
     readline(prompt = "Press [enter] to continue")
   }
-  fnt <- do.call(rbind, lapply(fn2, fread))
+  fnt <- do.call(rbind, lapply(paste0(path, fn2), fread))
   df$Pgen <- fnt$V2
   df
 }
