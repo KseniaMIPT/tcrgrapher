@@ -111,29 +111,40 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
   df
 }
 
+# TODO дописать return
+
 # Main function -----------------------------------------------------------
-#' Main function
+#' pipeline_OLGA
 #'
-#' @param df data.table with the following columns (names of the colums are not
-#' important but the followig order is necessary)
-#' \describe{
-#' \item{Read.count}{Number of unique reads per cdr3 sequence}
-#' \item{freq}{Clonotype frequency in the clonoset}
-#' \item{cdr3nt}{CDR3 nucleotide sequence}
-#' \item{bestVGene}{TRBV segment}
-#' \item{bestVGene}{TRBD segment}
-#' \item{bestJGene}{TRBJ segment}
-#' \item{VEnd}{Position of the end of V segment in CDR3 sequence}
-#' \item{DStart}{Position of the start of D segment in CDR3 sequence}
-#' \item{DEnd}{Position of the end of D segment in CDR3 sequence}
-#' \item{JStart}{{Position of the start of J segment in CDR3 sequence}
+#' Main fucntion that takes table with cdr3 sequences as an input. Table should
+#' have the following columns (names of the colums are not important but the
+#' followig order is necessary)
+#' \itemize{
+#' \item{"Read.count"}{"Number of unique reads per cdr3 sequence"}
+#' \item{"freq"}{"Clonotype frequency in the clonoset"}
+#' \item{"cdr3nt"}{"CDR3 nucleotide sequence"}
+#' \item{"bestVGene"}{"TRBV segment"}
+#' \item{"bestVGene"}{"TRBD segment"}
+#' \item{"bestJGene"}{"TRBJ segment"}
+#' \item{"VEnd"}{"Position of the end of V segment in CDR3 sequence"}
+#' \item{"DStart""}{"Position of the start of D segment in CDR3 sequence"}
+#' \item{"DEnd"}{"Position of the end of D segment in CDR3 sequence"}
+#' \item{"JStart"}{"Position of the start of J segment in CDR3 sequence"}
 #' }
+#'
+#' @param df data.table
 #' @param Q selection factor. 1/Q sequences pass selection in thymus
 #' @param cores number of used cores
 #' @param prompt smth
 #' @param Read_thres threshold 1
 #' @param Read_thres2 threshold 2
 #' @param N_neighbors_thres threshold 3
+#' @return Function returns tha same table that was in input with additional
+#' columns
+#' \itemize{
+#' \item{"D"}{"Number of neighbors in clonoset. Neighbor is a simular sequence
+#' with one mismatch"}
+#' }
 #' @export
 pipeline_OLGA <- function(df, Q = 6.27, cores = 1, prompt = F, Read_thres = 0,
                           Read_thres2 = 1, N_neighbors_thres = 1) {

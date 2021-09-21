@@ -2,7 +2,7 @@
 % Please edit documentation in R/OLGA_pipeline.R
 \name{pipeline_OLGA}
 \alias{pipeline_OLGA}
-\title{Main function}
+\title{pipeline_OLGA}
 \usage{
 pipeline_OLGA(
   df,
@@ -17,9 +17,9 @@ pipeline_OLGA(
 \arguments{
 \item{df}{data.table}
 
-\item{Q}{selection factor}
+\item{Q}{selection factor. 1/Q sequences pass selection in thymus}
 
-\item{cores}{number of cores}
+\item{cores}{number of used cores}
 
 \item{prompt}{smth}
 
@@ -29,6 +29,28 @@ pipeline_OLGA(
 
 \item{N_neighbors_thres}{threshold 3}
 }
+\value{
+Function returns tha same table that was in input with additional
+columns
+\itemize{
+\item{"D"}{"Number of neighbors in clonoset. Neighbor is a simular sequence
+with one mismatch"}
+}
+}
 \description{
-Main function
+Main fucntion that takes table with cdr3 sequences as an input. Table should
+have the following columns (names of the colums are not important but the
+followig order is necessary)
+\itemize{
+\item{"Read.count"}{"Number of unique reads per cdr3 sequence"}
+\item{"freq"}{"Clonotype frequency in the clonoset"}
+\item{"cdr3nt"}{"CDR3 nucleotide sequence"}
+\item{"bestVGene"}{"TRBV segment"}
+\item{"bestVGene"}{"TRBD segment"}
+\item{"bestJGene"}{"TRBJ segment"}
+\item{"VEnd"}{"Position of the end of V segment in CDR3 sequence"}
+\item{"DStart""}{"Position of the start of D segment in CDR3 sequence"}
+\item{"DEnd"}{"Position of the end of D segment in CDR3 sequence"}
+\item{"JStart"}{"Position of the start of J segment in CDR3 sequence"}
+}
 }
