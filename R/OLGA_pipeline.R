@@ -78,22 +78,24 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 
   dfl <- split(df, sort((1:nrow(df) - 1) %% cores + 1))
 
+  path <- tempdir()
+
   for (i in 1:length(dfl)) {
     write.table(as.data.frame(dfl[[i]][, .(cdr3aa, bestVGene, bestJGene, ind), ]),
-      quote = F, row.names = F, sep = "\t", file = fn[i]
+      quote = F, row.names = F, sep = "\t", file = paste0(path, fn[i])
     )
   }
 
   olga_commands <- paste0(
     "olga-compute_pgen --", chain,
-    " --display_off --time_updates_off	--seq_in 0 --v_in 1 --j_in 2 --lines_to_skip 1 -d 'tab' -i tmp",
-    1:cores, ".tsv -o tmp_out", 1:cores, ".tsv"
+    " --display_off --time_updates_off	--seq_in 0 --v_in 1 --j_in 2 --lines_to_skip 1 -d 'tab' -i ",
+    path, "tmp", 1:cores, ".tsv -o ", path, "tmp_out", 1:cores, ".tsv"
   )
   if (withoutVJ) {
     olga_commands <- paste0(
       "olga-compute_pgen --", chain,
-      " --display_off --time_updates_off --seq_in 0  --lines_to_skip 1 -d 'tab' -i tmp",
-      1:cores, ".tsv -o tmp_out", 1:cores, ".tsv"
+      " --display_off --time_updates_off --seq_in 0 --lines_to_skip 1 -d 'tab' -i ",
+      path, "tmp", 1:cores, ".tsv -o ", path," "tmp_out", 1:cores, ".tsv"
     )
   }
 
