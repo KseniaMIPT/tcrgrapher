@@ -95,7 +95,7 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
     olga_commands <- paste0(
       "olga-compute_pgen --", chain,
       " --display_off --time_updates_off --seq_in 0 --lines_to_skip 1 -d 'tab' -i ",
-      path, "tmp", 1:cores, ".tsv -o ", path," "tmp_out", 1:cores, ".tsv"
+      path, "tmp", 1:cores, ".tsv -o ", path, "tmp_out", 1:cores, ".tsv"
     )
   }
 
