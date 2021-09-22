@@ -123,16 +123,20 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 #' @param Q selection factor. 1/Q sequences pass selection in thymus. Default
 #' value for mouses 6.27
 #' @param cores number of used cores, 1 by default
-#' @param thres_counts threshold 1
-#' @param N_neighbors_thres threshold 3
+#' @param thres_counts Only sequences with number of counts above this threshold
+#' are taken into account
+#' @param N_neighbors_thres Only sequences with number of neighbors above
+#' threshold are used to calculate generation probability
 #' @param p_adjust_method one of the method from p.adjust from stats package
 #' possible options: "bonferroni", "holm", "hochberg", "hommel", "BH" or "fdr",
 #' "BY", "none". "BH" is a default method.
-#' @return Function returns tha same table that was in input with additional
-#' columns
+#' @return Function returns the same table that was in input filtered by number
+#' of counts and number of neighbors with additional columns. Additional columns
+#' are the following
 #' \itemize{
-#' \item{"D"}{"Number of neighbors in clonoset. Neighbor is a simular sequence
+#' \item{"D"}{"Number of neighbors in clonoset. Neighbor is a similar sequence
 #' with one mismatch"}
+#' \item{"VJ_n_total"}{"Number of unique sequences with given VJ combination"}
 #' }
 #' @export
 pipeline_OLGA <- function(df, Q = 6.27, cores = 1, thres_counts = 1,
@@ -155,7 +159,7 @@ pipeline_OLGA <- function(df, Q = 6.27, cores = 1, thres_counts = 1,
 
   df <- calculate_nb_of_neighbors(df)
 
-  df[, n_total := .N, .(bestVGene, bestJGene)]
+  df[, VJ_n_total := .N, .(bestVGene, bestJGene)]
   df <- df[D >= N_neighbors_thres][, ind := 1:.N, ]
 
   df_with_mismatch <- df[, .(bestVGene, bestJGene,
@@ -166,13 +170,21 @@ pipeline_OLGA <- function(df, Q = 6.27, cores = 1, thres_counts = 1,
   df_with_mismatch <- olga_parallel_wrapper_beta(df = df_with_mismatch,
     cores = cores)
 
-  df$Pgen1 <- df_with_mismatch[, sum(Pgen), ind]$V1
-  df[, Pgen3 := Pgen1 - Pgen * (nchar(cdr3aa) - 2), ]
-  df[, space := Pgen3 / (OLGAVJ[cbind(bestVGene, bestJGene)]), ]
-  df[, space_n := Pgen3 / (OLGAVJ[cbind(bestVGene, bestJGene)]), ]
-  df[, p_val := ppois(D, lambda = 3 * Q * n_total * Pgen3 /
-    (OLGAVJ[cbind(bestVGene, bestJGene)]), lower.tail = F), ]
+  # Pgeg - probability to be generated computed by OLGA
+  # Pgen_sum - sum of Pgen of all sequences similar to the given with one mismatch
+  # Pgen_sum_corr - Pgen_sum without probabilities of the main sequence
+  df$Pgen_sum <- df_with_mismatch[, sum(Pgen), ind]$V1
+  df[, Pgen_sum_corr := Pgen_sum - Pgen * (nchar(cdr3aa) - 2), ]
 
+  # Bayes' rule
+  Pgen_by_VJ <- 1*Pgen_sum_corr / OLGAVJ[cbind(bestVGene, bestJGene)]
+
+  # TODO Q for different CDR3 lengths
+
+  df[, p_val := ppois(D, lambda = Q * VJ_n_total * Pgen_by_VJ)]
   df[, p_adjust := p.adjust(p_val, method = p_adjust_method)]
+
+  # deletion of unnecessary columns
+  df <- subset(df, select = -c(ind))
   return(df)
 }
