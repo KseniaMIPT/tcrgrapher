@@ -123,8 +123,7 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 #' @param Q selection factor. 1/Q sequences pass selection in thymus. Default
 #' value for mouses 6.27
 #' @param cores number of used cores, 1 by default
-#' @param Read_thres threshold 1
-#' @param Read_thres2 threshold 2
+#' @param thres_counts threshold 1
 #' @param N_neighbors_thres threshold 3
 #' @param p_adjust_method one of the method from p.adjust from stats package
 #' possible options: "bonferroni", "holm", "hochberg", "hommel", "BH" or "fdr",
@@ -137,8 +136,7 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 #' }
 #' @export
 pipeline_OLGA <- function(df, Q = 6.27, cores = 1, thres_counts = 1,
-                          Read_thres2 = 1, N_neighbors_thres = 1,
-                          p_adjust_method = "BH") {
+                          N_neighbors_thres = 1, p_adjust_method = "BH") {
   colnames(df) <- c(
     "Read.count", "freq", "cdr3nt", "cdr3aa", "bestVGene", "bestDGene",
     "bestJGene", "VEnd", "DStart", "DEnd", "JStart"
@@ -157,7 +155,7 @@ pipeline_OLGA <- function(df, Q = 6.27, cores = 1, thres_counts = 1,
 
   df <- calculate_nb_of_neighbors(df)
 
-  df[Read.count > Read_thres2, n_total := .N, .(bestVGene, bestJGene)]
+  df[, n_total := .N, .(bestVGene, bestJGene)]
   df <- df[D >= N_neighbors_thres][, ind := 1:.N, ]
 
   df_with_mismatch <- df[, .(bestVGene, bestJGene,
