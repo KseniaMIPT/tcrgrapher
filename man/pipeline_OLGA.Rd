@@ -9,7 +9,6 @@ pipeline_OLGA(
   Q = 6.27,
   cores = 1,
   thres_counts = 1,
-  Read_thres2 = 1,
   N_neighbors_thres = 1,
   p_adjust_method = "BH"
 )
@@ -22,22 +21,24 @@ value for mouses 6.27}
 
 \item{cores}{number of used cores, 1 by default}
 
-\item{Read_thres2}{threshold 2}
+\item{thres_counts}{Only sequences with number of counts above this threshold
+are taken into account}
 
-\item{N_neighbors_thres}{threshold 3}
+\item{N_neighbors_thres}{Only sequences with number of neighbors above
+threshold are used to calculate generation probability}
 
 \item{p_adjust_method}{one of the method from p.adjust from stats package
 possible options: "bonferroni", "holm", "hochberg", "hommel", "BH" or "fdr",
 "BY", "none". "BH" is a default method.}
-
-\item{Read_thres}{threshold 1}
 }
 \value{
-Function returns tha same table that was in input with additional
-columns
+Function returns the same table that was in input filtered by number
+of counts and number of neighbors with additional columns. Additional columns
+are the following
 \itemize{
-\item{"D"}{"Number of neighbors in clonoset. Neighbor is a simular sequence
+\item{"D"}{"Number of neighbors in clonoset. Neighbor is a similar sequence
 with one mismatch"}
+\item{"VJ_n_total"}{"Number of unique sequences with given VJ combination"}
 }
 }
 \description{

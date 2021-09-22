@@ -172,12 +172,11 @@ pipeline_OLGA <- function(df, Q = 6.27, cores = 1, thres_counts = 1,
 
   # Pgeg - probability to be generated computed by OLGA
   # Pgen_sum - sum of Pgen of all sequences similar to the given with one mismatch
-  # Pgen_sum_corr - Pgen_sum without probabilities of the main sequence
   df$Pgen_sum <- df_with_mismatch[, sum(Pgen), ind]$V1
+  # Pgen_sum_corr - Pgen_sum without probabilities of the main sequence
   df[, Pgen_sum_corr := Pgen_sum - Pgen * (nchar(cdr3aa) - 2), ]
-
   # Bayes' rule
-  Pgen_by_VJ <- 1*Pgen_sum_corr / OLGAVJ[cbind(bestVGene, bestJGene)]
+  df[, Pgen_by_VJ := 1 * Pgen_sum_corr / OLGAVJ[cbind(bestVGene, bestJGene)]]
 
   # TODO Q for different CDR3 lengths
 
