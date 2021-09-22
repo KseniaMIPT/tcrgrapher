@@ -180,10 +180,10 @@ pipeline_OLGA <- function(df, Q = 6.27, cores = 1, thres_counts = 1,
 
   # TODO Q for different CDR3 lengths
 
-  df[, p_val := ppois(D, lambda = Q * VJ_n_total * Pgen_by_VJ)]
+  df[, p_val := ppois(D, lambda = Q * VJ_n_total * Pgen_by_VJ, lower.tail = F)]
   df[, p_adjust := p.adjust(p_val, method = p_adjust_method)]
 
   # deletion of unnecessary columns
-  df <- subset(df, select = -c(ind))
+  df <- subset(df, select = -c(ind, Pgen_sum, Pgen_sum_corr))
   return(df)
 }
