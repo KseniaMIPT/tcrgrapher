@@ -6,15 +6,16 @@
 
 # Secondary functions -----------------------------------------------------
 
-calculate_nb_of_neighbors <- function(df, N_neighbors_thres = 1) {
+calculate_nb_of_neighbors_one_side <- function(df) {
   # Calculate nb of neighbors above threshold
-  # Every count is a one neighbor
+  # Every sequence with one mismatch is a neighbor. Only sequences with number
+  # of counts above threshold are taken into account
   if (nrow(df) > 1) {
     tmp <- stringdistmatrix(df$cdr3aa, df$cdr3aa, method = "hamming")
     apply(tmp,
       MARGIN = 1,
       function(x) {
-        sum(x[df$Read.count > N_neighbors_thres] <= 1, na.rm = T)
+        sum(x <= 1, na.rm = T)
       }
     ) - 0
   } else {
@@ -22,7 +23,7 @@ calculate_nb_of_neighbors <- function(df, N_neighbors_thres = 1) {
   }
 }
 
-filter_data_by_nb_of_neighbors <- function(df, N_neighbors_thres = 1) {
+calculate_nb_of_neighbors <- function(df) {
   # Filter data by nb of neighbors
   # Calculate nb of neighbors using computational trick = usage of sequences
   # with identical left or right parts
@@ -32,16 +33,8 @@ filter_data_by_nb_of_neighbors <- function(df, N_neighbors_thres = 1) {
   df[, rightgr := .GRP, .(substr(cdr3aa, floor(nchar(cdr3aa) / 2) + 1, nchar(cdr3aa)),
     bestVGene, bestJGene)]
 
-  # TODO: тут так-то отдельный трешхолд, надо разобраться с ними
-
-  df[
-    , D_left := calculate_nb_of_neighbors(.SD, N_neighbors_thres = N_neighbors_thres),
-    .(leftgr)
-  ]
-  df[
-    , D_right := calculate_nb_of_neighbors(.SD, N_neighbors_thres = N_neighbors_thres),
-    .(rightgr)
-  ]
+  df[, D_left := calculate_nb_of_neighbors_one_side(.SD), .(leftgr)]
+  df[, D_right := calculate_nb_of_neighbors_one_side(.SD),.(rightgr)]
   df[, D_id := .N, .(cdr3aa)]
   df[, D := (D_left + D_right - D_id - 1), ]
   df <- subset(df, select = -c(rightgr, leftgr, D_left, D_right, D_id))
@@ -143,7 +136,7 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 #' with one mismatch"}
 #' }
 #' @export
-pipeline_OLGA <- function(df, Q = 6.27, cores = 1, Read_thres = 0,
+pipeline_OLGA <- function(df, Q = 6.27, cores = 1, thres_counts = 1,
                           Read_thres2 = 1, N_neighbors_thres = 1,
                           p_adjust_method = "BH") {
   colnames(df) <- c(
@@ -158,10 +151,11 @@ pipeline_OLGA <- function(df, Q = 6.27, cores = 1, Read_thres = 0,
   # checking for unproductive sequences if it hasn't been made earlier
   df <- df[!grepl(cdr3aa, pattern = "*", fixed = T) & ((nchar(cdr3nt) %% 3) == 0)]
   # filter V and J for present in model
-  df <- df[Read.count > Read_thres,][bestVGene %in% row.names(OLGAVJ) &
+  # filter sequences by number of counts
+  df <- df[Read.count > thres_counts,][bestVGene %in% row.names(OLGAVJ) &
     bestJGene %in% colnames(OLGAVJ)]
 
-  df <- filter_data_by_nb_of_neighbors(df, N_neighbors_thres = 1)
+  df <- calculate_nb_of_neighbors(df)
 
   df[Read.count > Read_thres2, n_total := .N, .(bestVGene, bestJGene)]
   df <- df[D >= N_neighbors_thres][, ind := 1:.N, ]

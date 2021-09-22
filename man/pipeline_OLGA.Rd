@@ -8,8 +8,7 @@ pipeline_OLGA(
   df,
   Q = 6.27,
   cores = 1,
-  prompt = F,
-  Read_thres = 0,
+  thres_counts = 1,
   Read_thres2 = 1,
   N_neighbors_thres = 1,
   p_adjust_method = "BH"
@@ -23,10 +22,6 @@ value for mouses 6.27}
 
 \item{cores}{number of used cores, 1 by default}
 
-\item{prompt}{smth}
-
-\item{Read_thres}{threshold 1}
-
 \item{Read_thres2}{threshold 2}
 
 \item{N_neighbors_thres}{threshold 3}
@@ -34,6 +29,8 @@ value for mouses 6.27}
 \item{p_adjust_method}{one of the method from p.adjust from stats package
 possible options: "bonferroni", "holm", "hochberg", "hommel", "BH" or "fdr",
 "BY", "none". "BH" is a default method.}
+
+\item{Read_thres}{threshold 1}
 }
 \value{
 Function returns tha same table that was in input with additional
