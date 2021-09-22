@@ -176,7 +176,7 @@ pipeline_OLGA <- function(df, Q = 6.27, cores = 1, thres_counts = 1,
   # Pgen_sum_corr - Pgen_sum without probabilities of the main sequence
   df[, Pgen_sum_corr := Pgen_sum - Pgen * (nchar(cdr3aa) - 2), ]
   # Bayes' rule
-  df[, Pgen_by_VJ := 1 * Pgen_sum_corr / OLGAVJ[cbind(bestVGene, bestJGene)]]
+  df[, Pgen_by_VJ := 3 * Pgen_sum_corr / OLGAVJ[cbind(bestVGene, bestJGene)]]
 
   # TODO Q for different CDR3 lengths
 
