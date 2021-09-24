@@ -32,7 +32,8 @@ threshold are used to calculate generation probability}
 possible options: "bonferroni", "holm", "hochberg", "hommel", "BH" or "fdr",
 "BY", "none". "BH" is a default method.}
 
-\item{chain}{Statistical model selection. Possible options: "mouseTRB"}
+\item{chain}{Statistical model selection. Possible options: "mouseTRB",
+"humanTRB", "humanTRA".}
 }
 \value{
 Function returns the same table that was in input filtered by number

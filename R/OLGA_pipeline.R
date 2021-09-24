@@ -130,7 +130,8 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 #' @param p_adjust_method One of the method from p.adjust from stats package
 #' possible options: "bonferroni", "holm", "hochberg", "hommel", "BH" or "fdr",
 #' "BY", "none". "BH" is a default method.
-#' @param chain Statistical model selection. Possible options: "mouseTRB"
+#' @param chain Statistical model selection. Possible options: "mouseTRB",
+#' "humanTRB", "humanTRA".
 #' @return Function returns the same table that was in input filtered by number
 #' of counts and number of neighbors with additional columns. Additional columns
 #' are the following
@@ -164,8 +165,12 @@ pipeline_OLGA <- function(df, Q = 6.27, cores = 1, thres_counts = 1,
   df <- df[!grepl(cdr3aa, pattern = "*", fixed = T) & ((nchar(cdr3nt) %% 3) == 0)]
 
   # TODO model selection
-  if(chain == 'mouseTRB'){
+  if (chain == 'mouseTRB'){
     OLGAVJ == OLGAVJ_MOUSE_TRB
+  } else if (chain == 'humanTRB'){
+    OLGAVJ == OLGAVJ_HUMAN_TRB
+  } else if (chain == 'humanTRA'){
+    OLGAVJ == OLGAVJ_HUMAN_TRA
   } else {
     # TODO посмотреть как ошибки прописывать
     print('There is no such model')
