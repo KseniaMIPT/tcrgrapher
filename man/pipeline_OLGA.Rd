@@ -10,7 +10,8 @@ pipeline_OLGA(
   cores = 1,
   thres_counts = 1,
   N_neighbors_thres = 1,
-  p_adjust_method = "BH"
+  p_adjust_method = "BH",
+  chain = "mouseTRB"
 )
 }
 \arguments{
@@ -27,9 +28,11 @@ are taken into account}
 \item{N_neighbors_thres}{Only sequences with number of neighbors above
 threshold are used to calculate generation probability}
 
-\item{p_adjust_method}{one of the method from p.adjust from stats package
+\item{p_adjust_method}{One of the method from p.adjust from stats package
 possible options: "bonferroni", "holm", "hochberg", "hommel", "BH" or "fdr",
 "BY", "none". "BH" is a default method.}
+
+\item{chain}{Statistical model selection. Possible options: "mouseTRB"}
 }
 \value{
 Function returns the same table that was in input filtered by number

@@ -127,9 +127,10 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 #' are taken into account
 #' @param N_neighbors_thres Only sequences with number of neighbors above
 #' threshold are used to calculate generation probability
-#' @param p_adjust_method one of the method from p.adjust from stats package
+#' @param p_adjust_method One of the method from p.adjust from stats package
 #' possible options: "bonferroni", "holm", "hochberg", "hommel", "BH" or "fdr",
 #' "BY", "none". "BH" is a default method.
+#' @param chain Statistical model selection. Possible options: "mouseTRB"
 #' @return Function returns the same table that was in input filtered by number
 #' of counts and number of neighbors with additional columns. Additional columns
 #' are the following
@@ -148,7 +149,8 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 #' }
 #' @export
 pipeline_OLGA <- function(df, Q = 6.27, cores = 1, thres_counts = 1,
-                          N_neighbors_thres = 1, p_adjust_method = "BH") {
+                          N_neighbors_thres = 1, p_adjust_method = "BH",
+                          chain = 'mouseTRB') {
   colnames(df) <- c(
     "Read.count", "freq", "cdr3nt", "cdr3aa", "bestVGene", "bestDGene",
     "bestJGene", "VEnd", "DStart", "DEnd", "JStart"
@@ -160,6 +162,15 @@ pipeline_OLGA <- function(df, Q = 6.27, cores = 1, thres_counts = 1,
 
   # checking for unproductive sequences if it hasn't been made earlier
   df <- df[!grepl(cdr3aa, pattern = "*", fixed = T) & ((nchar(cdr3nt) %% 3) == 0)]
+
+  # TODO model selection
+  if(chain == 'mouseTRB'){
+    OLGAVJ == OLGAVJ_MOUSE_TRB
+  } else {
+    # TODO посмотреть как ошибки прописывать
+    print('There is no such model')
+  }
+
   # filter V and J for present in model
   # filter sequences by number of counts
   df <- df[Read.count > thres_counts,][bestVGene %in% row.names(OLGAVJ) &
@@ -174,9 +185,9 @@ pipeline_OLGA <- function(df, Q = 6.27, cores = 1, thres_counts = 1,
     cdr3aa = all_other_variants_one_mismatch_regexp(cdr3aa)
   ), ind]
 
-  df <- olga_parallel_wrapper_beta(df = df, cores = cores)
+  df <- olga_parallel_wrapper_beta(df = df, cores = cores, chain = chain)
   df_with_mismatch <- olga_parallel_wrapper_beta(df = df_with_mismatch,
-    cores = cores)
+                                                 cores = cores, chain = chain)
 
   # Pgeg - probability to be generated computed by OLGA
   # Pgen_sum - sum of Pgen of all sequences similar to the given with one mismatch
