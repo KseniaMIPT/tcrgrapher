@@ -46,36 +46,32 @@ You can find default parameters and possible options bellow.
 pipeline_OLGA(df, Q = 6.27, cores = 1, thres_counts = 1, N_neighbors_thres = 1,
 p_adjust_method = "BH", chain = "mouseTRB")
 }
-\itemize{
-\item{"df"}{"data.table"}
-\item{"Q"}{"selection factor. 1/Q sequences pass selection in the thymus. The 
+* df - data.table
+* Q - selection factor. 1/Q sequences pass selection in the thymus. The 
 default value for mouses 6.27. If a human model is taken and Q is not changed 
-manually Q = 27 is used"}
-\item{"cores"}{"number of used cores, 1 by default"}
-\item{"thres_counts"}{"Only sequences with number of counts above this threshold
-are taken into account"}
-\item{"N_neighbors_thres"}{"Only sequences with number of neighbors above
-threshold are used to calculate generation probability"}
-\item{"p_adjust_method"}{"One of the method from p.adjust from stats package
+manually Q = 27 is used
+* cores - number of used cores, 1 by default
+* thres_counts - Only sequences with number of counts above this threshold
+are taken into account
+* N_neighbors_thres - Only sequences with number of neighbors above
+threshold are used to calculate generation probability
+* p_adjust_method - One of the method from p.adjust from stats package
 possible options: "bonferroni", "holm", "hochberg", "hommel", "BH" or "fdr",
-"BY", "none". "BH" is a default method."}
-\item{"chain"}{"Statistical model selection. Possible options: "mouseTRB",
-"humanTRB", "humanTRA"."}
-}
+"BY", "none". "BH" is a default method.
+* chain - Statistical model selection. Possible options: "mouseTRB", "humanTRB",
+"humanTRA".
 
 Function returns the same table that was in input filtered by number
 of counts and number of neighbors with additional columns. Additional columns
 are the following
-\itemize{
-\item{"D"}{"Number of neighbors in clonoset. Neighbor is a similar sequence
-with one mismatch"}
-\item{"VJ_n_total"}{"Number of unique sequences with given VJ combination"}
-\item{"Pgen"}{"Probability to be generated computed by OLGA"}
-\item{"Pgen_sum_corr"}{"Sum of Pgen of all sequences similar to the given
-with one mismatch"}
-\item{"Pgen_by_VJ"}{"Conditional probability. Sum of probabilities to be
-generated with given VJ combination"}
-\item{"p_val"}{"p value under null hypothesis that number of sequence's
-neighbors is not more than in the random model"}
-\item{"p_adjust"}{"p value with multiple testing correction"}
-}
+* D - Number of neighbors in clonoset. Neighbor is a similar sequence
+with one mismatch
+* VJ_n_total - Number of unique sequences with given VJ combination
+* Pgen - Probability to be generated computed by OLGA
+* Pgen_sum_corr - Sum of Pgen of all sequences similar to the given
+with one mismatch
+* Pgen_by_VJ - Conditional probability. Sum of probabilities to be
+generated with given VJ combination
+* p_val - p value under null hypothesis that number of sequence's
+neighbors is not more than in the random model
+* p_adjust - p value with multiple testing correction
