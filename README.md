@@ -12,7 +12,7 @@ devtools::install_github("KseniaMIPT/tcrgrapher")
 ## Quick start
 
 To use tcrgrapher OLGA is needed. For detailed information please visit
-\url{https://github.com/statbiophys/OLGA}.
+https://github.com/statbiophys/OLGA.
 
 OLGA can be installed using pip or pip3.
 
@@ -30,18 +30,17 @@ df <- pipeline_OLGA(sample)
 ```pipeline_OLGA``` is the main function that takes table with CDR3 sequences as
 an input. Table should have the following columns (names of the columns are not 
 important but the following order is necessary)
-\itemize{
-\item{"Read.count"}{"Number of unique reads per cdr3 sequence"}
-\item{"freq"}{"Clonotype frequency in the clonoset"}
-\item{"cdr3nt"}{"CDR3 nucleotide sequence"}
-\item{"bestVGene"}{"TRBV segment"}
-\item{"bestVGene"}{"TRBD segment"}
-\item{"bestJGene"}{"TRBJ segment"}
-\item{"VEnd"}{"Position of the end of V segment in CDR3 sequence"}
-\item{"DStart""}{"Position of the start of D segment in CDR3 sequence"}
-\item{"DEnd"}{"Position of the end of D segment in CDR3 sequence"}
-\item{"JStart"}{"Position of the start of J segment in CDR3 sequence"}
-}
+* Read.count - Number of unique reads per cdr3 sequence
+* freq - Clonotype frequency in the clonoset
+* cdr3nt - CDR3 nucleotide sequence
+* bestVGene - TRBV segment
+* bestVGene - TRBD segment
+* bestJGene - TRBJ segment
+* VEnd - Position of the end of V segment in CDR3 sequence
+* DStart - Position of the start of D segment in CDR3 sequence
+* DEnd - Position of the end of D segment in CDR3 sequence
+*JStart - Position of the start of J segment in CDR3 sequence
+
 You can find default parameters and possible options bellow.
 
 pipeline_OLGA(df, Q = 6.27, cores = 1, thres_counts = 1, N_neighbors_thres = 1,
