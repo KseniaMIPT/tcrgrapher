@@ -49,8 +49,9 @@ p_adjust_method = "BH", chain = "mouseTRB")
 }
 \itemize{
 \item{"df"}{"data.table"}
-\item{"Q"}{"selection factor. 1/Q sequences pass selection in thymus. Default
-value for mouses 6.27"}
+\item{"Q"}{"selection factor. 1/Q sequences pass selection in the thymus. The 
+default value for mouses 6.27. If a human model is taken and Q is not changed 
+manually Q = 27 is used"}
 \item{"cores"}{"number of used cores, 1 by default"}
 \item{"thres_counts"}{"Only sequences with number of counts above this threshold
 are taken into account"}

@@ -116,8 +116,9 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 #' }
 #'
 #' @param df data.table
-#' @param Q selection factor. 1/Q sequences pass selection in thymus. Default
-#' value for mouses 6.27
+#' @param Q selection factor. 1/Q sequences pass selection in the thymus. The
+#' default value for mouses 6.27. If a human model is taken and Q is not changed
+#' manually Q = 27 is used
 #' @param cores number of used cores, 1 by default
 #' @param thres_counts Only sequences with number of counts above this threshold
 #' are taken into account
@@ -165,8 +166,14 @@ pipeline_OLGA <- function(df, Q = 6.27, cores = 1, thres_counts = 1,
     OLGAVJ == OLGAVJ_MOUSE_TRB
   } else if (chain == 'humanTRB'){
     OLGAVJ == OLGAVJ_HUMAN_TRB
+    if(Q == 6.27){
+      Q = 27
+    }
   } else if (chain == 'humanTRA'){
     OLGAVJ == OLGAVJ_HUMAN_TRA
+    if(Q == 6.27){
+      Q = 27
+    }
   } else {
     # TODO посмотреть как ошибки прописывать
     print('There is no such model')
@@ -197,9 +204,6 @@ pipeline_OLGA <- function(df, Q = 6.27, cores = 1, thres_counts = 1,
   df[, Pgen_sum_corr := Pgen_sum - Pgen * (nchar(cdr3aa) - 2), ]
   # Bayes' rule
   df[, Pgen_by_VJ := 1 * Pgen_sum_corr / OLGAVJ[cbind(bestVGene, bestJGene)], ]
-
-  # TODO Q for different CDR3 lengths
-
   df[, p_val := ppois(D, lambda = Q * VJ_n_total * Pgen_by_VJ, lower.tail = F)]
   df[, p_adjust := p.adjust(p_val, method = p_adjust_method)]
 
