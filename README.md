@@ -47,8 +47,10 @@ important but the following order is necessary)
 
 You can find default parameters and possible options bellow.
 
+```R
 pipeline_OLGA(df, Q = 6.27, cores = 1, thres_counts = 1, N_neighbors_thres = 1,
 p_adjust_method = "BH", chain = "mouseTRB")
+```
 * df - data.table
 * Q - selection factor. 1/Q sequences pass selection in the thymus. The 
 default value for mouses 6.27. If a human model is taken and Q is not changed 
