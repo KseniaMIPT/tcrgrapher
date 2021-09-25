@@ -89,23 +89,19 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
   }
 
   system(olga_commands, wait = T)
-  #system(paste0(olga_commands, collapse = " & "), wait = T)
   system("echo done", wait = T)
 
-  # TODO вот тут беда была
-  fnt <- fread(paste0(path, fn2)) #do.call(rbind, lapply(paste0(path, fn2), fread))
+  fnt <- fread(paste0(path, fn2))
   df$Pgen <- fnt$V2
   df
 }
 
-# TODO дописать return
-
 # Main function -----------------------------------------------------------
 #' pipeline_OLGA
 #'
-#' Main fucntion that takes table with cdr3 sequences as an input. Table should
-#' have the following columns (names of the colums are not important but the
-#' followig order is necessary)
+#' Main function that takes table with CDR3 sequences as an input. Table should
+#' have the following columns (names of the columns are not important but the
+#' following order is necessary)
 #' \itemize{
 #' \item{"Read.count"}{"Number of unique reads per cdr3 sequence"}
 #' \item{"freq"}{"Clonotype frequency in the clonoset"}
