@@ -1,6 +1,8 @@
 # tcrgrapher
+
 R package for identifying condition associated T cell clones from a single 
 repertoire.
+
 ## Installation
 
 ```R
@@ -8,8 +10,6 @@ install.packages('devtools')
 library(devtools)
 devtools::install_github("KseniaMIPT/tcrgrapher")
 ```
-
-## Quick start
 
 To use tcrgrapher OLGA is needed. For detailed information please visit
 https://github.com/statbiophys/OLGA.
@@ -20,12 +20,16 @@ OLGA can be installed using pip or pip3.
 pip install olga
 ```
 
+## Quick start
+
 ```R
 library(tcrgrapher)
 library(data.table)
 sample <- fread('sample.txt')
 df <- pipeline_OLGA(sample)
 ```
+
+## Details
 
 ```pipeline_OLGA``` is the main function that takes table with CDR3 sequences as
 an input. Table should have the following columns (names of the columns are not 
@@ -45,7 +49,6 @@ You can find default parameters and possible options bellow.
 
 pipeline_OLGA(df, Q = 6.27, cores = 1, thres_counts = 1, N_neighbors_thres = 1,
 p_adjust_method = "BH", chain = "mouseTRB")
-}
 * df - data.table
 * Q - selection factor. 1/Q sequences pass selection in the thymus. The 
 default value for mouses 6.27. If a human model is taken and Q is not changed 
