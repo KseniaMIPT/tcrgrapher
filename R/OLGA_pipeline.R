@@ -3,6 +3,10 @@
 #' @importFrom utils write.table
 #' @importFrom stringdist stringdistmatrix
 #' @importFrom data.table :=
+NULL
+"OLGAVJ_MOUSE_TRB"
+"OLGAVJ_HUMAN_TRB"
+"OLGAVJ_HUMAN_TRA"
 
 # Secondary functions -----------------------------------------------------
 

@@ -17,8 +17,9 @@ pipeline_OLGA(
 \arguments{
 \item{df}{data.table}
 
-\item{Q}{selection factor. 1/Q sequences pass selection in thymus. Default
-value for mouses 6.27}
+\item{Q}{selection factor. 1/Q sequences pass selection in the thymus. The
+default value for mouses 6.27. If a human model is taken and Q is not changed
+manually Q = 27 is used}
 
 \item{cores}{number of used cores, 1 by default}
 
@@ -54,9 +55,9 @@ neighbors is not more than in the random model"}
 }
 }
 \description{
-Main fucntion that takes table with cdr3 sequences as an input. Table should
-have the following columns (names of the colums are not important but the
-followig order is necessary)
+Main function that takes table with CDR3 sequences as an input. Table should
+have the following columns (names of the columns are not important but the
+following order is necessary)
 \itemize{
 \item{"Read.count"}{"Number of unique reads per cdr3 sequence"}
 \item{"freq"}{"Clonotype frequency in the clonoset"}
