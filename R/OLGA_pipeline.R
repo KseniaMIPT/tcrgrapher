@@ -163,14 +163,14 @@ pipeline_OLGA <- function(df, Q = 6.27, cores = 1, thres_counts = 1,
 
   # TODO model selection
   if (chain == 'mouseTRB'){
-    OLGAVJ == OLGAVJ_MOUSE_TRB
+    OLGAVJ = OLGAVJ_MOUSE_TRB
   } else if (chain == 'humanTRB'){
-    OLGAVJ == OLGAVJ_HUMAN_TRB
+    OLGAVJ = OLGAVJ_HUMAN_TRB
     if(Q == 6.27){
       Q = 27
     }
   } else if (chain == 'humanTRA'){
-    OLGAVJ == OLGAVJ_HUMAN_TRA
+    OLGAVJ = OLGAVJ_HUMAN_TRA
     if(Q == 6.27){
       Q = 27
     }
