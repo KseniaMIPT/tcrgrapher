@@ -179,8 +179,7 @@ pipeline_OLGA <- function(df, Q = 6.27, cores = 1, thres_counts = 1,
       Q = 27
     }
   } else {
-    # TODO посмотреть как ошибки прописывать
-    stop('There is no such model')
+    return('There is no such model')
   }
 
   # filter V and J for present in model
