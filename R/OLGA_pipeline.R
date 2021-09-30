@@ -3,6 +3,7 @@
 #' @importFrom utils write.table
 #' @importFrom stringdist stringdistmatrix
 #' @importFrom data.table :=
+#' @importFrom foreach %dopar%
 NULL
 "OLGAVJ_MOUSE_TRB"
 "OLGAVJ_HUMAN_TRB"
