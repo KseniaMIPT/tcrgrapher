@@ -5,6 +5,9 @@
 #' @importFrom data.table :=
 #' @importFrom foreach %dopar%
 #' @importFrom foreach foreach
+#' @importFrom parallel makeCluster
+#' @importFrom parallel stopCluster
+#' @importFrom doParallel registerDoParallel
 NULL
 "OLGAVJ_MOUSE_TRB"
 "OLGAVJ_HUMAN_TRB"

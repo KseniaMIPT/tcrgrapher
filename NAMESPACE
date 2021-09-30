@@ -2,8 +2,11 @@
 
 export(pipeline_OLGA)
 importFrom(data.table,":=")
+importFrom(doParallel,registerDoParallel)
 importFrom(foreach,"%dopar%")
 importFrom(foreach,foreach)
+importFrom(parallel,makeCluster)
+importFrom(parallel,stopCluster)
 importFrom(stats,p.adjust)
 importFrom(stats,ppois)
 importFrom(stringdist,stringdistmatrix)
