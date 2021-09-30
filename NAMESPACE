@@ -3,6 +3,7 @@
 export(pipeline_OLGA)
 importFrom(data.table,":=")
 importFrom(foreach,"%dopar%")
+importFrom(foreach,foreach)
 importFrom(stats,p.adjust)
 importFrom(stats,ppois)
 importFrom(stringdist,stringdistmatrix)
