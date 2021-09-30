@@ -86,7 +86,7 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 
   olga_commands <- paste0(
     "olga-compute_pgen --", chain,
-    " --display_off --time_updates_off	--seq_in 0 --v_in 1 --j_in 2 --lines_to_skip 1 -d 'tab' -i ",
+    " --display_off --time_updates_off --seq_in 0 --v_in 1 --j_in 2 --lines_to_skip 1 -d 'tab' -i ",
     path, "tmp", 1:cores, ".tsv -o ", path, "tmp_out", 1:cores, ".tsv"
   )
   if (withoutVJ) {
@@ -108,10 +108,12 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 
   # system(olga_commands)
 
-  system("echo done", wait = T)
-
   #fnt <- fread(paste0(path, fn2))
-  fnt <- rbind(lapply(paste0(path, fn2),fread))
+  #fnt <- rbind(lapply(paste0(path, fn2),fread))
+  fnt <- c()
+  for(file in fn2){
+    fnt <- rbind(fnt, fread(paste0(path, file)))
+  }
 
   df$Pgen <- fnt$V2
   df
