@@ -104,7 +104,8 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
   system("echo done", wait = T)
 
   #fnt <- fread(paste0(path, fn2))
-  fnt <- do.call(rbind,lapply(fn2,fread))
+  fnt <- rbind(lapply(fn2,fread))
+
   df$Pgen <- fnt$V2
   df
 }
