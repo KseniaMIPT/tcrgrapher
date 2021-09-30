@@ -95,7 +95,9 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
   #system(olga_commands, wait = T)
   cl <- parallel::makeCluster(cores)
   doParallel::registerDoParallel(cl)
-  foreach(i=1:cores) %dopar% system(olga_commands[i])
+  foreach(i=1:cores) %dopar% {
+    system(olga_commands[i])
+  }
   parallel::stopCluster(cl)
   system("echo done", wait = T)
 

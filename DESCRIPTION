@@ -19,7 +19,8 @@ Imports:
     utils,
     stringdist,
     foreach,
-    doParallel
+    doParallel,
+    parallel
 SystemRequirements:
     OLGA (python 2.7/3.6 software)
 
