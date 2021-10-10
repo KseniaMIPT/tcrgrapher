@@ -116,9 +116,9 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 # Main function -----------------------------------------------------------
 #' pipeline_OLGA
 #'
-#' Main function that takes table with CDR3 sequences as an input. Table should
-#' have the following columns (names of the columns are not important but the
-#' following order is necessary)
+#' Main function that takes a table with CDR3 sequences as an input. The table
+#' should have the following columns (names of the columns are not important but
+#' the following order is necessary)
 #' \itemize{
 #' \item{"Read.count"}{"Number of unique reads per cdr3 sequence"}
 #' \item{"freq"}{"Clonotype frequency in the clonoset"}

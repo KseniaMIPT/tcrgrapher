@@ -31,10 +31,10 @@ df <- pipeline_OLGA(sample)
 
 ## Details
 
-```pipeline_OLGA``` is the main function that takes table with CDR3 sequences as
-an input. Table should have the following columns (names of the columns are not 
+```pipeline_OLGA``` is the main function that takes a table with CDR3 sequences as
+an input. The table should have the following columns (names of the columns are not 
 important but the following order is necessary)
-* Read.count - Number of unique reads per cdr3 sequence
+* Read.count - Number of unique reads per CDR3 sequence
 * freq - Clonotype frequency in the clonoset
 * cdr3nt - CDR3 nucleotide sequence
 * bestVGene - TRBV segment
@@ -45,6 +45,9 @@ important but the following order is necessary)
 * DEnd - Position of the end of D segment in CDR3 sequence
 *JStart - Position of the start of J segment in CDR3 sequence
 
+Also, the table can contain additional columns that will be kept in the output 
+table.
+
 You can find default parameters and possible options bellow.
 
 ```R
@@ -53,12 +56,12 @@ p_adjust_method = "BH", chain = "mouseTRB")
 ```
 * df - data.table
 * Q - selection factor. 1/Q sequences pass selection in the thymus. The 
-default value for mouses 6.27. If a human model is taken and Q is not changed 
+default value for mouses is 6.27. If a human model is taken and Q is not changed 
 manually Q = 27 is used
 * cores - number of used cores, 1 by default
-* thres_counts - Only sequences with number of counts above this threshold
+* thres_counts - Only sequences with a number of counts above this threshold
 are taken into account
-* N_neighbors_thres - Only sequences with number of neighbors above
+* N_neighbors_thres - Only sequences with a number of neighbours above the 
 threshold are used to calculate generation probability
 * p_adjust_method - One of the method from p.adjust from stats package
 possible options: "bonferroni", "holm", "hochberg", "hommel", "BH" or "fdr",
