@@ -11,7 +11,8 @@ pipeline_OLGA(
   thres_counts = 1,
   N_neighbors_thres = 1,
   p_adjust_method = "BH",
-  chain = "mouseTRB"
+  chain = "mouseTRB",
+  stats = "ALICE"
 )
 }
 \arguments{
@@ -55,9 +56,9 @@ neighbors is not more than in the random model"}
 }
 }
 \description{
-Main function that takes table with CDR3 sequences as an input. Table should
-have the following columns (names of the columns are not important but the
-following order is necessary)
+Main function that takes a table with CDR3 sequences as an input. The table
+should have the following columns (names of the columns are not important but
+the following order is necessary)
 \itemize{
 \item{"Read.count"}{"Number of unique reads per cdr3 sequence"}
 \item{"freq"}{"Clonotype frequency in the clonoset"}

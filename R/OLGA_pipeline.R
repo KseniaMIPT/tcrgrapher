@@ -113,6 +113,7 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
   df
 }
 
+#' @export
 find_cluster <- function(df){
   # function gives unique number to all similar sequences with one mismatch
   # it doesn't depend on VJ combination
