@@ -19,36 +19,36 @@ calculate_nb_of_neighbors_one_side <- function(df) {
   # Calculate nb of neighbors above threshold
   # Every sequence with one mismatch is a neighbor. Only sequences with number
   # of counts above threshold are taken into account
-  if (nrow(df) > 1) {
+  #if (nrow(df) > 1) {
     tmp <- stringdistmatrix(df$cdr3aa, df$cdr3aa, method = "hamming")
     apply(tmp,
       MARGIN = 1,
-      function(x) {
-        sum(x <= 1, na.rm = T)
-      }
-    ) - 0
-  } else {
-    1
-  }
+      function(x) { sum(x <= 1, na.rm = T) }) #- 0
+  #} else {
+  #  1
+  #}
 }
 
-calculate_nb_of_neighbors <- function(df) {
-  # Filter data by nb of neighbors
-  # Calculate nb of neighbors using computational trick = usage of sequences
-  # with identical left or right parts
+calculate_nb_of_neighbors <- function(df, stats) {
+  # TODO: another stats within all sequences not only within VJ combination
+  if(stats == 'ALICE'){
+    # Filter data by nb of neighbors
+    # Calculate nb of neighbors using computational trick = usage of sequences
+    # with identical left or right parts
 
-  df[, leftgr := .GRP, .(substr(cdr3aa, 1, floor(nchar(cdr3aa) / 2)),
-    bestVGene, bestJGene)]
-  df[, rightgr := .GRP, .(substr(cdr3aa, floor(nchar(cdr3aa) / 2) + 1, nchar(cdr3aa)),
-    bestVGene, bestJGene)]
+    df[, leftgr := .GRP, .(substr(cdr3aa, 1, floor(nchar(cdr3aa) / 2)),
+                           bestVGene, bestJGene)]
+    df[, rightgr := .GRP, .(substr(cdr3aa, floor(nchar(cdr3aa) / 2) + 1, nchar(cdr3aa)),
+                            bestVGene, bestJGene)]
 
-  df[, D_left := calculate_nb_of_neighbors_one_side(.SD), .(leftgr)]
-  df[, D_right := calculate_nb_of_neighbors_one_side(.SD),.(rightgr)]
-  df[, D_id := .N, .(cdr3aa)]
-  df[, D := (D_left + D_right - D_id - 1), ]
-  df <- subset(df, select = -c(rightgr, leftgr, D_left, D_right, D_id))
-  df[D < 0, D := 0, ]
-  df
+    df[, D_left := calculate_nb_of_neighbors_one_side(.SD), .(leftgr)]
+    df[, D_right := calculate_nb_of_neighbors_one_side(.SD),.(rightgr)]
+    df[, D_id := .N, .(cdr3aa)]
+    df[, D := (D_left + D_right - D_id - 1), ]
+    df <- subset(df, select = -c(rightgr, leftgr, D_left, D_right, D_id))
+    df[D < 0, D := 0, ]
+    df
+  }
 }
 
 all_other_variants_one_mismatch_regexp <- function(str) {
@@ -113,6 +113,23 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
   df
 }
 
+find_cluster <- function(df){
+  # function gives unique number to all similar sequences with one mismatch
+  # it doesn't depend on VJ combination
+  df$cluster_id <- 0
+  tmp <- stringdistmatrix(df$cdr3aa, df$cdr3aa, method = "hamming")
+  for(i in 1:nrow(data)){
+    check <- df[tmp[i,] <= 1, 'cluster_id'] != 0
+    if(sum(check) != 0){
+      id <- df[tmp[i,] <= 1, 'cluster_id'][check][1]
+    } else {
+      id <- i
+    }
+    df[tmp[i,] <= 1, 'cluster_id'] <- id
+  }
+  df
+}
+
 # Main function -----------------------------------------------------------
 #' pipeline_OLGA
 #'
@@ -165,7 +182,7 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 #' @export
 pipeline_OLGA <- function(df, Q = 6.27, cores = 1, thres_counts = 1,
                           N_neighbors_thres = 1, p_adjust_method = "BH",
-                          chain = 'mouseTRB') {
+                          chain = 'mouseTRB', stats = 'ALICE') {
   sd_colnames <- c(
     "Read.count", "freq", "cdr3nt", "cdr3aa", "bestVGene", "bestDGene",
     "bestJGene", "VEnd", "DStart", "DEnd", "JStart"
@@ -209,7 +226,7 @@ pipeline_OLGA <- function(df, Q = 6.27, cores = 1, thres_counts = 1,
   df <- df[bestVGene %in% row.names(OLGAVJ) & bestJGene %in% colnames(OLGAVJ)]
   stopifnot(nrow(df) != 0)
 
-  df <- calculate_nb_of_neighbors(df)
+  df <- calculate_nb_of_neighbors(df, stats = stats)
 
   df[, VJ_n_total := .N, .(bestVGene, bestJGene)]
   df <- df[D >= N_neighbors_thres][, ind := 1:.N, ]
@@ -232,6 +249,8 @@ pipeline_OLGA <- function(df, Q = 6.27, cores = 1, thres_counts = 1,
   df[, Pgen_by_VJ := 1 * Pgen_sum_corr / OLGAVJ[cbind(bestVGene, bestJGene)], ]
   df[, p_val := ppois(D, lambda = Q * VJ_n_total * Pgen_by_VJ, lower.tail = F)]
   df[, p_adjust := p.adjust(p_val, method = p_adjust_method)]
+  # add cluster IDs
+  df <- find_cluster(df)
 
   # deletion of unnecessary columns
   df <- subset(df, select = -c(ind, Pgen_sum))
