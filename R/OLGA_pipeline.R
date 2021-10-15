@@ -119,7 +119,7 @@ find_cluster <- function(df){
   # it doesn't depend on VJ combination
   df$cluster_id <- 0
   tmp <- stringdistmatrix(df$cdr3aa, df$cdr3aa, method = "hamming")
-  for(i in 1:nrow(data)){
+  for(i in 1:nrow(df)){
     check <- df[tmp[i,] <= 1, 'cluster_id'] != 0
     if(sum(check) != 0){
       id <- df[tmp[i,] <= 1, 'cluster_id'][check][1]
