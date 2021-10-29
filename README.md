@@ -32,19 +32,14 @@ df <- pipeline_OLGA(sample)
 ## Details
 
 ```pipeline_OLGA``` is the main function that takes a table with CDR3 sequences as
-an input. The table should have the following columns (names of the columns are not 
-important but the following order is necessary)
+an input. The table should have the following columns. Order of the columns are not 
+important but the following names are necessary.
+
 * Read.count - Number of unique reads per CDR3 sequence
-* freq - Clonotype frequency in the clonoset
 * cdr3nt - CDR3 nucleotide sequence
 * cdr3aa - CDR3 aminoacid sequence
 * bestVGene - TRBV segment
-* bestDGene - TRBD segment
 * bestJGene - TRBJ segment
-* VEnd - Position of the end of V segment in CDR3 sequence
-* DStart - Position of the start of D segment in CDR3 sequence
-* DEnd - Position of the end of D segment in CDR3 sequence
-* JStart - Position of the start of J segment in CDR3 sequence
 
 Also, the table can contain additional columns that will be kept in the output 
 table.

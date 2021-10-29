@@ -73,6 +73,7 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
   fn <- paste0("tmp", 1:cores, ".tsv")
   fn2 <- paste0("tmp_out", 1:cores, ".tsv")
   path <- tempdir()
+  path <- paste0(path, '/')
 
   for (f in c(paste0(path, fn), paste0(path,fn2))) if (file.exists(f)) file.remove(f)
 
@@ -184,17 +185,6 @@ find_cluster <- function(df){
 pipeline_OLGA <- function(df, Q = 6.27, cores = 1, thres_counts = 1,
                           N_neighbors_thres = 1, p_adjust_method = "BH",
                           chain = 'mouseTRB', stats = 'ALICE') {
-  sd_colnames <- c(
-    "Read.count", "freq", "cdr3nt", "cdr3aa", "bestVGene", "bestDGene",
-    "bestJGene", "VEnd", "DStart", "DEnd", "JStart"
-  )
-  nb_cols <- ncol(df)
-  nb_sd_cols <- length(sd_colnames)
-  if(nb_cols == nb_sd_cols){
-    colnames(df) <- sd_colnames
-  } else {
-    colnames(df) <- c(sd_colnames, colnames(df)[(nb_sd_cols + 1) : nb_cols])
-  }
 
   # TODO: check table format
   # TODO: check arguments' values
