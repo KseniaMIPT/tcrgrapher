@@ -37,13 +37,14 @@ important but the following order is necessary)
 * Read.count - Number of unique reads per CDR3 sequence
 * freq - Clonotype frequency in the clonoset
 * cdr3nt - CDR3 nucleotide sequence
+* cdr3aa - CDR3 aminoacid sequence
 * bestVGene - TRBV segment
-* bestVGene - TRBD segment
+* bestDGene - TRBD segment
 * bestJGene - TRBJ segment
 * VEnd - Position of the end of V segment in CDR3 sequence
 * DStart - Position of the start of D segment in CDR3 sequence
 * DEnd - Position of the end of D segment in CDR3 sequence
-*JStart - Position of the start of J segment in CDR3 sequence
+* JStart - Position of the start of J segment in CDR3 sequence
 
 Also, the table can contain additional columns that will be kept in the output 
 table.
