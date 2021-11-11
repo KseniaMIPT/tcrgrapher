@@ -75,6 +75,8 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
   path <- tempdir()
   path <- paste0(path, '/')
 
+  for (f in c(paste0(path, fn), paste0(path,fn2))) if (file.exists(f)) file.remove(f)
+
   dfl <- split(df, sort((1:nrow(df) - 1) %% cores + 1))
 
   for (i in 1:length(dfl)) {
