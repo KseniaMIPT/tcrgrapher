@@ -128,7 +128,6 @@ find_cluster <- function(df){
   df$cluster_id <- 0
   tmp <- stringdistmatrix(df$cdr3aa, df$cdr3aa, method = "hamming")
   for(i in 1:nrow(df)){
-    df[i, 'cluster_id'] <- i
     # check if we already have id number for this cluster
     check <- as.vector(df[tmp[i,] <= 1, 'cluster_id'] != 0)
     if(sum(check) != 0){
@@ -137,6 +136,7 @@ find_cluster <- function(df){
         replace(df$cluster_id, df$cluster_id == id, i)
       }
     }
+  df[tmp[i,] <= 1, 'cluster_id'] <- i
   }
   df
 }
