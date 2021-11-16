@@ -133,7 +133,7 @@ find_cluster <- function(df){
     if(sum(check) != 0){
       id_list <- unique(df[tmp[i,] <= 1, 'cluster_id'][check])
       for(id in id_list){
-        replace(df$cluster_id, df$cluster_id == id, i)
+        df$cluster_id <- replace(df$cluster_id, df$cluster_id == id, i)
       }
     }
   df[tmp[i,] <= 1, 'cluster_id'] <- i
