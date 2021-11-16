@@ -114,10 +114,17 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
   df
 }
 
+#' find_cluster
+#'
+#' Function gives unique number (cluster_id) to all similar sequences with one
+#' mismatch it doesn't depend on VJ combination. Sequences with distance more
+#' than one mismatch can have one cluster_id if they have common neighbor
+#' between them
+#'
+#' @param df data.table
+#' @return the same data.table with additional column 'cluster_id'
 #' @export
 find_cluster <- function(df){
-  # function gives unique number to all similar sequences with one mismatch
-  # it doesn't depend on VJ combination
   df$cluster_id <- 0
   tmp <- stringdistmatrix(df$cdr3aa, df$cdr3aa, method = "hamming")
   for(i in 1:nrow(df)){
