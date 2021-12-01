@@ -53,7 +53,7 @@ calculate_nb_of_neighbors <- function(df, stats) {
     df$D_log2_counts <- apply(tmp,
                          MARGIN = 1,
                          function(x) {sum(log2(df$Read.count[x <= 1]))})
-    df$D_log2_counts <- df$D_counts - df$Read.count
+    df$D_log2_counts <- df$D_log2_counts - df$Read.count
 
     # df[, D_id := .N, .(cdr3aa)]
     # df[, D := (D_left + D_right - D_id - 1), ]
@@ -130,14 +130,13 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 pval_with_abundance <- function(df) {
   counts <- df[,1]
   log_counts <- log2(counts)
-  #PDF_f <- approxfun(density(counts))
   neighbors <- df[,'D']
-  n_counts <- lenght(df$D_log2_counts)
-  n_neighbors <- length(neighbors)
-  prob_matrix <- matrix(0, n_counts, n_neighbors)
-  for(d in 1:n_neighbors){
+  df$pval_with_abundance <- -1
+  for(d in unique(neighbors)){
     PDF_f <- approxfun(density((log_counts)^d))
-    df[df$D == d, 'pval_with_abundance'] <- PDF_f(df[df$D == d, 'D_log2_counts'])
+    df[df$D == d, 'pval_with_abundance_log2_counts'] <- PDF_f(df[df$D == d, 'D_log2_counts'])
+    PDF_f <- approxfun(density((counts)^d))
+    df[df$D == d, 'pval_with_abundance_counts'] <- PDF_f(df[df$D == d, 'D_counts'])
   }
   df
 }
