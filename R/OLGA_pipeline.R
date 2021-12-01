@@ -19,33 +19,45 @@ calculate_nb_of_neighbors_one_side <- function(df) {
   # Calculate nb of neighbors above threshold
   # Every sequence with one mismatch is a neighbor. Only sequences with number
   # of counts above threshold are taken into account
-  #if (nrow(df) > 1) {
-    tmp <- stringdistmatrix(df$cdr3aa, df$cdr3aa, method = "hamming")
-    apply(tmp,
-      MARGIN = 1,
-      function(x) { sum(x <= 1, na.rm = T) }) #- 0
-  #} else {
-  #  1
-  #}
+  tmp <- stringdistmatrix(df$cdr3aa, df$cdr3aa, method = "hamming")
+  apply(tmp,
+    MARGIN = 1,
+    function(x) { sum(x <= 1, na.rm = T) })
 }
 
 calculate_nb_of_neighbors <- function(df, stats) {
   # TODO: another stats within all sequences not only within VJ combination
   if(stats == 'ALICE'){
     # Filter data by nb of neighbors
-    # Calculate nb of neighbors using computational trick = usage of sequences
-    # with identical left or right parts
+    # # Calculate nb of neighbors using computational trick = usage of sequences
+    # # with identical left or right parts
+    #
+    # df[, leftgr := .GRP, .(substr(cdr3aa, 1, floor(nchar(cdr3aa) / 2)),
+    #                        bestVGene, bestJGene)]
+    # df[, rightgr := .GRP, .(substr(cdr3aa, floor(nchar(cdr3aa) / 2) + 1, nchar(cdr3aa)),
+    #                         bestVGene, bestJGene)]
 
-    df[, leftgr := .GRP, .(substr(cdr3aa, 1, floor(nchar(cdr3aa) / 2)),
-                           bestVGene, bestJGene)]
-    df[, rightgr := .GRP, .(substr(cdr3aa, floor(nchar(cdr3aa) / 2) + 1, nchar(cdr3aa)),
-                            bestVGene, bestJGene)]
+    # df[, D_left := calculate_nb_of_neighbors_one_side(.SD), .(leftgr)]
+    # df[, D_right := calculate_nb_of_neighbors_one_side(.SD),.(rightgr)]
+    df[ ,ind := 1:.N, ]
+    tmp <- stringdistmatrix(df$cdr3aa, df$cdr3aa, method = "hamming")
+    df$D <- apply(tmp,
+                  MARGIN = 1,
+                  function(x) { sum(x <= 1, na.rm = T) }) - 1
 
-    df[, D_left := calculate_nb_of_neighbors_one_side(.SD), .(leftgr)]
-    df[, D_right := calculate_nb_of_neighbors_one_side(.SD),.(rightgr)]
-    df[, D_id := .N, .(cdr3aa)]
-    df[, D := (D_left + D_right - D_id - 1), ]
-    df <- subset(df, select = -c(rightgr, leftgr, D_left, D_right, D_id))
+    df$D_counts <- apply(tmp,
+                         MARGIN = 1,
+                         function(x) {sum(df$Read.count[x <= 1])})
+    df$D_counts <- df$D_counts - df$Read.count
+
+    df$D_log2_counts <- apply(tmp,
+                         MARGIN = 1,
+                         function(x) {sum(log2(df$Read.count[x <= 1]))})
+    df$D_log2_counts <- df$D_counts - df$Read.count
+
+    # df[, D_id := .N, .(cdr3aa)]
+    # df[, D := (D_left + D_right - D_id - 1), ]
+    # df <- subset(df, select = -c(rightgr, leftgr, D_left, D_right, D_id))
     df[D < 0, D := 0, ]
     df
   }
@@ -114,29 +126,18 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
   df
 }
 
-#' find_cluster
-#'
-#' Function gives unique number (cluster_id) to all similar sequences with one
-#' mismatch it doesn't depend on VJ combination. Sequences with distance more
-#' than one mismatch can have one cluster_id if they have common neighbor
-#' between them
-#'
-#' @param df data.table
-#' @return the same data.table with additional column 'cluster_id'
 #' @export
-find_cluster <- function(df){
-  df$cluster_id <- 0
-  tmp <- stringdistmatrix(df$cdr3aa, df$cdr3aa, method = "hamming")
-  for(i in 1:nrow(df)){
-    # check if we already have id number for this cluster
-    check <- as.vector(df[tmp[i,] <= 1, 'cluster_id'] != 0)
-    if(sum(check) != 0){
-      id_list <- unique(df[tmp[i,] <= 1, 'cluster_id'][check])
-      for(id in id_list){
-        df$cluster_id <- replace(df$cluster_id, df$cluster_id == id, i)
-      }
-    }
-  df[tmp[i,] <= 1, 'cluster_id'] <- i
+pval_with_abundance <- function(df) {
+  counts <- df[,1]
+  log_counts <- log2(counts)
+  #PDF_f <- approxfun(density(counts))
+  neighbors <- df[,'D']
+  n_counts <- lenght(df$D_log2_counts)
+  n_neighbors <- length(neighbors)
+  prob_matrix <- matrix(0, n_counts, n_neighbors)
+  for(d in 1:n_neighbors){
+    PDF_f <- approxfun(density((log_counts)^d))
+    df[df$D == d, 'pval_with_abundance'] <- PDF_f(df[df$D == d, 'D_log2_counts'])
   }
   df
 }
@@ -145,19 +146,14 @@ find_cluster <- function(df){
 #' pipeline_OLGA
 #'
 #' Main function that takes a table with CDR3 sequences as an input. The table
-#' should have the following columns (names of the columns are not important but
-#' the following order is necessary)
+#' should have the following columns (Order of the columns are not important but
+#' the following names are necessary.)
 #' \itemize{
 #' \item{"Read.count"}{"Number of unique reads per cdr3 sequence"}
-#' \item{"freq"}{"Clonotype frequency in the clonoset"}
 #' \item{"cdr3nt"}{"CDR3 nucleotide sequence"}
+#' \item{"cdr3aa"}{"CDR3 aminoacid sequence"}
 #' \item{"bestVGene"}{"TRBV segment"}
-#' \item{"bestVGene"}{"TRBD segment"}
 #' \item{"bestJGene"}{"TRBJ segment"}
-#' \item{"VEnd"}{"Position of the end of V segment in CDR3 sequence"}
-#' \item{"DStart""}{"Position of the start of D segment in CDR3 sequence"}
-#' \item{"DEnd"}{"Position of the end of D segment in CDR3 sequence"}
-#' \item{"JStart"}{"Position of the start of J segment in CDR3 sequence"}
 #' }
 #'
 #' @param df data.table

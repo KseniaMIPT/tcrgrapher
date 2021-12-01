@@ -57,18 +57,13 @@ neighbors is not more than in the random model"}
 }
 \description{
 Main function that takes a table with CDR3 sequences as an input. The table
-should have the following columns (names of the columns are not important but
-the following order is necessary)
+should have the following columns (Order of the columns are not important but
+the following names are necessary.)
 \itemize{
 \item{"Read.count"}{"Number of unique reads per cdr3 sequence"}
-\item{"freq"}{"Clonotype frequency in the clonoset"}
 \item{"cdr3nt"}{"CDR3 nucleotide sequence"}
+\item{"cdr3aa"}{"CDR3 aminoacid sequence"}
 \item{"bestVGene"}{"TRBV segment"}
-\item{"bestVGene"}{"TRBD segment"}
 \item{"bestJGene"}{"TRBJ segment"}
-\item{"VEnd"}{"Position of the end of V segment in CDR3 sequence"}
-\item{"DStart""}{"Position of the start of D segment in CDR3 sequence"}
-\item{"DEnd"}{"Position of the end of D segment in CDR3 sequence"}
-\item{"JStart"}{"Position of the start of J segment in CDR3 sequence"}
 }
 }
