@@ -233,7 +233,7 @@ pipeline_OLGA <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
   } else if (stats == 'SONIA'){
     df$Ppost_sum <- df_with_mismatch[, sum(Ppost), ind]$V1
     df[, Ppost_sum_corr := Ppost_sum - Ppost * (nchar(cdr3aa) - 2), ]
-    f[, Ppost_by_VJ := 1 * Ppost_sum_corr / OLGAVJ[cbind(bestVGene, bestJGene)], ]
+    df[, Ppost_by_VJ := 1 * Ppost_sum_corr / OLGAVJ[cbind(bestVGene, bestJGene)], ]
     df[, p_val := ppois(D-1, lambda =  VJ_n_total * Ppost_by_VJ, lower.tail = F)]
   }
 
