@@ -218,7 +218,7 @@ pipeline_OLGA <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
     cdr3aa = all_other_variants_one_mismatch_regexp(cdr3aa)
   ), ind]
 
-  df <- parallel_wrapper_beta(df = df, cores = cores, chain = chain)
+  df <- parallel_wrapper_beta(df = df, cores = cores, chain = chain, stats = stats)
   df_with_mismatch <- parallel_wrapper_beta(df = df_with_mismatch,
                                                  cores = cores, chain = chain)
   if(stats == 'OLGA'){
