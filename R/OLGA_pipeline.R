@@ -219,8 +219,8 @@ pipeline_OLGA <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
   ), ind]
 
   df <- parallel_wrapper_beta(df = df, cores = cores, chain = chain, stats = stats)
-  df_with_mismatch <- parallel_wrapper_beta(df = df_with_mismatch,
-                                                 cores = cores, chain = chain)
+  df_with_mismatch <- parallel_wrapper_beta(df = df_with_mismatch, cores = cores,
+                                            chain = chain,  stats = stats)
   if(stats == 'OLGA'){
     # Pgen - probability to be generated computed by OLGA
     # Pgen_sum - sum of Pgen of all sequences similar to the given with one mismatch
