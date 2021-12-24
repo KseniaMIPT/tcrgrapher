@@ -75,9 +75,9 @@ all_other_variants_one_mismatch_regexp <- function(str) {
   )))
 }
 
-olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
-                                       withoutVJ = F) {
-  # Calculate generation probability with OLGA
+parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
+                                  stats = 'OLGA') {
+  # Calculate generation probability with OLGA or SONIA
 
   # add ind column for sequence combining
   if (!("ind" %in% colnames(df))) df[, ind := 1:.N, ]
@@ -93,27 +93,25 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 
   for (i in 1:length(dfl)) {
     write.table(as.data.frame(dfl[[i]][, .(cdr3aa, bestVGene, bestJGene, ind), ]),
-      quote = F, row.names = F, sep = "\t", file = paste0(path, fn[i])
+      quote = F, row.names = F, sep = "\t", file = paste0(path, fn[i],  col.names = F)
     )
   }
 
-  olga_commands <- paste0(
-    "olga-compute_pgen --", chain,
-    " --display_off --time_updates_off --seq_in 0 --v_in 1 --j_in 2 --lines_to_skip 1 -d 'tab' -i ",
-    path, "tmp", 1:cores, ".tsv -o ", path, "tmp_out", 1:cores, ".tsv"
-  )
-  if (withoutVJ) {
-    olga_commands <- paste0(
+  if(stats == 'OLFA'){
+    commands <- paste0(
       "olga-compute_pgen --", chain,
-      " --display_off --time_updates_off --seq_in 0 --lines_to_skip 1 -d 'tab' -i ",
+      " --display_off --time_updates_off --seq_in 0 --v_in 1 --j_in 2 -d 'tab' -i ",
       path, "tmp", 1:cores, ".tsv -o ", path, "tmp_out", 1:cores, ".tsv"
     )
+  } else if (stats == 'SONIA'){
+    commands <- paste0('sonia-evaluate --', chain, " --ppost -i ", path, "tmp",
+                       1:cores, ".tsv -o ", path, "tmp_out", 1:cores, ".tsv")
   }
 
   cl <- parallel::makeCluster(cores)
   doParallel::registerDoParallel(cl)
   foreach(i=1:cores) %dopar% {
-    system(olga_commands[i])
+    system(commands[i])
   }
   parallel::stopCluster(cl)
 
@@ -122,7 +120,13 @@ olga_parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
     fnt <- rbind(fnt, fread(paste0(path, file)))
   }
 
-  df$Pgen <- fnt$V2
+  if(stats == 'OLGA'){
+    df$Pgen <- fnt$V2
+  }else if (stats == 'SONIA'){
+    df$Pgen <- fnt$Pgen
+    df$Q <- fnt$Q
+    df$Ppost <- fnt$Ppost
+  }
   df
 }
 
@@ -156,7 +160,7 @@ pval_with_abundance <- function(df) {
 #' }
 #'
 #' @param df data.table
-#' @param Q selection factor. 1/Q sequences pass selection in the thymus. The
+#' @param Q_val selection factor. 1/Q sequences pass selection in the thymus. The
 #' default value for mouses 6.27. If a human model is taken and Q is not changed
 #' manually Q = 27 is used
 #' @param cores number of used cores, 1 by default
@@ -169,6 +173,7 @@ pval_with_abundance <- function(df) {
 #' "BY", "none". "BH" is a default method.
 #' @param chain Statistical model selection. Possible options: "mouseTRB",
 #' "humanTRB", "humanTRA".
+#' @param stats OLGA or SONIA
 #' @return Function returns the same table that was in input filtered by number
 #' of counts and number of neighbors with additional columns. Additional columns
 #' are the following
@@ -186,9 +191,9 @@ pval_with_abundance <- function(df) {
 #' \item{"p_adjust"}{"p value with multiple testing correction"}
 #' }
 #' @export
-pipeline_OLGA <- function(df, Q = 6.27, cores = 1, thres_counts = 1,
+pipeline_OLGA <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
                           N_neighbors_thres = 1, p_adjust_method = "BH",
-                          chain = 'mouseTRB', stats = 'ALICE') {
+                          chain = 'mouseTRB', stats = 'OLGA') {
 
   # TODO: check table format
   # TODO: check arguments' values
@@ -197,18 +202,17 @@ pipeline_OLGA <- function(df, Q = 6.27, cores = 1, thres_counts = 1,
   # checking for unproductive sequences if it hasn't been made earlier
   df <- df[!grepl(cdr3aa, pattern = "*", fixed = T) & ((nchar(cdr3nt) %% 3) == 0)]
 
-  # TODO model selection
   if (chain == 'mouseTRB'){
     OLGAVJ = OLGAVJ_MOUSE_TRB
   } else if (chain == 'humanTRB'){
     OLGAVJ = OLGAVJ_HUMAN_TRB
-    if(Q == 6.27){
-      Q = 27
+    if(Q_val == 6.27){
+      Q_val = 27
     }
   } else if (chain == 'humanTRA'){
     OLGAVJ = OLGAVJ_HUMAN_TRA
-    if(Q == 6.27){
-      Q = 27
+    if(Q_val == 6.27){
+      Q_val = 27
     }
   } else {
     stop('There is no such model')
@@ -231,23 +235,30 @@ pipeline_OLGA <- function(df, Q = 6.27, cores = 1, thres_counts = 1,
     cdr3aa = all_other_variants_one_mismatch_regexp(cdr3aa)
   ), ind]
 
-  df <- olga_parallel_wrapper_beta(df = df, cores = cores, chain = chain)
-  df_with_mismatch <- olga_parallel_wrapper_beta(df = df_with_mismatch,
+  df <- parallel_wrapper_beta(df = df, cores = cores, chain = chain)
+  df_with_mismatch <- parallel_wrapper_beta(df = df_with_mismatch,
                                                  cores = cores, chain = chain)
+  if(stats == 'OLGA'){
+    # Pgen - probability to be generated computed by OLGA
+    # Pgen_sum - sum of Pgen of all sequences similar to the given with one mismatch
+    df$Pgen_sum <- df_with_mismatch[, sum(Pgen), ind]$V1
+    # Pgen_sum_corr - Pgen_sum without probabilities of the main sequence
+    df[, Pgen_sum_corr := Pgen_sum - Pgen * (nchar(cdr3aa) - 2), ]
+    # Bayes' rule
+    df[, Pgen_by_VJ := 1 * Pgen_sum_corr / OLGAVJ[cbind(bestVGene, bestJGene)], ]
+    df[, p_val := ppois(D-1, lambda = Q_val * VJ_n_total * Pgen_by_VJ, lower.tail = F)]
+  } else if (stats == 'SONIA'){
+    df$Ppost_sum <- df_with_mismatch[, sum(Ppost), ind]$V1
+    df[, Ppost_sum_corr := Ppost_sum - Ppost * (nchar(cdr3aa) - 2), ]
+    f[, Ppost_by_VJ := 1 * Ppost_sum_corr / OLGAVJ[cbind(bestVGene, bestJGene)], ]
+    df[, p_val := ppois(D-1, lambda =  VJ_n_total * Ppost_by_VJ, lower.tail = F)]
+  }
 
-  # Pgeg - probability to be generated computed by OLGA
-  # Pgen_sum - sum of Pgen of all sequences similar to the given with one mismatch
-  df$Pgen_sum <- df_with_mismatch[, sum(Pgen), ind]$V1
-  # Pgen_sum_corr - Pgen_sum without probabilities of the main sequence
-  df[, Pgen_sum_corr := Pgen_sum - Pgen * (nchar(cdr3aa) - 2), ]
-  # Bayes' rule
-  df[, Pgen_by_VJ := 1 * Pgen_sum_corr / OLGAVJ[cbind(bestVGene, bestJGene)], ]
-  df[, p_val := ppois(D-1, lambda = Q * VJ_n_total * Pgen_by_VJ, lower.tail = F)]
   df[, p_adjust := p.adjust(p_val, method = p_adjust_method)]
   # add cluster IDs
   # df <- find_cluster(df)
 
   # deletion of unnecessary columns
-  df <- subset(df, select = -c(ind, Pgen_sum))
+  df <- subset(df, select = -c(ind))
   return(df)
 }
