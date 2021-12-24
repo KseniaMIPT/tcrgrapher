@@ -26,19 +26,7 @@ calculate_nb_of_neighbors_one_side <- function(df) {
 }
 
 calculate_nb_of_neighbors <- function(df, stats) {
-  # TODO: another stats within all sequences not only within VJ combination
-  if(stats == 'ALICE'){
-    # Filter data by nb of neighbors
-    # # Calculate nb of neighbors using computational trick = usage of sequences
-    # # with identical left or right parts
-    #
-    # df[, leftgr := .GRP, .(substr(cdr3aa, 1, floor(nchar(cdr3aa) / 2)),
-    #                        bestVGene, bestJGene)]
-    # df[, rightgr := .GRP, .(substr(cdr3aa, floor(nchar(cdr3aa) / 2) + 1, nchar(cdr3aa)),
-    #                         bestVGene, bestJGene)]
 
-    # df[, D_left := calculate_nb_of_neighbors_one_side(.SD), .(leftgr)]
-    # df[, D_right := calculate_nb_of_neighbors_one_side(.SD),.(rightgr)]
     df[ ,ind := 1:.N, ]
     tmp <- stringdistmatrix(df$cdr3aa, df$cdr3aa, method = "hamming")
     df$D <- apply(tmp,
@@ -54,13 +42,8 @@ calculate_nb_of_neighbors <- function(df, stats) {
                          MARGIN = 1,
                          function(x) {sum(log2(df$Read.count[x <= 1]))})
     df$D_log2_counts <- df$D_log2_counts - df$Read.count
-
-    # df[, D_id := .N, .(cdr3aa)]
-    # df[, D := (D_left + D_right - D_id - 1), ]
-    # df <- subset(df, select = -c(rightgr, leftgr, D_left, D_right, D_id))
     df[D < 0, D := 0, ]
     df
-  }
 }
 
 all_other_variants_one_mismatch_regexp <- function(str) {
@@ -97,7 +80,7 @@ parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
     )
   }
 
-  if(stats == 'OLFA'){
+  if(stats == 'OLGA'){
     commands <- paste0(
       "olga-compute_pgen --", chain,
       " --display_off --time_updates_off --seq_in 0 --v_in 1 --j_in 2 -d 'tab' -i ",
