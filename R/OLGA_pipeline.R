@@ -76,7 +76,7 @@ parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 
   for (i in 1:length(dfl)) {
     write.table(as.data.frame(dfl[[i]][, .(cdr3aa, bestVGene, bestJGene, ind), ]),
-      quote = F, row.names = F, sep = "\t", file = paste0(path, fn[i],  col.names = F)
+      quote = F, row.names = F, sep = "\t", file = paste0(path, fn[i]), col.names = F
     )
   }
 
