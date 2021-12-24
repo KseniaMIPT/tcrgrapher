@@ -134,9 +134,9 @@ pval_with_abundance <- function(df) {
   df$pval_with_abundance <- -1
   for(d in unique(neighbors)){
     PDF_f <- approxfun(density((log_counts)^d))
-    df[df$D == d, 'pval_with_abundance_log2_counts'] <- PDF_f(df[df$D == d, 'D_log2_counts'])
+    df[df$D == d, 'pval_with_abundance_log2_counts'] <- PDF_f(df[df$D == d, 'D_log2_counts']) * df[df$D == d, 'p_val']
     PDF_f <- approxfun(density((counts)^d))
-    df[df$D == d, 'pval_with_abundance_counts'] <- PDF_f(df[df$D == d, 'D_counts'])
+    df[df$D == d, 'pval_with_abundance_counts'] <- PDF_f(df[df$D == d, 'D_counts'])* df[df$D == d, 'p_val']
   }
   df
 }
@@ -242,7 +242,7 @@ pipeline_OLGA <- function(df, Q = 6.27, cores = 1, thres_counts = 1,
   df[, Pgen_sum_corr := Pgen_sum - Pgen * (nchar(cdr3aa) - 2), ]
   # Bayes' rule
   df[, Pgen_by_VJ := 1 * Pgen_sum_corr / OLGAVJ[cbind(bestVGene, bestJGene)], ]
-  df[, p_val := ppois(D, lambda = Q * VJ_n_total * Pgen_by_VJ, lower.tail = F)]
+  df[, p_val := ppois(D-1, lambda = Q * VJ_n_total * Pgen_by_VJ, lower.tail = F)]
   df[, p_adjust := p.adjust(p_val, method = p_adjust_method)]
   # add cluster IDs
   # df <- find_cluster(df)
