@@ -27,23 +27,19 @@ calculate_nb_of_neighbors_one_side <- function(df) {
 
 calculate_nb_of_neighbors <- function(df, stats) {
 
-    df[ ,ind := 1:.N, ]
-    tmp <- stringdistmatrix(df$cdr3aa, df$cdr3aa, method = "hamming")
-    df$D <- apply(tmp,
-                  MARGIN = 1,
-                  function(x) { sum(x <= 1, na.rm = T) }) - 1
 
-    df$D_counts <- apply(tmp,
-                         MARGIN = 1,
-                         function(x) {sum(df$Read.count[x <= 1])})
-    df$D_counts <- df$D_counts - df$Read.count
+  df[, leftgr := .GRP, .(substr(cdr3aa, 1, floor(nchar(cdr3aa) / 2)),
+                         bestVGene, bestJGene)]
+  df[, rightgr := .GRP, .(substr(cdr3aa, floor(nchar(cdr3aa) / 2) + 1, nchar(cdr3aa)),
+                          bestVGene, bestJGene)]
 
-    df$D_log2_counts <- apply(tmp,
-                         MARGIN = 1,
-                         function(x) {sum(log2(df$Read.count[x <= 1]))})
-    df$D_log2_counts <- df$D_log2_counts - df$Read.count
-    df[D < 0, D := 0, ]
-    df
+  df[, D_left := calculate_nb_of_neighbors_one_side(.SD), .(leftgr)]
+  df[, D_right := calculate_nb_of_neighbors_one_side(.SD),.(rightgr)]
+  df[, D_id := .N, .(cdr3aa)]
+  df[, D := (D_left + D_right - D_id - 1), ]
+  df <- subset(df, select = -c(rightgr, leftgr, D_left, D_right, D_id))
+  df[D < 0, D := 0, ]
+  df
 }
 
 all_other_variants_one_mismatch_regexp <- function(str) {
@@ -125,6 +121,27 @@ pval_with_abundance <- function(df) {
     PDF_f <- approxfun(density((counts)^d))
     df[df$D == d, 'pval_with_abundance_counts'] <- PDF_f(df[df$D == d, 'D_counts'])* df[df$D == d, 'p_val']
   }
+  df
+}
+
+find_cluster <- function(df){
+  adj_matrix <- stringdistmatrix(df$cdr3aa, df$cdr3aa, method = "hamming")
+  adj_matrix <- 1*(adj_matrix <= 1)
+  rownames(adj_matrix) <- df$cdr3aa
+  colnames(adj_matrix) <- df$cdr3aa
+  diag(adj_matrix) <- 0
+
+  g1 <- graph_from_adjacency_matrix(
+    adj_matrix,
+    mode = "undirected",
+    weighted = NULL,
+    diag = TRUE,
+    add.colnames = NULL,
+    add.rownames = NA
+  )
+
+  components <- components(g1)
+  df$cluster_id <- components$membership
   df
 }
 
