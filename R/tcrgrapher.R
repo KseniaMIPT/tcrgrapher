@@ -64,18 +64,18 @@ parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
   # add ind column for sequence combining
   if (!("ind" %in% colnames(df))) df[, ind := 1:.N, ]
 
-  fn <- paste0("tmp", 1:cores, ".tsv")
-  fn2 <- paste0("tmp_out", 1:cores, ".tsv")
+  tmp_names <- paste0("tmp", 1:cores, ".tsv")
+  tmp_names_out <- paste0("tmp_out", 1:cores, ".tsv")
   path <- tempdir()
   path <- paste0(path, '/')
 
-  for (f in c(paste0(path, fn), paste0(path,fn2))) if (file.exists(f)) file.remove(f)
+  for (f in c(paste0(path, tmp_names), paste0(path,tmp_names_out))) if (file.exists(f)) file.remove(f)
 
-  dfl <- split(df, sort((1:nrow(df) - 1) %% cores + 1))
+  dft <- split(df, sort((1:nrow(df) - 1) %% cores + 1))
 
-  for (i in 1:length(dfl)) {
-    write.table(as.data.frame(dfl[[i]][, .(cdr3aa, bestVGene, bestJGene, ind), ]),
-      quote = F, row.names = F, sep = "\t", file = paste0(path, fn[i]), col.names = F
+  for (i in 1:length(dft)) {
+    write.table(as.data.frame(dft[[i]][, .(cdr3aa, bestVGene, bestJGene, ind), ]),
+      quote = F, row.names = F, sep = "\t", file = paste0(path, tmp_names[i]), col.names = F
     )
   }
 
@@ -97,17 +97,17 @@ parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
   }
   parallel::stopCluster(cl)
 
-  fnt <- c()
-  for(file in fn2){
-    fnt <- rbind(fnt, fread(paste0(path, file)))
+  stats_output <- c()
+  for(file in tmp_names_out){
+    stats_output <- rbind(stats_output, fread(paste0(path, file)))
   }
 
   if(stats == 'OLGA'){
-    df$Pgen <- fnt$V2
+    df$Pgen <- stats_output$V2
   }else if (stats == 'SONIA'){
-    df$Pgen <- fnt$Pgen
-    df$Q <- fnt$Q
-    df$Ppost <- fnt$Ppost
+    df$Pgen <- stats_output$Pgen
+    df$Q <- stats_output$Q
+    df$Ppost <- stats_output$Ppost
   }
   df
 }
@@ -184,16 +184,16 @@ tcrgrapher <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
 
   # filter sequences by number of counts
   df <- df[Read.count > thres_counts,]
-  stopifnot(nrow(df) != 0)
+  stopitmp_namesot(nrow(df) != 0)
   # filter V and J for present in model
   df <- df[bestVGene %in% row.names(OLGAVJ) & bestJGene %in% colnames(OLGAVJ)]
-  stopifnot(nrow(df) != 0)
+  stopitmp_namesot(nrow(df) != 0)
 
   df <- calculate_nb_of_neighbors(df, stats = stats)
 
   df[, VJ_n_total := .N, .(bestVGene, bestJGene)]
   df <- df[D >= N_neighbors_thres][, ind := 1:.N, ]
-  stopifnot(nrow(df) != 0)
+  stopitmp_namesot(nrow(df) != 0)
 
   df_with_mismatch <- df[, .(bestVGene, bestJGene,
     cdr3aa = all_other_variants_one_mismatch_regexp(cdr3aa)
