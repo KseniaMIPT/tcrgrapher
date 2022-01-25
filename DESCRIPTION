@@ -1,13 +1,16 @@
 Package: tcrgrapher
-Title: Package finds TCRs involved in immune response from single dataset
+Title: R package for identifying condition associated T cell clones from a 
+single repertoire.
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Ksenia",
            family = "Lupyr",
            role = c("aut", "cre"),
            email = "kseniia.lupyr@skoltech.ru")
-Description: Package finds TCRs involved in immune response from single dataset
-    with statistic for mouses' TRB
+Description: R package for identifying condition associated T cell clones from a 
+single repertoire. Main function finds clones with significantly high number of
+neighbors (convergent clones or clones with one mismacth), taking into account 
+their generation probabilities.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -20,7 +23,9 @@ Imports:
     stringdist,
     foreach,
     doParallel,
-    parallel
+    parallel,
+    igraph
 SystemRequirements:
     OLGA (python 2.7/3.6 software)
+    SONIA (python 2.7/3.6 software)
 
