@@ -11,13 +11,25 @@ library(devtools)
 devtools::install_github("KseniaMIPT/tcrgrapher")
 ```
 
-To use tcrgrapher OLGA is needed. For detailed information please visit
+To calculate generation probability TCRgrapher can use OLGA or SONIA. 
+
+For detailed information about OLGA please visit
 https://github.com/statbiophys/OLGA.
 
 OLGA can be installed using pip or pip3.
 
 ```python
 pip install olga
+```
+
+For detailed information about SONIA please visit
+https://github.com/statbiophys/SONIA
+
+SONIA is a python 2.7/3.6 software. It is available on PyPI and can be 
+downloaded and installed through pip:
+
+```python
+pip install sonia
 ```
 
 ## Quick start
@@ -31,9 +43,9 @@ df <- pipeline_OLGA(sample)
 
 ## Details
 
-```pipeline_OLGA``` is the main function that takes a table with CDR3 sequences as
-an input. The table should have the following columns. Order of the columns are not 
-important but the following names are necessary.
+```tcrgrapher``` is the main function that takes a table with CDR3 sequences as
+an input. The table should have the following columns. Order of the columns are 
+not  important but the following names are necessary.
 
 * Read.count - Number of unique reads per CDR3 sequence
 * cdr3nt - CDR3 nucleotide sequence
@@ -47,35 +59,37 @@ table.
 You can find default parameters and possible options bellow.
 
 ```R
-pipeline_OLGA(df, Q = 6.27, cores = 1, thres_counts = 1, N_neighbors_thres = 1,
-p_adjust_method = "BH", chain = "mouseTRB")
+tcrgrapher(df, Q_val = 6.27, cores = 1, thres_counts = 1, N_neighbors_thres = 1, 
+          p_adjust_method = "BH", chain = 'mouseTRB', stats = 'OLGA')
 ```
 * df - data.table
-* Q - selection factor. 1/Q sequences pass selection in the thymus. The 
-default value for mouses is 6.27. If a human model is taken and Q is not changed 
+* Q - Selection factor. 1/Q sequences pass selection in the thymus. The 
+default value for mice is 6.27. If a human model is taken and Q is not changed 
 manually Q = 27 is used
 * cores - number of used cores, 1 by default
 * thres_counts - Only sequences with a number of counts above this threshold
 are taken into account
 * N_neighbors_thres - Only sequences with a number of neighbours above the 
 threshold are used to calculate generation probability
-* p_adjust_method - One of the method from p.adjust from stats package
-possible options: "bonferroni", "holm", "hochberg", "hommel", "BH" or "fdr",
+* p_adjust_method - One of the method from p.adjust from stats package. 
+Possible options: "bonferroni", "holm", "hochberg", "hommel", "BH" or "fdr",
 "BY", "none". "BH" is a default method.
 * chain - Statistical model selection. Possible options: "mouseTRB", "humanTRB",
 "humanTRA".
+* stats - Tool that will be used for generation probability calculation.
+Possible options: "OLGA", "SONIA". "SONIA" also calculate Q for every sequence.
 
 Function returns the same table that was in input filtered by number
-of counts and number of neighbors with additional columns. Additional columns
+of counts and number of neighbours with additional columns. Additional columns
 are the following
 * D - Number of neighbors in clonoset. Neighbor is a similar sequence
 with one mismatch
 * VJ_n_total - Number of unique sequences with given VJ combination
 * Pgen - Probability to be generated computed by OLGA
-* Pgen_sum_corr - Sum of Pgen of all sequences similar to the given
-with one mismatch
-* Pgen_by_VJ - Conditional probability. Sum of probabilities to be
-generated with given VJ combination
+* Pgen_sum_corr - Sum of Pgen of all sequences similar to the given with one 
+mismatch
+* Pgen_by_VJ - Conditional probability. Sum of probabilities to be generated 
+with given VJ combination
 * p_val - p value under null hypothesis that number of sequence's
 neighbors is not more than in the random model
 * p_adjust - p value with multiple testing correction
