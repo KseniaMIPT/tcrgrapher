@@ -184,16 +184,16 @@ tcrgrapher <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
 
   # filter sequences by number of counts
   df <- df[Read.count > thres_counts,]
-  stopitmp_namesot(nrow(df) != 0)
+  stopifnot(nrow(df) != 0)
   # filter V and J for present in model
   df <- df[bestVGene %in% row.names(OLGAVJ) & bestJGene %in% colnames(OLGAVJ)]
-  stopitmp_namesot(nrow(df) != 0)
+  stopifnot(nrow(df) != 0)
 
   df <- calculate_nb_of_neighbors(df, stats = stats)
 
   df[, VJ_n_total := .N, .(bestVGene, bestJGene)]
   df <- df[D >= N_neighbors_thres][, ind := 1:.N, ]
-  stopitmp_namesot(nrow(df) != 0)
+  stopifnot(nrow(df) != 0)
 
   df_with_mismatch <- df[, .(bestVGene, bestJGene,
     cdr3aa = all_other_variants_one_mismatch_regexp(cdr3aa)
