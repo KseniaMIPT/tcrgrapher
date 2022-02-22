@@ -229,7 +229,7 @@ tcrgrapher <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
 
 #' pval_with_abundance
 #'
-#' Function calculate p-value taking into account count number of every clonotype
+#' Function calculates p-value taking into account abundance of every clonotype
 #'
 #' @param df output of tcrgrapher function
 #' @return Function returns the same data.table with additional columns:

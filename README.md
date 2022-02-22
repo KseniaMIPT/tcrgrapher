@@ -41,7 +41,7 @@ sample <- fread('sample.txt')
 df <- pipeline_OLGA(sample)
 ```
 
-## Details
+## Basic pipeline
 
 ```tcrgrapher``` is the main function that takes a table with CDR3 sequences as
 an input. The table should have the following columns. Order of the columns are 
@@ -93,3 +93,19 @@ with given VJ combination
 * p_val - p value under null hypothesis that number of sequence's
 neighbors is not more than in the random model
 * p_adjust - p value with multiple testing correction
+
+## Additional functions
+
+```pval_with_abundance(df)``` Function takes output of tcrgrapher function and 
+adjusts p-value taking into account abundance of every clonotype. There are two 
+additional columns in the output depending on count normalization: 
+"pval_with_abundance_log2_counts" - Log2 is used for count normalization; "pval_with_abundance_counts" - no count normalization.
+
+```make_graph(df)``` Function makes graph from tcrgrapher output with igraph package.
+Every node of the graph is an unique clonotype from the table (one line). Edges
+connects clonotypes with one amino acid mismatch or identical clonotypes if they
+were in separate lines.
+
+```find_cluster(df, graph)``` #' Function takes tcrgrapher and make_graph outputs
+and returns the same table with additional column "cluster_id". All clusters of neighbours
+with one mismatch have unique id. Function uses "components" function from igraph package.
