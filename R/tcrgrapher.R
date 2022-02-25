@@ -59,7 +59,7 @@ all_other_variants_one_mismatch_regexp <- function(str) {
 }
 
 parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
-                                  stats = 'OLGA', model=T) {
+                                  stats = 'OLGA', model='-') {
   # Calculate generation probability with OLGA or SONIA
 
   # add ind column for sequence combining
@@ -80,7 +80,7 @@ parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
     )
   }
 
-  if(model != T){
+  if(model != '-'){
     chain=model
   }
 
@@ -166,12 +166,12 @@ parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 #' @export
 tcrgrapher <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
                           N_neighbors_thres = 1, p_adjust_method = "BH",
-                          chain = 'mouseTRB', stats = 'OLGA', model = T) {
+                          chain = 'mouseTRB', stats = 'OLGA', model = '-') {
 
   # checking for unproductive sequences if it hasn't been made earlier
   df <- df[!grepl(cdr3aa, pattern = "*", fixed = T) & ((nchar(cdr3nt) %% 3) == 0)]
 
-  if(model){
+  if(model == '-'){
     if (chain == 'mouseTRB'){
       OLGAVJ = OLGAVJ_MOUSE_TRB
     } else if (chain == 'humanTRB'){
