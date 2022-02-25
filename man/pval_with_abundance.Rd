@@ -18,5 +18,5 @@ count number of every clonotype. Log2 is used for count normalization"}
 count number of every clonotype. There is no count normalization"}
 }
 \description{
-Function calculate p-value taking into account count number of every clonotype
+Function calculates p-value taking into account abundance of every clonotype
 }

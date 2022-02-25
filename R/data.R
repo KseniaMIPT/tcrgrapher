@@ -14,6 +14,8 @@
 #' A data frame with probabilities of VJ combinations
 #' All probabilities based on unproductive sequences from C57BL/6 mice line
 #'
+#' @source \url{https://github.com/KseniaMIPT/tcrgrapher/tree/master/models/C57BL.6_mouseTRB}
+#'
 #' @author Ksenia R. Lupyr
 "C57BL6_MOUSE_TRB"
 

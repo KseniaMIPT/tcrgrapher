@@ -12,7 +12,8 @@ tcrgrapher(
   N_neighbors_thres = 1,
   p_adjust_method = "BH",
   chain = "mouseTRB",
-  stats = "OLGA"
+  stats = "OLGA",
+  model = "-"
 )
 }
 \arguments{
