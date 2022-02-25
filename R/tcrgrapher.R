@@ -15,6 +15,7 @@ NULL
 "OLGAVJ_MOUSE_TRB"
 "OLGAVJ_HUMAN_TRB"
 "OLGAVJ_HUMAN_TRA"
+"C57BL6_MOUSE_TRB"
 
 # Secondary functions -----------------------------------------------------
 
@@ -58,7 +59,7 @@ all_other_variants_one_mismatch_regexp <- function(str) {
 }
 
 parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
-                                  stats = 'OLGA') {
+                                  stats = 'OLGA', model=T) {
   # Calculate generation probability with OLGA or SONIA
 
   # add ind column for sequence combining
@@ -77,6 +78,10 @@ parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
     write.table(as.data.frame(dft[[i]][, .(cdr3aa, bestVGene, bestJGene, ind), ]),
       quote = F, row.names = F, sep = "\t", file = paste0(path, tmp_names[i]), col.names = F
     )
+  }
+
+  if(model != T){
+    chain=model
   }
 
   if(stats == 'OLGA'){
@@ -161,25 +166,27 @@ parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 #' @export
 tcrgrapher <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
                           N_neighbors_thres = 1, p_adjust_method = "BH",
-                          chain = 'mouseTRB', stats = 'OLGA') {
+                          chain = 'mouseTRB', stats = 'OLGA', model = T) {
 
   # checking for unproductive sequences if it hasn't been made earlier
   df <- df[!grepl(cdr3aa, pattern = "*", fixed = T) & ((nchar(cdr3nt) %% 3) == 0)]
 
-  if (chain == 'mouseTRB'){
-    OLGAVJ = OLGAVJ_MOUSE_TRB
-  } else if (chain == 'humanTRB'){
-    OLGAVJ = OLGAVJ_HUMAN_TRB
-    if(Q_val == 6.27){
-      Q_val = 27
-    }
-  } else if (chain == 'humanTRA'){
-    OLGAVJ = OLGAVJ_HUMAN_TRA
-    if(Q_val == 6.27){
-      Q_val = 27
+  if(model){
+    if (chain == 'mouseTRB'){
+      OLGAVJ = OLGAVJ_MOUSE_TRB
+    } else if (chain == 'humanTRB'){
+      OLGAVJ = OLGAVJ_HUMAN_TRB
+      if(Q_val == 6.27){
+        Q_val = 27
+      }
+    } else if (chain == 'humanTRA'){
+      OLGAVJ = OLGAVJ_HUMAN_TRA
+      if(Q_val == 6.27){
+        Q_val = 27
+      }
     }
   } else {
-    stop('There is no such model')
+    OLGAVJ = C57BL6_MOUSE_TRB
   }
 
   # filter sequences by number of counts
@@ -199,9 +206,10 @@ tcrgrapher <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
     cdr3aa = all_other_variants_one_mismatch_regexp(cdr3aa)
   ), ind]
 
-  df <- parallel_wrapper_beta(df = df, cores = cores, chain = chain, stats = stats)
+  df <- parallel_wrapper_beta(df = df, cores = cores, chain = chain,
+                              stats = stats, model=model)
   df_with_mismatch <- parallel_wrapper_beta(df = df_with_mismatch, cores = cores,
-                                            chain = chain,  stats = stats)
+                                            chain = chain,  stats = stats, model=model)
   if(stats == 'OLGA'){
     # Pgen - probability to be generated computed by OLGA
     # Pgen_sum - sum of Pgen of all sequences similar to the given with one mismatch
