@@ -60,7 +60,7 @@ You can find default parameters and possible options bellow.
 
 ```R
 tcrgrapher(df, Q_val = 6.27, cores = 1, thres_counts = 1, N_neighbors_thres = 1, 
-          p_adjust_method = "BH", chain = 'mouseTRB', stats = 'OLGA')
+          p_adjust_method = "BH", chain = 'mouseTRB', stats = 'OLGA', model= '-')
 ```
 * df - data.table
 * Q - Selection factor. 1/Q sequences pass selection in the thymus. The 
@@ -78,6 +78,12 @@ Possible options: "bonferroni", "holm", "hochberg", "hommel", "BH" or "fdr",
 "humanTRA".
 * stats - Tool that will be used for generation probability calculation.
 Possible options: "OLGA", "SONIA". "SONIA" also calculate Q for every sequence.
+* model - Standard OLGA generation probability model is used by default. To set 
+your one generation probability model write "set_custom_model_VDJ 
+<path_to_folder_with_model>". Generation probability model is usually IGOR output.
+Folder should contain the following files: V_gene_CDR3_anchors.csv,
+J_gene_CDR3_anchors.csv, model_marginals.txt, model_params.txt. Some models one 
+can find in the folder "model"
 
 Function returns the same table that was in input filtered by number
 of counts and number of neighbours with additional columns. Additional columns
