@@ -192,17 +192,17 @@ tcrgrapher <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
       }
     }
   } else {
-    path_to_model <- unlist(strsplit(model, ' '))[2]
+    path_to_model <- unlist(base::strsplit(model, ' '))[2]
     V_names <- read.csv(paste0(path_to_model, 'V_gene_CDR3_anchors.csv'))
-    V_names <- unlist(strsplit(V_names$gene, '\\*'))
+    V_names <- unlist(base::strsplit(V_names$gene, '\\*'))
     V_names <- V_names[seq(1, length(V_names), 2)]
     J_names <- read.csv(paste0(path_to_model, 'J_gene_CDR3_anchors.csv'))
-    J_names <- unlist(strsplit(J_names$gene, '\\*'))
+    J_names <- unlist(base::strsplit(J_names$gene, '\\*'))
     J_names <- J_names[seq(1, length(J_names), 2)]
     marginals <- read.table(paste0(path_to_model, 'model_marginals.txt'))
     marginals <- marginals$V1
-    V_prob <- as.numeric(unlist(srtsplit(substring(marginals[3], 2, nchar(marginals[3])), ',')))
-    J_prob <- as.numeric(unlist(srtsplit(substring(marginals[6], 2, nchar(marginals[6])), ',')))
+    V_prob <- as.numeric(unlist(strsplit(substring(marginals[3], 2, nchar(marginals[3])), ',')))
+    J_prob <- as.numeric(unlist(strsplit(substring(marginals[6], 2, nchar(marginals[6])), ',')))
     OLGAVJ <- t(V_prob) %*% J_prob
     rownames(OLGAVJ) <- V_names
     colnames(OLGAVJ) <- J_names
