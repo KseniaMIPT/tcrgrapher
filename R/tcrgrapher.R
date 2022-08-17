@@ -192,7 +192,7 @@ tcrgrapher <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
       }
     }
   } else {
-    path_to_model <- unlist(strsplit(model))[2]
+    path_to_model <- unlist(strsplit(model, ' '))[2]
     V_names <- read.csv(paste0(path_to_model, 'V_gene_CDR3_anchors.csv'))
     V_names <- unlist(strsplit(V_names$gene, '\\*'))
     V_names <- V_names[seq(1, length(V_names), 2)]
