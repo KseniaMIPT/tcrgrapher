@@ -38,7 +38,7 @@ pip install sonia
 library(tcrgrapher)
 library(data.table)
 sample <- fread('sample.txt')
-df <- pipeline_OLGA(sample)
+df <- tcrgrapher(sample)
 ```
 
 ## Basic pipeline
