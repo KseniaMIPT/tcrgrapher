@@ -193,23 +193,21 @@ tcrgrapher <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
     }
   } else {
     path_to_model <- unlist(base::strsplit(model, ' '))[2]
-    V_names <- read.csv(paste0(path_to_model, 'V_gene_CDR3_anchors.csv'))
-    V_names <- unlist(base::strsplit(V_names$gene, '\\*'))
-    V_names <- V_names[seq(1, length(V_names), 2)]
-    J_names <- read.csv(paste0(path_to_model, 'J_gene_CDR3_anchors.csv'))
-    J_names <- unlist(base::strsplit(J_names$gene, '\\*'))
-    J_names <- J_names[seq(1, length(J_names), 2)]
+    params <- read.table(paste0(path_to_model, 'model_params.txt'))
+    V_names <- sapply(strsplit(params$V1[grep('TRBV', params$V1)], "\\*"), `[`, 1)
+    V_names <- sub('%TRBV', 'TRBV', V_names)
+    J_names <- sapply(strsplit(params$V1[grep('TRBJ', params$V1)], "\\*"), `[`, 1)
+    J_names <- sub('%TRBJ', 'TRBJ', J_names)
     marginals <- read.table(paste0(path_to_model, 'model_marginals.txt'))
-    marginals <- marginals$V1
-    V_prob <- as.numeric(unlist(strsplit(substring(marginals[3], 2, nchar(marginals[3])), ',')))
-    J_prob <- as.numeric(unlist(strsplit(substring(marginals[6], 2, nchar(marginals[6])), ',')))
-    OLGAVJ <- t(V_prob) %*% J_prob
+    V_prob <- as.numeric(unlist(strsplit(substring(marginals$V1[3], 2, nchar(marginals$V1[3])), ',')))
+    J_prob <- as.numeric(unlist(strsplit(substring(marginals$V1[6], 2, nchar(marginals$V1[6])), ',')))
+    OLGAVJ <- V_prob %*% t(J_prob)
     rownames(OLGAVJ) <- V_names
     colnames(OLGAVJ) <- J_names
   }
 
   # filter sequences by number of counts
-  df <- df[Read.count > thres_counts,]
+  df <- df[Read.count >= thres_counts,]
   stopifnot(nrow(df) != 0)
   # filter V and J for present in model
   df <- df[bestVGene %in% row.names(OLGAVJ) & bestJGene %in% colnames(OLGAVJ)]
