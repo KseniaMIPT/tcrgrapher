@@ -176,16 +176,21 @@ tcrgrapher <- function(df, cores = 1, thres_counts = 1,
                           N_neighbors_thres = 1, p_adjust_method = "BH",
                           chain = 'mouseTRB', stats = 'OLGA', model = '-') {
 
-  # checking for unproductive sequences if it hasn't been made earlier
+  message("checking for unproductive sequences if it hasn't been made earlier")
   df <- df[!grepl(cdr3aa, pattern = "*", fixed = T) & ((nchar(cdr3nt) %% 3) == 0)]
 
-  models <- list('mouseTRB'=c(OLGAVJ_MOUSE_TRB, 6.27),
-                 'humanTRB'=c(OLGAVJ_HUMAN_TRB, 27),
-                 'humanTRA'=c(OLGAVJ_HUMAN_TRA, 27))
+  model_marginals <- list('mouseTRB'=OLGAVJ_MOUSE_TRB,
+                 'humanTRB'=OLGAVJ_HUMAN_TRB,
+                 'humanTRA'=OLGAVJ_HUMAN_TRA)
 
+  model_Q_val <- list('mouseTRB'=6.27,
+                      'humanTRB'=27,
+                      'humanTRA'=27)
+
+  message('model selection')
   if(model == '-'){
-    OLGAVJ <- models[chain][[1]][1]
-    Q_val <- models[chain][[1]][2]
+    OLGAVJ <- model_marginals[chain][[1]]
+    Q_val <- model_Q_val[chain][[1]]
   } else {
     path_to_model <- unlist(base::strsplit(model, ' '))[2]
     params <- read.table(paste0(path_to_model, 'model_params.txt'))
@@ -201,23 +206,23 @@ tcrgrapher <- function(df, cores = 1, thres_counts = 1,
     colnames(OLGAVJ) <- J_names
   }
 
-  # filter sequences by number of counts
+  message('filtering sequences by number of counts')
   df <- df[Read.count >= thres_counts,]
   stopifnot(nrow(df) != 0)
-  # filter V and J for present in model
-  df <- df[bestVGene %in% row.names(OLGAVJ) & bestJGene %in% colnames(OLGAVJ)]
+  message('filtering V and J for present in model')
+  df <- df[bestVGene %in% rownames(OLGAVJ) & bestJGene %in% colnames(OLGAVJ)]
   stopifnot(nrow(df) != 0)
-
+  message('calculating number of neighbors for every sequence')
   df <- calculate_nb_of_neighbors(df)
-
   df[, VJ_n_total := .N, .(bestVGene, bestJGene)]
+  message('filtering sequences by number of neighbors')
   df <- df[D >= N_neighbors_thres][, ind := 1:.N, ]
   stopifnot(nrow(df) != 0)
-
+  message('generating all possible sequences with one mismatch')
   df_with_mismatch <- df[, .(bestVGene, bestJGene,
     cdr3aa = all_other_variants_one_mismatch_regexp(cdr3aa)
   ), ind]
-
+  message('generation probability calculation')
   df <- parallel_wrapper_beta(df = df, cores = cores, chain = chain,
                               stats = stats, model=model)
   df_with_mismatch <- parallel_wrapper_beta(df = df_with_mismatch, cores = cores,
