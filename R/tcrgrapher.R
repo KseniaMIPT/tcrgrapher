@@ -100,7 +100,7 @@ parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
   cl <- parallel::makeCluster(cores)
   doParallel::registerDoParallel(cl)
   foreach(i=1:cores) %dopar% {
-    system(commands[i])
+    system(commands[i], intern=TRUE)
   }
   parallel::stopCluster(cl)
 
