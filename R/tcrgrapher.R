@@ -172,27 +172,20 @@ parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 #' \item{"p_adjust"}{"p value with multiple testing correction"}
 #' }
 #' @export
-tcrgrapher <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
+tcrgrapher <- function(df, cores = 1, thres_counts = 1,
                           N_neighbors_thres = 1, p_adjust_method = "BH",
                           chain = 'mouseTRB', stats = 'OLGA', model = '-') {
 
   # checking for unproductive sequences if it hasn't been made earlier
   df <- df[!grepl(cdr3aa, pattern = "*", fixed = T) & ((nchar(cdr3nt) %% 3) == 0)]
 
+  models <- list('mouseTRB'=c(OLGAVJ_MOUSE_TRB, 6.27),
+                 'humanTRB'=c(OLGAVJ_HUMAN_TRB, 27),
+                 'humanTRA'=c(OLGAVJ_HUMAN_TRA, 27))
+
   if(model == '-'){
-    if (chain == 'mouseTRB'){
-      OLGAVJ = OLGAVJ_MOUSE_TRB
-    } else if (chain == 'humanTRB'){
-      OLGAVJ = OLGAVJ_HUMAN_TRB
-      if(Q_val == 6.27){
-        Q_val = 27
-      }
-    } else if (chain == 'humanTRA'){
-      OLGAVJ = OLGAVJ_HUMAN_TRA
-      if(Q_val == 6.27){
-        Q_val = 27
-      }
-    }
+    OLGAVJ <- models[chain][[1]][1]
+    Q_val <- models[chain][[1]][2]
   } else {
     path_to_model <- unlist(base::strsplit(model, ' '))[2]
     params <- read.table(paste0(path_to_model, 'model_params.txt'))
@@ -215,7 +208,7 @@ tcrgrapher <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
   df <- df[bestVGene %in% row.names(OLGAVJ) & bestJGene %in% colnames(OLGAVJ)]
   stopifnot(nrow(df) != 0)
 
-  df <- calculate_nb_of_neighbors(df, stats = stats)
+  df <- calculate_nb_of_neighbors(df)
 
   df[, VJ_n_total := .N, .(bestVGene, bestJGene)]
   df <- df[D >= N_neighbors_thres][, ind := 1:.N, ]
