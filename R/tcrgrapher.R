@@ -29,16 +29,18 @@ calculate_nb_of_neighbors_one_side <- function(df) {
     function(x) { sum(x <= 1, na.rm = T) })
 }
 
-calculate_nb_of_neighbors <- function(df, stats) {
-
-
+calculate_nb_of_neighbors <- function(df) {
+  # give unique number 'leftgr' to the rows with the same VJ combination and left
+  # CDR3aa part
   df[, leftgr := .GRP, .(substr(cdr3aa, 1, floor(nchar(cdr3aa) / 2)),
                          bestVGene, bestJGene)]
+  # give unique number 'rightgr' to the rows with the same VJ combination and right
+  # CDR3aa part
   df[, rightgr := .GRP, .(substr(cdr3aa, floor(nchar(cdr3aa) / 2) + 1, nchar(cdr3aa)),
                           bestVGene, bestJGene)]
 
   df[, D_left := calculate_nb_of_neighbors_one_side(.SD), .(leftgr)]
-  df[, D_right := calculate_nb_of_neighbors_one_side(.SD),.(rightgr)]
+  df[, D_right := calculate_nb_of_neighbors_one_side(.SD), .(rightgr)]
   df[, D_id := .N, .(cdr3aa)]
   df[, D := (D_left + D_right - D_id - 1), ]
   df <- subset(df, select = -c(rightgr, leftgr, D_left, D_right, D_id))
