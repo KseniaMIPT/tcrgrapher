@@ -172,7 +172,7 @@ parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 #' \item{"p_adjust"}{"p value with multiple testing correction"}
 #' }
 #' @export
-tcrgrapher <- function(df, cores = 1, thres_counts = 1,
+tcrgrapher <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
                           N_neighbors_thres = 1, p_adjust_method = "BH",
                           chain = 'mouseTRB', stats = 'OLGA', model = '-') {
 
