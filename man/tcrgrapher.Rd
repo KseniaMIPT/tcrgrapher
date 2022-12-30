@@ -40,6 +40,13 @@ possible options: "bonferroni", "holm", "hochberg", "hommel", "BH" or "fdr",
 
 \item{stats}{Tool that will be used for generation probability calculation.
 Possible options: "OLGA", "SONIA". "SONIA" also calculate Q for every sequence.}
+
+\item{model}{Standard OLGA generation probability model is used by default.
+To set your one generation probability model write "set_custom_model_VDJ
+<path_to_folder_with_model>". Generation probability model is usually IGOR output.
+Folder should contain the following files: V_gene_CDR3_anchors.csv,
+J_gene_CDR3_anchors.csv, model_marginals.txt, model_params.txt. Some models
+one can find in the folder "model"}
 }
 \value{
 Function returns the same table that was in input filtered by number
