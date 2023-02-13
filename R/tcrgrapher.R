@@ -194,9 +194,9 @@ tcrgrapher <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
   } else {
     path_to_model <- unlist(base::strsplit(model, ' '))[2]
     params <- read.table(paste0(path_to_model, 'model_params.txt'))
-    V_names <- sapply(strsplit(params$V1[grep('TRBV', params$V1)], "\\*"), `[`, 1)
+    V_names <- sapply(strsplit(params$V1[grep('TRBV', params$V1)], ";"), `[`, 1)
     V_names <- sub('%TRBV', 'TRBV', V_names)
-    J_names <- sapply(strsplit(params$V1[grep('TRBJ', params$V1)], "\\*"), `[`, 1)
+    J_names <- sapply(strsplit(params$V1[grep('TRBJ', params$V1)], ";"), `[`, 1)
     J_names <- sub('%TRBJ', 'TRBJ', J_names)
     marginals <- read.table(paste0(path_to_model, 'model_marginals.txt'))
     V_prob <- as.numeric(unlist(strsplit(substring(marginals$V1[3], 2, nchar(marginals$V1[3])), ',')))
