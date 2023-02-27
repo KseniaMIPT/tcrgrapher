@@ -93,7 +93,8 @@ parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
       path, "tmp", 1:cores, ".tsv -o ", path, "tmp_out", 1:cores, ".tsv"
     )
   } else if (stats == 'SONIA'){
-    commands <- paste0('sonia-evaluate --', chain, " --ppost -i ", path, "tmp",
+    commands <- paste0('sonia-evaluate --', chain,
+                       " --seq_in 0 --v_in 1 --j_in 2 -d 'tab' --ppost -i ", path, "tmp",
                        1:cores, ".tsv -o ", path, "tmp_out", 1:cores, ".tsv")
   }
 
@@ -233,14 +234,11 @@ tcrgrapher <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
     df$Pgen_sum <- df_with_mismatch[, sum(Pgen), ind]$V1
     # Pgen_sum_corr - Pgen_sum without probabilities of the main sequence
     df[, Pgen_sum_corr := Pgen_sum - Pgen * (nchar(cdr3aa) - 2), ]
-    # Bayes' rule
-    df[, Pgen_by_VJ := 1 * Pgen_sum_corr / OLGAVJ[cbind(bestVGene, bestJGene)], ]
-    df[, p_val := ppois(D-1, lambda = Q_val * VJ_n_total * Pgen_by_VJ, lower.tail = F)]
+    df[, p_val := ppois(D-1, lambda = Q_val * VJ_n_total * Pgen_sum_corr, lower.tail = F)]
   } else if (stats == 'SONIA'){
     df$Ppost_sum <- df_with_mismatch[, sum(Ppost), ind]$V1
     df[, Ppost_sum_corr := Ppost_sum - Ppost * (nchar(cdr3aa) - 2), ]
-    df[, Ppost_by_VJ := 1 * Ppost_sum_corr / OLGAVJ[cbind(bestVGene, bestJGene)], ]
-    df[, p_val := ppois(D-1, lambda =  VJ_n_total * Ppost_by_VJ, lower.tail = F)]
+    df[, p_val := ppois(D-1, lambda =  VJ_n_total * Ppost_sum_corr, lower.tail = F)]
   }
 
   df[, p_adjust := p.adjust(p_val, method = p_adjust_method)]
