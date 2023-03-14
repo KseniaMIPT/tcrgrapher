@@ -22,7 +22,8 @@ Imports:
     stringdist,
     foreach,
     doParallel,
-    parallel,
+    parallel
+Suggests:
     igraph
 SystemRequirements:
     OLGA (python 2.7/3.6 software)
