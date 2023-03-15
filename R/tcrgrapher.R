@@ -9,8 +9,6 @@
 #' @importFrom parallel makeCluster
 #' @importFrom parallel stopCluster
 #' @importFrom doParallel registerDoParallel
-#' @importFrom igraph graph_from_adjacency_matrix
-#' @importFrom igraph components
 NULL
 "OLGAVJ_MOUSE_TRB"
 "OLGAVJ_HUMAN_TRB"
@@ -277,49 +275,5 @@ pval_with_abundance <- function(df) {
        'pval_with_abundance_counts'] <- PDF_f(df[df$D == d,
                                                  'D_counts'])* df[df$D == d, 'p_val']
   }
-  df
-}
-
-#' make_graph
-#'
-#' Function makes graph from tcrgrapher output with igraph package. Every node
-#' of the graph is an unique clonotype from the table (one line). Edges
-#' connects clonotypes with one amino acid mismatch or identical clonotypes if
-#' they were in separate lines.
-#'
-#' @param df output of tcrgrapher function
-#' @return Function returns an igraph graph object
-#' @export
-make_graph <- function(df){
-  adj_matrix <- stringdistmatrix(df$cdr3aa, df$cdr3aa, method = "hamming")
-  adj_matrix <- 1*(adj_matrix <= 1)
-  rownames(adj_matrix) <- df$cdr3aa
-  colnames(adj_matrix) <- df$cdr3aa
-  diag(adj_matrix) <- 0
-  g <- graph_from_adjacency_matrix(
-    adj_matrix,
-    mode = "undirected",
-    weighted = NULL,
-    diag = TRUE,
-    add.colnames = NULL,
-    add.rownames = NA
-  )
-  g
-}
-
-#' find_cluster
-#'
-#' Function takes tcrgrapher output and returns the same table with additional
-#' column "cluster_id". All clusters of neighbours with one mismatch have unique
-#' id. Function uses "components" function from igraph package.
-#'
-#' @param df output of tcrgrapher function
-#' @param g make_graph output
-#' @return Function returns the same data.table with additional column
-#' "cluster_id"
-#' @export
-find_cluster <- function(df, g){
-  components <- components(g)
-  df$cluster_id <- components$membership
   df
 }
