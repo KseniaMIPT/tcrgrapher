@@ -24,7 +24,8 @@ Imports:
     doParallel,
     parallel
 Suggests:
-    igraph
+    igraph,
+    edgeR
 SystemRequirements:
     OLGA (python 2.7/3.6 software)
     SONIA (python 2.7/3.6 software)
