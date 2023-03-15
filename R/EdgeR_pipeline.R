@@ -17,7 +17,7 @@ create_count_table <- function(dir, metadata){
     sample <- fread(paste0(dir, sample_name))
     sample <- sample[, .(count = sum(count)), by = 'cdr3aa']
     setnames(sample, "count", sample_name)
-    count_table <- merge.data.table(count_table, sample, by=cdr3aa, all=TRUE)
+    count_table <- merge.data.table(count_table, sample, by='cdr3aa', all=TRUE)
   }
   count_table <- count_table[cdr3aa != '0']
   count_table[is.na(count_table), ] <- 0
@@ -77,8 +77,8 @@ take_subset_from_count_table <- function(count_table, samples){
 #' @param normalization_method method to be used to edgeR::calcNormFactors function
 #' @return data.frame with statistics for every clonotype performed for each pair
 #' of groups. 'comparison' column shows comparisons in the format 'Group1 vs Group2'.
-#' In this case, LFC values are positive if the clonotype is expanded in 'Group1' and
-#' negative if it is expanded in 'Group2'.
+#' In this case, LFC values are negative if the clonotype is expanded in 'Group1' and
+#' positive if it is expanded in 'Group2'.
 #' @examples
 #' # find significantly expanded clonotypes after vaccination
 #' # my_metadata table contains column 'vaccination_status' with groups of comparison
@@ -107,7 +107,7 @@ edgeR_pipeline <- function(count_table, metadata, comparison, min.count = 1,
   }
   # Data preparation
   rownames(metadata) <- metadata$sample
-  design <- model.matrix(~ as.formula(paste('0 +', comparison)), data=metadata)
+  design <- model.matrix(as.formula(paste('~ 0 +', comparison)), data=metadata)
   sample <- DGEList(counts=count_table)
   # Data filtration
   keep <- filterByExpr(sample, design,
@@ -126,7 +126,7 @@ edgeR_pipeline <- function(count_table, metadata, comparison, min.count = 1,
   for(i in 1:(nb_of_comparisons-1)){
     nb_of_rows = nb_of_comparisons - i
     comparison_matrix <- cbind(matrix(0, nrow = nb_of_rows, ncol = i-1),
-                               matrix(1, nrow = nb_of_rows, ncol = 1),
+                               matrix(-1, nrow = nb_of_rows, ncol = 1),
                                diag(nb_of_rows))
     for(j in 1:nb_of_rows){
       qlf <- glmQLFTest(fit,contrast = comparison_matrix[j,])

@@ -47,8 +47,8 @@ p-values equal or lower than specified are returned}
 \value{
 data.frame with statistics for every clonotype performed for each pair
 of groups. 'comparison' column shows comparisons in the format 'Group1 vs Group2'.
-In this case, LFC values are positive if the clonotype is expanded in 'Group1' and
-negative if it is expanded in 'Group2'.
+In this case, LFC values are negative if the clonotype is expanded in 'Group1' and
+positive if it is expanded in 'Group2'.
 }
 \description{
 Function performs statistical analysis by edgeR to identify significantly
