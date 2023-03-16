@@ -3,7 +3,7 @@
 export(create_count_table)
 export(edgeR_pipeline)
 export(find_cluster)
-export(make_graph)
+export(make_TCR_graph)
 export(pval_with_abundance)
 export(take_subset_from_count_table)
 export(tcrgrapher)

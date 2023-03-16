@@ -1,4 +1,4 @@
-#' make_graph
+#' make_TCR_graph
 #'
 #' Function makes graph from tcrgrapher output with igraph package. Every node
 #' of the graph is an unique clonotype from the table (one line). Edges
@@ -8,7 +8,7 @@
 #' @param df output of tcrgrapher function
 #' @return Function returns an igraph graph object
 #' @export
-make_graph <- function(df){
+make_TCR_graph <- function(df){
   if (!requireNamespace("igraph", quietly = TRUE)) {
     stop(
       "Package \"igraph\" must be installed to use this function.",
