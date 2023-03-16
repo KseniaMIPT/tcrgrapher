@@ -106,6 +106,7 @@ edgeR_pipeline <- function(count_table, metadata, comparison, min.count = 1,
          call. = FALSE)
   }
   # Data preparation
+  metadata <- as.data.frame(metadata)
   rownames(metadata) <- metadata$sample
   design <- model.matrix(as.formula(paste('~ 0 +', comparison)), data=metadata)
   sample <- DGEList(counts=count_table)
