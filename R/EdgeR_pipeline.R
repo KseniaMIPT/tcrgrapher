@@ -133,6 +133,7 @@ edgeR_pipeline <- function(count_table, metadata, comparison, min.count = 1,
       qlf <- glmQLFTest(fit,contrast = comparison_matrix[j,])
       topTags <- topTags(qlf, n = nrow(count_table), p.value = alpha)$table
       topTags$comparison <- paste(comparison_levels[i], 'vs', comparison_levels[i+j])
+      topTags$feature <- rownames(topTags)
       sign_result <- rbind(sign_result, topTags)
     }
   }
