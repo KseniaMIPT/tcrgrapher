@@ -122,7 +122,7 @@ edgeR_pipeline <- function(count_table, metadata, comparison, min.count = 1,
   fit <- glmQLFit(sample, design)
   # All pairwise comparisons by QL F-test
   sign_result <- c()
-  comparison_levels <- unique(metadata[,comparison])
+  comparison_levels <- colnames(design)
   nb_of_comparisons <- length(comparison_levels)
   for(i in 1:(nb_of_comparisons-1)){
     nb_of_rows = nb_of_comparisons - i
