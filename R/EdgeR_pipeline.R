@@ -76,7 +76,8 @@ take_subset_from_count_table <- function(count_table, samples){
 #' p-values equal or lower than specified are returned
 #' @param normalization_method method to be used to edgeR::calcNormFactors function
 #' @return data.frame with statistics for every clonotype performed for each pair
-#' of groups. 'comparison' column shows comparisons in the format 'Group1 vs Group2'.
+#' of groups and for every sample vs all others. 'comparison' column shows
+#' comparisons in the format 'Group1 vs Group2'.
 #' In this case, LFC values are negative if the clonotype is expanded in 'Group1' and
 #' positive if it is expanded in 'Group2'.
 #' @examples
@@ -124,18 +125,29 @@ edgeR_pipeline <- function(count_table, metadata, comparison, min.count = 1,
   sign_result <- c()
   comparison_levels <- colnames(design)
   nb_of_comparisons <- length(comparison_levels)
+  # pairwise comparisons
   for(i in 1:(nb_of_comparisons-1)){
     nb_of_rows = nb_of_comparisons - i
-    comparison_matrix <- cbind(matrix(0, nrow = nb_of_rows, ncol = i-1),
+    comparison_matrix_pairwise <- cbind(matrix(0, nrow = nb_of_rows, ncol = i-1),
                                matrix(-1, nrow = nb_of_rows, ncol = 1),
                                diag(nb_of_rows))
     for(j in 1:nb_of_rows){
-      qlf <- glmQLFTest(fit,contrast = comparison_matrix[j,])
+      qlf <- glmQLFTest(fit,contrast = comparison_matrix_pairwise[j,])
       topTags <- topTags(qlf, n = nrow(count_table), p.value = alpha)$table
       topTags$comparison <- paste(comparison_levels[i], 'vs', comparison_levels[i+j])
       topTags$feature <- rownames(topTags)
       sign_result <- rbind(sign_result, topTags)
     }
+  }
+  # each sample vs all others
+  comparison_matrix_vs_all <- matrix(-1/(nb_of_comparisons-1), nb_of_comparisons, nb_of_comparisons)
+  comparison_matrix_vs_all[row(comparison_matrix_vs_all) == col(comparison_matrix_vs_all)] <- 1
+  for(i in 1:nb_of_comparisons){
+    qlf <- glmQLFTest(fit,contrast = comparison_matrix_vs_all[i,])
+    topTags <- topTags(qlf, n = nrow(count_table), p.value = alpha)$table
+    topTags$comparison <- paste(comparison_levels[i], 'vs all')
+    topTags$cluster <- rownames(topTags)
+    sign_result <- rbind(sign_result, topTags)
   }
   sign_result
 }
