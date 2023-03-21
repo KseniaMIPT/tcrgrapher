@@ -139,7 +139,7 @@ edgeR_pipeline <- function(count_table, metadata, comparison, min.count = 1,
       sign_result <- rbind(sign_result, topTags)
     }
   }
-  # each sample vs all others
+  # each group vs all others
   comparison_matrix_vs_all <- matrix(-1/(nb_of_comparisons-1), nb_of_comparisons, nb_of_comparisons)
   comparison_matrix_vs_all[row(comparison_matrix_vs_all) == col(comparison_matrix_vs_all)] <- 1
   for(i in 1:nb_of_comparisons){
