@@ -11,20 +11,51 @@
 #' @return Function returns count table with unique amino acid sequences as
 #' row names and sample names as column names
 #' @export
-create_count_table <- function(dir, metadata){
-  count_table <- data.table(cdr3aa='0')
+create_count_table <- function(dir, metadata, v_gene = TRUE){
+  count_table <- data.table(cdr3aa='0', bestVGene='0')
   for(sample_name in metadata$sample){
     sample <- fread(paste0(dir, sample_name))
-    sample <- sample[, .(count = sum(count)), by = 'cdr3aa']
+    if(!v_gene){
+      sample$bestVGene <- ''
+    }
+    sample <- sample[, .(count = sum(count)), by = .(cdr3aa, bestVGene)]
     setnames(sample, "count", sample_name)
-    count_table <- merge.data.table(count_table, sample, by='cdr3aa', all=TRUE)
+    count_table <- merge.data.table(count_table, sample,
+                                    by=c('cdr3aa', 'bestVGene'), all=TRUE)
   }
   count_table <- count_table[cdr3aa != '0']
   count_table[is.na(count_table), ] <- 0
   count_table <- as.data.frame(count_table)
-  rownames(count_table) <- count_table$cdr3aa
-  count_table <- count_table[,-1]
+  if(v_gene){
+    rownames(count_table) <- paste(count_table$cdr3aa, count_table$bestVGene)
+  } else {
+    rownames(count_table) <- count_table$cdr3aa
+  }
+  count_table <- count_table[,-(1:2)]
   count_table
+}
+
+transform_from_clonotypes_to_clusters <- function(count_table, v_gene = TRUE){
+  # temporary columns
+  count_table$cdr3aa <- sapply(strsplit(rownames(count_table), ' '), function(x) x[1])
+  if(v_gene){
+    count_table$bestVGene <- sapply(strsplit(rownames(count_table), ' '), function(x) x[2])
+  } else {
+    count_table$bestVGene <- ''
+  }
+  # functions from igraph_capabilities.R
+  g <- make_TCR_graph(count_table)
+  count_table <- find_cluster(count_table, g)
+  # using aggregation from data.table
+  count_table <- setDT(count_table)
+  components_table <- count_table[,.(cdr3aa, bestVGene, cluster_id)]
+  count_table <- count_table[,-c('cdr3aa', 'bestVGene')]
+  count_table <- count_table[,lapply(.SD, sum), by='cluster_id']
+  count_table <- as.data.frame(count_table)
+  # now we have clusters id instead of clonotypes!
+  rownames(count_table) <- count_table$cluster_id
+  count_table$cluster_id <- NULL
+  # return TODO
 }
 
 #' take_subset_from_count_table

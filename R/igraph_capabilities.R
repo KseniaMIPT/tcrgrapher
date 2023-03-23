@@ -8,7 +8,7 @@
 #' @param df output of tcrgrapher function
 #' @return Function returns an igraph graph object
 #' @export
-make_TCR_graph <- function(df){
+make_TCR_graph <- function(df, v_gene = TRUE){
   if (!requireNamespace("igraph", quietly = TRUE)) {
     stop(
       "Package \"igraph\" must be installed to use this function.",
@@ -20,6 +20,9 @@ make_TCR_graph <- function(df){
   rownames(adj_matrix) <- df$cdr3aa
   colnames(adj_matrix) <- df$cdr3aa
   diag(adj_matrix) <- 0
+  if(v_gene){
+    adj_matrix[outer(df$v_segment, df$v_segment, FUN = '!=')] <- 0
+  }
   g <- graph_from_adjacency_matrix(
     adj_matrix,
     mode = "undirected",
