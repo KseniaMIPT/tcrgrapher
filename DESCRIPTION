@@ -25,7 +25,9 @@ Imports:
     parallel
 Suggests:
     igraph,
-    edgeR
+    edgeR,
+    testthat (>= 3.0.0)
 SystemRequirements:
     OLGA (python 2.7/3.6 software)
     SONIA (python 2.7/3.6 software)
+Config/testthat/edition: 3
