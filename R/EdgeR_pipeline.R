@@ -5,7 +5,7 @@
 #' corresponds to the sample.
 #'
 #' @param dir path to the directory where the clonotype tables are located
-#' @param metadata table should contain 'sample' column with names of the files
+#' @param metadata table should contain 'file' column with names of the files
 #' in directory specified earlier. Samples should contain 'cdr3aa' and 'count'
 #' columns.
 #' @return Function returns count table with unique amino acid sequences as
@@ -13,13 +13,16 @@
 #' @export
 create_count_table <- function(dir, metadata, v_gene = TRUE){
   count_table <- data.table(cdr3aa='0', bestVGene='0')
-  for(sample_name in metadata$sample){
+  for(i in 1:nrow(metadata)){
+    sample_name <- metadata$file[i]
+    sample_id <- metadata$sample_id[i]
+
     sample <- fread(paste0(dir, sample_name))
     if(!v_gene){
       sample$bestVGene <- ''
     }
     sample <- sample[, .(count = sum(count)), by = .(cdr3aa, bestVGene)]
-    setnames(sample, "count", sample_name)
+    setnames(sample, "count", sample_id)
     count_table <- merge.data.table(count_table, sample,
                                     by=c('cdr3aa', 'bestVGene'), all=TRUE)
   }
@@ -52,10 +55,11 @@ transform_from_clonotypes_to_clusters <- function(count_table, v_gene = TRUE){
   count_table <- count_table[,-c('cdr3aa', 'bestVGene')]
   count_table <- count_table[,lapply(.SD, sum), by='cluster_id']
   count_table <- as.data.frame(count_table)
-  # now we have clusters id instead of clonotypes!
+  # now we have clusters_id instead of clonotypes!
   rownames(count_table) <- count_table$cluster_id
   count_table$cluster_id <- NULL
   # return TODO
+  list('count_table'=count_table, 'components_table'=components_table)
 }
 
 #' take_subset_from_count_table
@@ -177,7 +181,7 @@ edgeR_pipeline <- function(count_table, metadata, comparison, min.count = 1,
     qlf <- glmQLFTest(fit,contrast = comparison_matrix_vs_all[i,])
     topTags <- topTags(qlf, n = nrow(count_table), p.value = alpha)$table
     topTags$comparison <- paste(comparison_levels[i], 'vs all')
-    topTags$cluster <- rownames(topTags)
+    topTags$feature <- rownames(topTags)
     sign_result <- rbind(sign_result, topTags)
   }
   sign_result

@@ -4,6 +4,8 @@
 #' @importFrom utils write.table
 #' @importFrom stringdist stringdistmatrix
 #' @importFrom data.table :=
+#' @importFrom data.table rbindlist
+#' @importFrom data.table fread
 #' @importFrom foreach %dopar%
 #' @importFrom foreach foreach
 #' @importFrom parallel makeCluster
@@ -18,9 +20,7 @@ NULL
 # Secondary functions -----------------------------------------------------
 
 calculate_nb_of_neighbors_one_side <- function(df) {
-  # Calculate nb of neighbors above threshold
-  # Every sequence with one mismatch is a neighbor. Only sequences with number
-  # of counts above threshold are taken into account
+  # Every sequence with one mismatch is a neighbor
   tmp <- stringdistmatrix(df$cdr3aa, df$cdr3aa, method = "hamming")
   apply(tmp,
     MARGIN = 1,
@@ -103,10 +103,7 @@ parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
   }
   parallel::stopCluster(cl)
 
-  stats_output <- c()
-  for(file in tmp_names_out){
-    stats_output <- rbind(stats_output, fread(paste0(path, file)))
-  }
+  stats_output <- rbindlist(lapply(paste0(path, tmp_names_out), fread))
 
   if(stats == 'OLGA'){
     df$Pgen <- stats_output$V2
@@ -119,13 +116,13 @@ parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 }
 
 # Main function -----------------------------------------------------------
-#' tcrgrapher
+#' ALICE_pipeline
 #'
 #' Main function that takes a table with CDR3 sequences as an input. The table
 #' should have the following columns (Order of the columns are not important but
 #' the following names are necessary)
 #' \itemize{
-#' \item{"Read.count"}{"Number of unique reads per cdr3 sequence"}
+#' \item{"count"}{"Number of unique reads per cdr3 sequence"}
 #' \item{"cdr3nt"}{"CDR3 nucleotide sequence"}
 #' \item{"cdr3aa"}{"CDR3 aminoacid sequence"}
 #' \item{"bestVGene"}{"TRBV segment"}
@@ -171,7 +168,7 @@ parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 #' \item{"p_adjust"}{"p value with multiple testing correction"}
 #' }
 #' @export
-tcrgrapher <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
+ALICE_pipeline <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
                           N_neighbors_thres = 1, p_adjust_method = "BH",
                           chain = 'mouseTRB', stats = 'OLGA', model = '-') {
 
@@ -206,7 +203,7 @@ tcrgrapher <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
   }
 
   message('filtering sequences by number of counts')
-  df <- df[Read.count >= thres_counts,]
+  df <- df[count >= thres_counts,]
   stopifnot(nrow(df) != 0)
   message('filtering V and J for present in model')
   df <- df[bestVGene %in% rownames(OLGAVJ) & bestJGene %in% colnames(OLGAVJ)]
@@ -257,7 +254,7 @@ tcrgrapher <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
 #' \itemize{
 #' \item{"pval_with_abundance_log2_counts"}{"Recalculated p-value considering
 #' count number of every clonotype. Log2 is used for count normalization"}
-#' #' \item{"pval_with_abundance_counts"}{"Recalculated p-value considering
+#' \item{"pval_with_abundance_counts"}{"Recalculated p-value considering
 #' count number of every clonotype. There is no count normalization"}
 #' @export
 pval_with_abundance <- function(df) {

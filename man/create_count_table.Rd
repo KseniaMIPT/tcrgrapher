@@ -4,12 +4,12 @@
 \alias{create_count_table}
 \title{create_count_table}
 \usage{
-create_count_table(dir, metadata)
+create_count_table(dir, metadata, v_gene = TRUE)
 }
 \arguments{
 \item{dir}{path to the directory where the clonotype tables are located}
 
-\item{metadata}{table should contain 'sample' column with names of the files
+\item{metadata}{table should contain 'file' column with names of the files
 in directory specified earlier. Samples should contain 'cdr3aa' and 'count'
 columns.}
 }

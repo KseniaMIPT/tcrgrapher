@@ -4,7 +4,7 @@
 \alias{make_TCR_graph}
 \title{make_TCR_graph}
 \usage{
-make_TCR_graph(df)
+make_TCR_graph(df, v_gene = TRUE)
 }
 \arguments{
 \item{df}{output of tcrgrapher function}
