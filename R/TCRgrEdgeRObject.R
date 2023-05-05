@@ -7,39 +7,50 @@
 setClass('TCRgrapherCounts',
          contains = 'TCRgrapher',
          slots = c(
-           count_table = 'data.table',
+           count_table = 'data.frame',
            feature_info = 'data.table'
          ))
 
 # constructor function
 # TODO
-# create_count_table <- function(..., TCRgrapherObject = NA, v_gene = TRUE){
-#   if(is.na(TCRgrapherObject)){
-#     TCRgrapher(...)
-#   } else {
-#     TCRgrapherObject
+# create_count_table <- function(TCRgrObject, v_gene = TRUE, by_clusters = FALSE,
+#                                custom_groupping = FALSE){
+#   # requirements
+#   if(!("TCRgrapher" %in% attr(TCRgrObject, 'class'))){
+#     stop("The function takes TCRgrapher object as an input. See ?TCRgrapher",
+#          call. = FALSE)
 #   }
-#   # count_table <- data.table(cdr3aa='0', bestVGene='0')
-#   # metadata <- metadata(TCRgrObject)
-#   # for(i in 1:nrow(metadata)){
-#   #   sample_id <- metadata$sample_id[i]
-#   #   sample <- clonoset(TCRgrObject)[sample == sample_id]
-#   #   if(!v_gene){
-#   #     sample$bestVGene <- ''
-#   #   }
-#   #   sample <- sample[, .(count = sum(count)), by = .(cdr3aa, bestVGene)]
-#   #   setnames(sample, "count", sample_id)
-#   #   count_table <- merge.data.table(count_table, sample,
-#   #                                   by=c('cdr3aa', 'bestVGene'), all=TRUE)
-#   # }
-#   # count_table <- count_table[cdr3aa != '0']
-#   # count_table[is.na(count_table), ] <- 0
-#   # count_table <- as.data.frame(count_table)
-#   # if(v_gene){
-#   #   rownames(count_table) <- paste(count_table$cdr3aa, count_table$bestVGene)
-#   # } else {
-#   #   rownames(count_table) <- count_table$cdr3aa
-#   # }
-#   # count_table <- count_table[,-(1:2)]
-#   # count_table
+#
+#   count_table <- list()
+#   feature_info <- list()
+#   metadata <- TCRgrObject@metadata
+#   clonoset <- TCRgrObject@clonoset
+#
+#   for(sample_t in metadata$sample_id){
+#     sample <- clonoset[sample_id == sample_t]
+#     if(!v_gene){
+#       sample <- sample[, .(count = sum(count)), by = .(cdr3aa)]
+#     } else {
+#       sample <- sample[, .(count = sum(count)), by = .(cdr3aa, bestVGene)]
+#     }
+#
+#     setnames(sample, "count", "sample_id")
+#     count_table <- merge.data.table(count_table, sample,
+#                                     by=c('cdr3aa', 'bestVGene'), all=TRUE)
+#   }
+#
+#   count_table <- Reduce(count_table, function(x, y) merge.data.table(x, y, by=c('cdr3aa', 'bestVGene'), all = TRUE))
+#
+#   count_table <- as.data.frame(count_table)
+#   if(v_gene){
+#     rownames(count_table) <- paste(count_table$cdr3aa, count_table$bestVGene)
+#   } else {
+#     rownames(count_table) <- count_table$cdr3aa
+#   }
+#   count_table <- count_table[,-(1:2)]
+#
+#
+#   new('TCRgrapherCounts', clonoset = TCRgrObject@clonoset,
+#       metadata = TCRgrObject@metadata, count_table = count_table,
+#       feature_info = feature_info)
 # }

@@ -79,4 +79,3 @@ test_that("subsetting method works", {
   expect_equal(length(unique(TCRgrObject@clonoset$sample)), 2)
   expect_equal(nrow(TCRgrObject@metadata), 2)
 })
-

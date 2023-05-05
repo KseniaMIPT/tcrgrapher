@@ -127,7 +127,7 @@ edgeR_pipeline <- function(count_table, metadata, comparison, min.count = 1,
   # Important conditions
   if(!requireNamespace("edgeR", quietly = TRUE)){
     stop("Package \"edgeR\" must be installed to use this function.",
-      call. = FALSE)
+         call. = FALSE)
   }
   if(!('sample' %in% colnames(metadata))){
     stop("There is no column 'sample' in metadata.", call. = FALSE)
@@ -164,8 +164,8 @@ edgeR_pipeline <- function(count_table, metadata, comparison, min.count = 1,
   for(i in 1:(nb_of_comparisons-1)){
     nb_of_rows = nb_of_comparisons - i
     comparison_matrix_pairwise <- cbind(matrix(0, nrow = nb_of_rows, ncol = i-1),
-                               matrix(-1, nrow = nb_of_rows, ncol = 1),
-                               diag(nb_of_rows))
+                                        matrix(-1, nrow = nb_of_rows, ncol = 1),
+                                        diag(nb_of_rows))
     for(j in 1:nb_of_rows){
       qlf <- glmQLFTest(fit,contrast = comparison_matrix_pairwise[j,])
       topTags <- topTags(qlf, n = nrow(count_table), p.value = alpha)$table

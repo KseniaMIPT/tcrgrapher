@@ -112,8 +112,8 @@ TCRgrapher <- function(files_path, count_column, cdr3nt_column,
         lapply(
           files,
           function(file) fread(paste0(files_path, file), header = TRUE)[, sample_id := file, ]
-          )
         )
+      )
       metadata <- data.table(file = files, sample_id = files)
     }
   } else {
@@ -126,8 +126,8 @@ TCRgrapher <- function(files_path, count_column, cdr3nt_column,
       lapply(
         1:nrow(metadata),
         function(i) fread(metadata_files[i], header = TRUE)[,sample_id := metadata$sample_id[i],]
-        )
       )
+    )
   }
   clonoset_indexes <-c(
     count_column, cdr3nt_column, cdr3aa_column, v_gene_column, j_gene_column

@@ -23,8 +23,8 @@ calculate_nb_of_neighbors_one_side <- function(df) {
   # Every sequence with one mismatch is a neighbor
   tmp <- stringdistmatrix(df$cdr3aa, df$cdr3aa, method = "hamming")
   apply(tmp,
-    MARGIN = 1,
-    function(x) { sum(x <= 1, na.rm = T) })
+        MARGIN = 1,
+        function(x) { sum(x <= 1, na.rm = T) })
 }
 
 calculate_nb_of_neighbors <- function(df) {
@@ -76,7 +76,7 @@ parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 
   for (i in 1:length(dft)) {
     write.table(as.data.frame(dft[[i]][, .(cdr3aa, bestVGene, bestJGene, ind), ]),
-      quote = F, row.names = F, sep = "\t", file = paste0(path, tmp_names[i]), col.names = F
+                quote = F, row.names = F, sep = "\t", file = paste0(path, tmp_names[i]), col.names = F
     )
   }
 
@@ -169,15 +169,15 @@ parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 #' }
 #' @export
 ALICE_pipeline <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
-                          N_neighbors_thres = 1, p_adjust_method = "BH",
-                          chain = 'mouseTRB', stats = 'OLGA', model = '-') {
+                           N_neighbors_thres = 1, p_adjust_method = "BH",
+                           chain = 'mouseTRB', stats = 'OLGA', model = '-') {
 
   message("checking for unproductive sequences if it hasn't been made earlier")
   df <- df[!grepl(cdr3aa, pattern = "*", fixed = T) & ((nchar(cdr3nt) %% 3) == 0)]
 
   model_marginals <- list('mouseTRB'=OLGAVJ_MOUSE_TRB,
-                 'humanTRB'=OLGAVJ_HUMAN_TRB,
-                 'humanTRA'=OLGAVJ_HUMAN_TRA)
+                          'humanTRB'=OLGAVJ_HUMAN_TRB,
+                          'humanTRA'=OLGAVJ_HUMAN_TRA)
 
   model_Q_val <- list('mouseTRB'=6.27,
                       'humanTRB'=27,
@@ -216,7 +216,7 @@ ALICE_pipeline <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
   stopifnot(nrow(df) != 0)
   message('generating all possible sequences with one mismatch')
   df_with_mismatch <- df[, .(bestVGene, bestJGene,
-    cdr3aa = all_other_variants_one_mismatch_regexp(cdr3aa)
+                             cdr3aa = all_other_variants_one_mismatch_regexp(cdr3aa)
   ), ind]
   message('generation probability calculation')
   df <- parallel_wrapper_beta(df = df, cores = cores, chain = chain,
