@@ -2,10 +2,10 @@ Package: tcrgrapher
 Title: R package for identifying condition-associated T cell clones
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "Ksenia",
+    person(given = "Kseniia",
            family = "Lupyr",
            role = c("aut", "cre"),
-           email = "kseniia.lupyr@skoltech.ru")
+           email = "kseniia.lupyr@gmail.ru")
 Description: R package for identifying condition associated T cell clones from a 
     single repertoire. Main function finds clones with significantly high number of
     neighbors (convergent clones or clones with one mismacth), taking into account 

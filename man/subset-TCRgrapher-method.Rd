@@ -2,9 +2,11 @@
 % Please edit documentation in R/TCRgrapherObject.R
 \name{subset,TCRgrapher-method}
 \alias{subset,TCRgrapher-method}
-\title{Subseting for TCRgrapher objects}
+\title{#' @export
+setGeneric("subset", function(x, samples) standardGeneric("subset"))
+Subseting for TCRgrapher objects}
 \usage{
-\S4method{subset}{TCRgrapher}(x, subset)
+\S4method{subset}{TCRgrapher}(x, samples)
 }
 \arguments{
 \item{x}{TCRgrapher object}
@@ -12,6 +14,6 @@
 \item{subset}{Vector with sample ids that should be kept}
 }
 \description{
-The function takes subset from both clonotype table and metadata. Samples that
+The function takes subset from both clonotype table and metadata. Samples
 to keep should be specified.
 }

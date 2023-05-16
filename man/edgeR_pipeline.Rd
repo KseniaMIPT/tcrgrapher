@@ -5,27 +5,16 @@
 \title{edgeR_pipeline}
 \usage{
 edgeR_pipeline(
-  count_table,
-  metadata,
+  TCRgrCounts,
   comparison,
   min.count = 1,
   min.total.count = 5,
   large.n = 1,
   min.prop = 0.5,
-  alpha = 0.05,
   normalization_method = "TMM"
 )
 }
 \arguments{
-\item{count_table}{a data frame where each row corresponds to unique
-amino acid clonotype and each column corresponds to the sample.}
-
-\item{metadata}{A data frame should contain the column 'sample'. The names of
-the count table columns and the 'sample' metadata column must be the same,
-and they must be in the same order. Also, metadata must contain a column that
-specifies levels of comparison. The name of the column must be the same as
-in 'comparison' variable.}
-
 \item{min.count}{parameter from edgeR::filterByExpr function. Minimum count
 required for at least some samples. Default value is 1.}
 
@@ -39,10 +28,16 @@ per group that is considered to be “large”. Default value is 1.}
 proportion of samples in the smallest group that express the gene. Default
 value is 0.5.}
 
-\item{alpha}{cutoff value for adjusted p-values. Only clonotypes with adjusted
-p-values equal or lower than specified are returned}
-
 \item{normalization_method}{method to be used to edgeR::calcNormFactors function}
+
+\item{count_table}{a data frame where each row corresponds to unique
+amino acid clonotype and each column corresponds to the sample.}
+
+\item{metadata}{A data frame should contain the column 'sample'. The names of
+the count table columns and the 'sample' metadata column must be the same,
+and they must be in the same order. Also, metadata must contain a column that
+specifies levels of comparison. The name of the column must be the same as
+in 'comparison' variable.}
 }
 \value{
 data.frame with statistics for every clonotype performed for each pair
@@ -55,12 +50,11 @@ positive if it is expanded in 'Group2'.
 Function performs statistical analysis by edgeR to identify significantly
 expanded clonotypes. First, it filters the data using relatively mild conditions
 that better suit TCR repertoire data. Second, it normalize counts and estimate
-dispersion by standard edgeR methods. Finally, it performs all comparisons
-between groups using glm and QL F-test.
+dispersion by standard edgeR methods. Finally, it performs all pairwise comparisons
+between groups and compares each group vs all others using glm and QL F-test.
 }
 \examples{
 # find significantly expanded clonotypes after vaccination
 # my_metadata table contains column 'vaccination_status' with groups of comparison
-# to get information for every clonotype alpha = 1 is specified
-# edgeR_pipeline(my_count_table, my_metadata, 'vaccination_status', alpha = 1)
+# edgeR_pipeline(my_count_table, my_metadata, 'vaccination_status')
 }

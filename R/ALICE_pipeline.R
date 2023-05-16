@@ -251,11 +251,10 @@ ALICE_pipeline <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
 #'
 #' @param df output of tcrgrapher function
 #' @return Function returns the same data.table with additional columns:
-#' \itemize{
-#' \item{"pval_with_abundance_log2_counts"}{"Recalculated p-value considering
-#' count number of every clonotype. Log2 is used for count normalization"}
-#' \item{"pval_with_abundance_counts"}{"Recalculated p-value considering
-#' count number of every clonotype. There is no count normalization"}
+#' pval_with_abundance_log2_counts -- recalculated p-value considering
+#' count number of every clonotype. Log2 is used for count normalization;
+#' pval_with_abundance_counts -- recalculated p-value considering
+#' count number of every clonotype. There is no count normalization.
 #' @export
 pval_with_abundance <- function(df) {
   counts <- df[,1]

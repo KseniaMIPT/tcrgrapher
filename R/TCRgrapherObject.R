@@ -3,12 +3,6 @@
 #' @importFrom data.table rbindlist
 #' @importFrom data.table :=
 
-setClass('TCRgrapher',
-         slots = c(
-           clonoset  = 'data.table',
-           metadata = 'data.table'
-         ))
-
 # secondary functions
 check_path <- function(files_path){
   if(substring(files_path, nchar(files_path)) != '/'){
@@ -225,34 +219,20 @@ setMethod("show", "TCRgrapher", function(object) {
   )
 })
 
-#' @export
-setGeneric("subset", function(x, subset) standardGeneric("subset"))
+#' #' @export
+#' setGeneric("subset", function(x, samples) standardGeneric("subset"))
 
 #' Subseting for TCRgrapher objects
 #'
-#' The function takes subset from both clonotype table and metadata. Samples that
+#' The function takes subset from both clonotype table and metadata. Samples
 #' to keep should be specified.
 #'
 #' @param x TCRgrapher object
 #' @param subset Vector with sample ids that should be kept
 #'
 #' @export
-setMethod("subset", "TCRgrapher", function(x, subset) {
-  x@metadata <- x@metadata[sample_id %in% subset]
-  x@clonoset <- x@clonoset[sample_id %in% subset]
+setMethod("subset", "TCRgrapher", function(x, samples) {
+  x@metadata <- x@metadata[sample_id %in% samples]
+  x@clonoset <- x@clonoset[sample_id %in% samples]
   x
 })
-
-
-# setClass('TCRgrALICE',
-#          contains = 'TCRgrapher',
-#          slots = c(
-#            Q_val = 'numeric',
-#            thres_counts = 'numeric',
-#            N_neighbors_thres = 'numeric',
-#            p_adjust_method = "character",
-#            chain = 'character',
-#            stats = 'character',
-#            model = 'character',
-#            OLGAVJ = 'list'
-#          ))

@@ -11,11 +11,10 @@ pval_with_abundance(df)
 }
 \value{
 Function returns the same data.table with additional columns:
-\itemize{
-\item{"pval_with_abundance_log2_counts"}{"Recalculated p-value considering
-count number of every clonotype. Log2 is used for count normalization"}
-\item{"pval_with_abundance_counts"}{"Recalculated p-value considering
-count number of every clonotype. There is no count normalization"}
+pval_with_abundance_log2_counts -- recalculated p-value considering
+count number of every clonotype. Log2 is used for count normalization;
+pval_with_abundance_counts -- recalculated p-value considering
+count number of every clonotype. There is no count normalization.
 }
 \description{
 Function calculates p-value taking into account abundance of every clonotype

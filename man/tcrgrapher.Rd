@@ -55,7 +55,8 @@ There are three ways to initialize an object.
 
 If path for only one file is specified metadata will be produced automatically
 and will contain one row and two columns: "file" and "sample_id".
-Clonoset will have additional column "sample_id" with one unique value.
+Clonoset will have additional column "sample_id" with one unique value and
+column "clone_id" with unique id for every row.
 Positions of "count", "cdr3nt", "cdr3aa", "V gene", "J gene" clonoset's columns must be specified.
 
 (2) Specify path to the directory with files without metadata
@@ -63,14 +64,16 @@ Positions of "count", "cdr3nt", "cdr3aa", "V gene", "J gene" clonoset's columns 
 If path for the directory with files is specified and metadata is not specified
 metadata will be produced automatically and will have number of rows equal
 to the number of samples in the directory. All files will be merged into one
-data.table with additional column "sample_id". Positions of "count", "cdr3nt", "cdr3aa",
+data.table with additional column "sample_id"  and column "clone_id" with
+unique id for every row.. Positions of "count", "cdr3nt", "cdr3aa",
 "V gene", "J gene" clonoset's columns must be specified.
 
 (3) Specify path to the directory with files and metadata
 
 If path for the directory with files and path to the metadata are specified
 only files from metadata column "file" will be taken into consideration.
-Clonosets will be merged into one data.table with additional column "sample_id".
+Clonosets will be merged into one data.table with additional column "sample_id" and
+column "clone_id" with unique id for every row.
 Values in the "sample_id" column will be the same as in the "sample_id"
 metadata column. Positions of "count", "cdr3nt", "cdr3aa", "V gene", "J gene" clonoset's
 columns and "file", "sampl_id" metadata's columns must be specified.

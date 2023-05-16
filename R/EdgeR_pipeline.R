@@ -1,95 +1,61 @@
-#' create_count_table
-#'
-#' Function takes clonotype tables from specified directory and creates a table
-#' where each row corresponds to unique amino acid clonotype and each column
-#' corresponds to the sample.
-#'
-#' @param dir path to the directory where the clonotype tables are located
-#' @param metadata table should contain 'file' column with names of the files
-#' in directory specified earlier. Samples should contain 'cdr3aa' and 'count'
-#' columns.
-#' @return Function returns count table with unique amino acid sequences as
-#' row names and sample names as column names
-#' @export
-create_count_table <- function(dir, metadata, v_gene = TRUE){
-  count_table <- data.table(cdr3aa='0', bestVGene='0')
-  for(i in 1:nrow(metadata)){
-    sample_name <- metadata$file[i]
-    sample_id <- metadata$sample_id[i]
+# create_count_table <- function(dir, metadata, v_gene = TRUE){
+#   count_table <- data.table(cdr3aa='0', bestVGene='0')
+#   for(i in 1:nrow(metadata)){
+#     sample_name <- metadata$file[i]
+#     sample_id <- metadata$sample_id[i]
+#
+#     sample <- fread(paste0(dir, sample_name))
+#     if(!v_gene){
+#       sample$bestVGene <- ''
+#     }
+#     sample <- sample[, .(count = sum(count)), by = .(cdr3aa, bestVGene)]
+#     setnames(sample, "count", sample_id)
+#     count_table <- merge.data.table(count_table, sample,
+#                                     by=c('cdr3aa', 'bestVGene'), all=TRUE)
+#   }
+#   count_table <- count_table[cdr3aa != '0']
+#   count_table[is.na(count_table), ] <- 0
+#   count_table <- as.data.frame(count_table)
+#   if(v_gene){
+#     rownames(count_table) <- paste(count_table$cdr3aa, count_table$bestVGene)
+#   } else {
+#     rownames(count_table) <- count_table$cdr3aa
+#   }
+#   count_table <- count_table[,-(1:2)]
+#   count_table
+# }
 
-    sample <- fread(paste0(dir, sample_name))
-    if(!v_gene){
-      sample$bestVGene <- ''
-    }
-    sample <- sample[, .(count = sum(count)), by = .(cdr3aa, bestVGene)]
-    setnames(sample, "count", sample_id)
-    count_table <- merge.data.table(count_table, sample,
-                                    by=c('cdr3aa', 'bestVGene'), all=TRUE)
-  }
-  count_table <- count_table[cdr3aa != '0']
-  count_table[is.na(count_table), ] <- 0
-  count_table <- as.data.frame(count_table)
-  if(v_gene){
-    rownames(count_table) <- paste(count_table$cdr3aa, count_table$bestVGene)
-  } else {
-    rownames(count_table) <- count_table$cdr3aa
-  }
-  count_table <- count_table[,-(1:2)]
-  count_table
-}
-
-transform_from_clonotypes_to_clusters <- function(count_table, v_gene = TRUE){
-  # temporary columns
-  count_table$cdr3aa <- sapply(strsplit(rownames(count_table), ' '), function(x) x[1])
-  if(v_gene){
-    count_table$bestVGene <- sapply(strsplit(rownames(count_table), ' '), function(x) x[2])
-  } else {
-    count_table$bestVGene <- ''
-  }
-  # functions from igraph_capabilities.R
-  g <- make_TCR_graph(count_table)
-  count_table <- find_cluster(count_table, g)
-  # using aggregation from data.table
-  count_table <- setDT(count_table)
-  components_table <- count_table[,.(cdr3aa, bestVGene, cluster_id)]
-  count_table <- count_table[,-c('cdr3aa', 'bestVGene')]
-  count_table <- count_table[,lapply(.SD, sum), by='cluster_id']
-  count_table <- as.data.frame(count_table)
-  # now we have clusters_id instead of clonotypes!
-  rownames(count_table) <- count_table$cluster_id
-  count_table$cluster_id <- NULL
-  # return TODO
-  list('count_table'=count_table, 'components_table'=components_table)
-}
-
-#' take_subset_from_count_table
-#'
-#' If you would like to take part of the samples into analysis, it is important
-#' to take a subset from a count table correctly, because number of rows influence
-#' the result.
-#'
-#' @param count_table a data frame where each row corresponds to unique
-#' amino acid clonotype and each column corresponds to the sample.
-#' @param samples a vector of names that matches the names of the columns to be
-#' taken into analysis
-#' @return count_table with specified columns and without rows with zero counts
-#' @examples
-#' # metadata_CD8 <- metadata[metadata$Cell_Population == 'CD8',]
-#' # count_table_CD8 <- take_subset_from_count_table(count_table, metadata_CD8$samples)
-#' @export
-take_subset_from_count_table <- function(count_table, samples){
-  count_table <- count_table[,samples]
-  count_table <- count_table[apply(count_table, 1, sum) != 0,]
-  count_table
-}
+# transform_from_clonotypes_to_clusters <- function(count_table, v_gene = TRUE){
+#   # temporary columns
+#   count_table$cdr3aa <- sapply(strsplit(rownames(count_table), ' '), function(x) x[1])
+#   if(v_gene){
+#     count_table$bestVGene <- sapply(strsplit(rownames(count_table), ' '), function(x) x[2])
+#   } else {
+#     count_table$bestVGene <- ''
+#   }
+#   # functions from igraph_capabilities.R
+#   g <- make_TCR_graph(count_table)
+#   count_table <- find_cluster(count_table, g)
+#   # using aggregation from data.table
+#   count_table <- setDT(count_table)
+#   components_table <- count_table[,.(cdr3aa, bestVGene, cluster_id)]
+#   count_table <- count_table[,-c('cdr3aa', 'bestVGene')]
+#   count_table <- count_table[,lapply(.SD, sum), by='cluster_id']
+#   count_table <- as.data.frame(count_table)
+#   # now we have clusters_id instead of clonotypes!
+#   rownames(count_table) <- count_table$cluster_id
+#   count_table$cluster_id <- NULL
+#   # return TODO
+#   list('count_table'=count_table, 'components_table'=components_table)
+# }
 
 #' edgeR_pipeline
 #'
 #' Function performs statistical analysis by edgeR to identify significantly
 #' expanded clonotypes. First, it filters the data using relatively mild conditions
 #' that better suit TCR repertoire data. Second, it normalize counts and estimate
-#' dispersion by standard edgeR methods. Finally, it performs all comparisons
-#' between groups using glm and QL F-test.
+#' dispersion by standard edgeR methods. Finally, it performs all pairwise comparisons
+#' between groups and compares each group vs all others using glm and QL F-test.
 #'
 #' @param count_table a data frame where each row corresponds to unique
 #' amino acid clonotype and each column corresponds to the sample.
@@ -107,8 +73,6 @@ take_subset_from_count_table <- function(count_table, samples){
 #' @param min.prop parameter from edgeR::filterByExpr function. Minimum
 #' proportion of samples in the smallest group that express the gene. Default
 #' value is 0.5.
-#' @param alpha cutoff value for adjusted p-values. Only clonotypes with adjusted
-#' p-values equal or lower than specified are returned
 #' @param normalization_method method to be used to edgeR::calcNormFactors function
 #' @return data.frame with statistics for every clonotype performed for each pair
 #' of groups and for every sample vs all others. 'comparison' column shows
@@ -118,17 +82,24 @@ take_subset_from_count_table <- function(count_table, samples){
 #' @examples
 #' # find significantly expanded clonotypes after vaccination
 #' # my_metadata table contains column 'vaccination_status' with groups of comparison
-#' # to get information for every clonotype alpha = 1 is specified
-#' # edgeR_pipeline(my_count_table, my_metadata, 'vaccination_status', alpha = 1)
+#' # edgeR_pipeline(my_count_table, my_metadata, 'vaccination_status')
 #' @export
-edgeR_pipeline <- function(count_table, metadata, comparison, min.count = 1,
+edgeR_pipeline <- function(TCRgrCounts, comparison, min.count = 1,
                            min.total.count = 5, large.n = 1, min.prop = 0.5,
-                           alpha = 0.05, normalization_method ="TMM"){
+                           normalization_method ="TMM"){
   # Important conditions
   if(!requireNamespace("edgeR", quietly = TRUE)){
     stop("Package \"edgeR\" must be installed to use this function.",
          call. = FALSE)
   }
+  if(!("TCRgrapherCounts" %in% attr(TCRgrCounts, 'class'))){
+    stop("The function takes TCRgrapherCounts object as an input. See ?TCRgrapherCounts and ?TCRgrapher",
+         call. = FALSE)
+  }
+
+  count_table <- TCRgrCounts@count_table
+  metadata <- TCRgrCounts@metadata
+
   if(!('sample' %in% colnames(metadata))){
     stop("There is no column 'sample' in metadata.", call. = FALSE)
   }
@@ -168,7 +139,7 @@ edgeR_pipeline <- function(count_table, metadata, comparison, min.count = 1,
                                         diag(nb_of_rows))
     for(j in 1:nb_of_rows){
       qlf <- glmQLFTest(fit,contrast = comparison_matrix_pairwise[j,])
-      topTags <- topTags(qlf, n = nrow(count_table), p.value = alpha)$table
+      topTags <- topTags(qlf, n = nrow(count_table), p.value = 1)$table
       topTags$comparison <- paste(comparison_levels[i], 'vs', comparison_levels[i+j])
       topTags$feature <- rownames(topTags)
       sign_result <- rbind(sign_result, topTags)
@@ -179,7 +150,7 @@ edgeR_pipeline <- function(count_table, metadata, comparison, min.count = 1,
   comparison_matrix_vs_all[row(comparison_matrix_vs_all) == col(comparison_matrix_vs_all)] <- 1
   for(i in 1:nb_of_comparisons){
     qlf <- glmQLFTest(fit,contrast = comparison_matrix_vs_all[i,])
-    topTags <- topTags(qlf, n = nrow(count_table), p.value = alpha)$table
+    topTags <- topTags(qlf, n = nrow(count_table), p.value = 1)$table
     topTags$comparison <- paste(comparison_levels[i], 'vs all')
     topTags$feature <- rownames(topTags)
     sign_result <- rbind(sign_result, topTags)
