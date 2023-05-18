@@ -100,11 +100,11 @@ edgeR_pipeline <- function(TCRgrCounts, comparison, min.count = 1,
   count_table <- TCRgrCounts@count_table
   metadata <- TCRgrCounts@metadata
 
-  if(!('sample' %in% colnames(metadata))){
-    stop("There is no column 'sample' in metadata.", call. = FALSE)
+  if(!('sample_id' %in% colnames(metadata))){
+    stop("There is no column 'sample_id' in metadata.", call. = FALSE)
   }
-  if(colnames(count_table) != metadata$sample){
-    stop("The names of the count table columns and the 'sample' metadata column do not match.",
+  if(!all(colnames(count_table) %in% metadata$sample_id)){
+    stop("The names of the count table columns and the 'sample_id' metadata column do not match.",
          call. = FALSE)
   }
   if(!is.character(comparison) | !(comparison %in% colnames(metadata))){
@@ -114,7 +114,7 @@ edgeR_pipeline <- function(TCRgrCounts, comparison, min.count = 1,
   }
   # Data preparation
   metadata <- as.data.frame(metadata)
-  rownames(metadata) <- metadata$sample
+  rownames(metadata) <- metadata$sample_id
   design <- model.matrix(as.formula(paste('~ 0 +', comparison)), data=metadata)
   sample <- DGEList(counts=count_table)
   # Data filtration

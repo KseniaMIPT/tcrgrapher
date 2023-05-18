@@ -1,7 +1,5 @@
 #' @import methods
-#' @importFrom data.table fread
-#' @importFrom data.table rbindlist
-#' @importFrom data.table :=
+#' @import data.table
 
 # secondary functions
 check_path <- function(files_path){

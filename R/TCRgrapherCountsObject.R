@@ -45,14 +45,15 @@ TCRgrapherCounts <- function(TCRgrObject, v_gene = TRUE, j_gene = FALSE){
   count_table <- dcast(clonoset, formula, value.var = 'count', fun.aggregate = sum)
   count_table <- as.data.frame(count_table)
 
-  rownames(count_table) <- Reduce(if(length(grouping) == 1) c else paste,
-                                  count_table[,grouping])
+  if(length(grouping) == 1){
+    rownames(count_table) <- count_table[,grouping]
+    feature_info <- cbind(clonoset, feature = clonoset[,grouping, with=FALSE])
+  } else {
+    rownames(count_table) <- Reduce(paste, count_table[,grouping])
+    feature_info <- cbind(clonoset, feature = Reduce(paste, clonoset[,grouping, with=FALSE]))
+  }
 
   count_table <- count_table[,-(1:length(grouping))]
-
-  feature_info <- cbind(clonoset, Reduce(if(length(grouping) == 1) c else paste,
-                                         clonoset[,grouping, with=FALSE]))
-  setnames(feature_info, 'V2', 'feature')
   feature_info$grouping <- paste(grouping, collapse = ' ')
 
   new('TCRgrapherCounts', clonoset = TCRgrObject@clonoset,
@@ -97,7 +98,7 @@ TCRgrCountsValidity <- function(object){
   if(!all(apply(object@count_table, 2, is.numeric))){
     return("All count_table values must be numeric")
   }
-  if(!all(apply(TCRgrCounts@count_table, 2, function(x) sum(x < 0) == 0))){
+  if(!all(apply(object@count_table, 2, function(x) sum(x < 0) == 0))){
     return("All count_table values must be positive")
   }
   if(!all(rownames(object@count_table) %in% object@feature_info$feature)){
