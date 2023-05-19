@@ -8,13 +8,13 @@ repertoire.
 ```R
 install.packages('devtools')
 library(devtools)
-# to install develop version
+# to install the develop version
 devtools::install_github("KseniaMIPT/tcrgrapher@develop")
 ```
 
-To calculate generation probability TCRgrapher can use OLGA or SONIA. 
+To calculate generation probability, TCRgrapher can use OLGA or SONIA. 
 
-For detailed information about OLGA please visit
+For detailed information about OLGA, please visit
 https://github.com/statbiophys/OLGA.
 
 OLGA can be installed using pip or pip3.
@@ -23,10 +23,10 @@ OLGA can be installed using pip or pip3.
 pip install olga
 ```
 
-For detailed information about SONIA please visit
+For detailed information about SONIA, please visit
 https://github.com/statbiophys/SONIA
 
-SONIA is a python 2.7/3.6 software. It is available on PyPI and can be 
+SONIA is a Python 2.7/3.6 software. It is available on PyPI and can be 
 downloaded and installed through pip:
 
 ```python
@@ -35,18 +35,18 @@ pip install sonia
 
 ## Data loading
 
-Data are stored in TCRgrapher object. TCRgrapher is a S4 class that can be 
+Data are stored in a TCRgrapher object. TCRgrapher is a S4 class that can be 
 constructed by calling the TCRgrapher( ) function. TCRgrapher contains clonoset 
 and metadata as data.tables.
 
 There are three ways to initialize an object.
 
-(1) Specify path to the one file without metadata
+(1) Specify the path to the one file without metadata
 
-If path for only one file is specified metadata will be produced automatically
+If the path for only one file is specified, metadata will be produced automatically
 and will contain one row and two columns: "file" and "sample_id".
-Clonoset will have additional column "sample_id" with one unique value and
-column "clone_id" with unique id for every row.
+Clonoset will have and additional column "sample_id" with one unique value and a
+column "clone_id" with an unique id for every row.
 Positions of "count", "cdr3nt", "cdr3aa", "V gene", "J gene" clonoset's columns must be specified.
 
 ```R
@@ -54,25 +54,25 @@ Positions of "count", "cdr3nt", "cdr3aa", "V gene", "J gene" clonoset's columns 
 TCRgrObject <- TCRgrapher(file_path, 1, 3, 4, 5, 7) # positions of clonoset's columns
 ```
 
-(2) Specify path to the directory with files without metadata
+(2) Specify the path to the directory with files without metadata
 
-If path for the directory with files is specified and metadata is not specified
-metadata will be produced automatically and will have number of rows equal
+If the path for the directory with files is specified and metadata is not specified,
+metadata will be produced automatically and will have a number of rows equal
 to the number of samples in the directory. All files will be merged into one
-data.table with additional column "sample_id"  and column "clone_id" with
-unique id for every row. Positions of "count", "cdr3nt", "cdr3aa",
+data.table with additional columns "sample_id"  and "clone_id" with
+unique ids  for every row. Positions of "count", "cdr3nt", "cdr3aa",
 "V gene", "J gene" clonoset's columns must be specified.
 
 ```R
 TCRgrObject <- TCRgrapher(dir_path, 1, 3, 4, 5, 7)
 ```
 
-(3) Specify path to the directory with files and metadata
+(3) Specify the path to the directory with files and metadata
 
-If path for the directory with files and path to the metadata are specified
-only files from metadata column "file" will be taken into consideration.
-Clonosets will be merged into one data.table with additional column "sample_id" and
-column "clone_id" with unique id for every row.
+If the path for the directory with files and the path to the metadata are specified,
+only files from the metadata column "file" will be taken into consideration.
+Clonosets will be merged into one data.table with additional columns "sample_id" and
+"clone_id" with unique ids for every row.
 Values in the "sample_id" column will be the same as in the "sample_id"
 metadata column. Positions of "count", "cdr3nt", "cdr3aa", "V gene", "J gene" clonoset's
 columns and "file", "sampl_id" metadata's columns must be specified.
@@ -94,45 +94,45 @@ subset(your_TCRgrapher_object, vector_with_sample_ids_to_keep)
 
 ## ALICE pipeline
 
-```ALICE_pipeline``` The function takes TCRgrapher object as an input and performs
-neighborhood enrichment analysis using ALICE algorithm You can find default 
-parameters and possible options bellow.
+```ALICE_pipeline``` The function takes a TCRgrapher object as an input and performs
+neighborhood enrichment analysis using the ALICE algorithm You can find default 
+parameters and possible options below.
 
 ```R
 tcrgrapher(TCRgrObject, Q_val = 6.27, cores = 1, thres_counts = 1, N_neighbors_thres = 1, 
           p_adjust_method = "BH", chain = 'mouseTRB', stats = 'OLGA', model= '-')
 ```
 * TCRgrObject - TCRgrapher object that contains clonotype table
-* Q - Selection factor. 1/Q sequences pass selection in the thymus. The 
+* Q - Selection factor. 1/Q sequences pass selection in a thymus. The 
 default value for mice is 6.27. If a human model is taken and Q is not changed 
 manually Q = 27 is used
 * cores - number of used cores, 1 by default
 * thres_counts - Only sequences with a number of counts above this threshold
 are taken into account
-* N_neighbors_thres - Only sequences with a number of neighbours above the 
+* N_neighbors_thres - Only sequences with a number of neighbors above the 
 threshold are used to calculate generation probability
-* p_adjust_method - One of the method from p.adjust from stats package. 
+* p_adjust_method - One of the methods from p.adjust from the stats package. 
 Possible options: "bonferroni", "holm", "hochberg", "hommel", "BH" or "fdr",
 "BY", "none". "BH" is a default method.
 * chain - Statistical model selection. Possible options: "mouseTRB", "humanTRB",
 "humanTRA".
 * stats - Tool that will be used for generation probability calculation.
-Possible options: "OLGA", "SONIA". "SONIA" also calculate Q for every sequence.
+Possible options: "OLGA", "SONIA". "SONIA" also calculates Q for every sequence.
 * model - Standard OLGA generation probability model is used by default. To set 
-your one generation probability model write "set_custom_model_VDJ 
-<path_to_folder_with_model>". Generation probability model is usually IGOR output.
-Folder should contain the following files: V_gene_CDR3_anchors.csv,
-J_gene_CDR3_anchors.csv, model_marginals.txt, model_params.txt. Some models one 
-can find in the folder "model"
+your one generation probability model, write "set_custom_model_VDJ 
+<path_to_folder_with_model>". A generation probability model is usually IGOR output.
+A folder should contain the following files: V_gene_CDR3_anchors.csv,
+J_gene_CDR3_anchors.csv, model_marginals.txt, model_params.txt. Some models 
+can be found in the folder "model".
 
 Function returns TCRgrapher object with the same clonotype table that was in input
-filtered by number of counts and number of neighbours with additional columns. 
+filtered by number of counts and number of neighbors with additional columns. 
 Additional columns are the following
 * D - Number of neighbors in clonoset. Neighbor is a similar sequence
 with one mismatch
 * VJ_n_total - Number of unique sequences with given VJ combination
 * Pgen - Probability to be generated computed by OLGA
-* Pgen_sum_corr - Sum of Pgen of all sequences similar to the given with one 
+* Pgen_sum_corr - The sum of Pgen of all sequences similar to the given with one 
 mismatch
 * Pgen_by_VJ - Conditional probability. Sum of probabilities to be generated 
 with given VJ combination
@@ -192,5 +192,5 @@ were in separate lines. If 'v_gene' and 'j_gene' are TRUE, edges connect only
 clonotypes with the same V gene or VJ combination.
 
 ```find_TCR_components(clonoset, graph)``` Function takes clonoset table and make_TCR_graph output
-and returns the same clonoset table with additional column "cluster_id". All clusters of neighbours
+and returns the same clonoset table with additional column "cluster_id". All clusters of neighbors
 with one mismatch have unique id. Function uses "components" function from igraph package.
