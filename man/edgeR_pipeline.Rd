@@ -15,6 +15,8 @@ edgeR_pipeline(
 )
 }
 \arguments{
+\item{comparison}{name of the column that specifies levels of comparison in the metadata}
+
 \item{min.count}{parameter from edgeR::filterByExpr function. Minimum count
 required for at least some samples. Default value is 1.}
 
@@ -32,12 +34,6 @@ value is 0.5.}
 
 \item{count_table}{a data frame where each row corresponds to unique
 amino acid clonotype and each column corresponds to the sample.}
-
-\item{metadata}{A data frame should contain the column 'sample'. The names of
-the count table columns and the 'sample' metadata column must be the same,
-and they must be in the same order. Also, metadata must contain a column that
-specifies levels of comparison. The name of the column must be the same as
-in 'comparison' variable.}
 }
 \value{
 data.frame with statistics for every clonotype performed for each pair

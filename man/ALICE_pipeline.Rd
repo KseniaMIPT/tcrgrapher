@@ -5,7 +5,7 @@
 \title{ALICE_pipeline}
 \usage{
 ALICE_pipeline(
-  DT,
+  TCRgrObject,
   Q_val = 6.27,
   cores = 1,
   thres_counts = 1,
@@ -17,7 +17,7 @@ ALICE_pipeline(
 )
 }
 \arguments{
-\item{DT}{data.table}
+\item{TCRgrObject}{TCRgrapher object that contains clonoset table}
 
 \item{Q_val}{selection factor. 1/Q sequences pass selection in the thymus. The
 default value for mouses 6.27. If a human model is taken and Q is not changed
@@ -49,7 +49,7 @@ J_gene_CDR3_anchors.csv, model_marginals.txt, model_params.txt. Some models
 one can find in the folder "model"}
 }
 \value{
-Function returns the same table that was in input filtered by number
+Function returns TCRgrapher object filtered by number
 of counts and number of neighbors with additional columns. Additional columns
 are the following
 \itemize{
@@ -67,14 +67,6 @@ neighbors is not more than in the random model"}
 }
 }
 \description{
-Main function that takes a table with CDR3 sequences as an input. The table
-should have the following columns (Order of the columns are not important but
-the following names are necessary)
-\itemize{
-\item{"count"}{"Number of unique reads per cdr3 sequence"}
-\item{"cdr3nt"}{"CDR3 nucleotide sequence"}
-\item{"cdr3aa"}{"CDR3 aminoacid sequence"}
-\item{"bestVGene"}{"TRBV segment"}
-\item{"bestJGene"}{"TRBJ segment"}
-}
+The function takes TCRgrapher object as an input and performs neighborhood
+enrichment analysis using ALICE algorithm. See ?TCRgrapher.
 }

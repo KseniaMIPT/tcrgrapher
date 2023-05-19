@@ -1,27 +1,3 @@
-# transform_from_clonotypes_to_clusters <- function(count_table, v_gene = TRUE){
-#   # temporary columns
-#   count_table$cdr3aa <- sapply(strsplit(rownames(count_table), ' '), function(x) x[1])
-#   if(v_gene){
-#     count_table$bestVGene <- sapply(strsplit(rownames(count_table), ' '), function(x) x[2])
-#   } else {
-#     count_table$bestVGene <- ''
-#   }
-#   # functions from igraph_capabilities.R
-#   g <- make_TCR_graph(count_table)
-#   count_table <- find_cluster(count_table, g)
-#   # using aggregation from data.table
-#   count_table <- setDT(count_table)
-#   components_table <- count_table[,.(cdr3aa, bestVGene, cluster_id)]
-#   count_table <- count_table[,-c('cdr3aa', 'bestVGene')]
-#   count_table <- count_table[,lapply(.SD, sum), by='cluster_id']
-#   count_table <- as.data.frame(count_table)
-#   # now we have clusters_id instead of clonotypes!
-#   rownames(count_table) <- count_table$cluster_id
-#   count_table$cluster_id <- NULL
-#   # return TODO
-#   list('count_table'=count_table, 'components_table'=components_table)
-# }
-
 #' edgeR_pipeline
 #'
 #' Function performs statistical analysis by edgeR to identify significantly
@@ -32,11 +8,7 @@
 #'
 #' @param count_table a data frame where each row corresponds to unique
 #' amino acid clonotype and each column corresponds to the sample.
-#' @param metadata A data frame should contain the column 'sample'. The names of
-#' the count table columns and the 'sample' metadata column must be the same,
-#' and they must be in the same order. Also, metadata must contain a column that
-#' specifies levels of comparison. The name of the column must be the same as
-#' in 'comparison' variable.
+#' @param comparison name of the column that specifies levels of comparison in the metadata
 #' @param min.count parameter from edgeR::filterByExpr function. Minimum count
 #' required for at least some samples. Default value is 1.
 #' @param min.total.count parameter from edgeR::filterByExpr function.

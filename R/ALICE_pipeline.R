@@ -116,18 +116,10 @@ parallel_wrapper_beta <- function(DT, cores = 1, chain = "mouseTRB",
 # Main function -----------------------------------------------------------
 #' ALICE_pipeline
 #'
-#' Main function that takes a table with CDR3 sequences as an input. The table
-#' should have the following columns (Order of the columns are not important but
-#' the following names are necessary)
-#' \itemize{
-#' \item{"count"}{"Number of unique reads per cdr3 sequence"}
-#' \item{"cdr3nt"}{"CDR3 nucleotide sequence"}
-#' \item{"cdr3aa"}{"CDR3 aminoacid sequence"}
-#' \item{"bestVGene"}{"TRBV segment"}
-#' \item{"bestJGene"}{"TRBJ segment"}
-#' }
+#' The function takes TCRgrapher object as an input and performs neighborhood
+#' enrichment analysis using ALICE algorithm. See ?TCRgrapher.
 #'
-#' @param DT data.table
+#' @param TCRgrObject TCRgrapher object that contains clonoset table
 #' @param Q_val selection factor. 1/Q sequences pass selection in the thymus. The
 #' default value for mouses 6.27. If a human model is taken and Q is not changed
 #' manually Q = 27 is used
@@ -149,7 +141,7 @@ parallel_wrapper_beta <- function(DT, cores = 1, chain = "mouseTRB",
 #' Folder should contain the following files: V_gene_CDR3_anchors.csv,
 #' J_gene_CDR3_anchors.csv, model_marginals.txt, model_params.txt. Some models
 #' one can find in the folder "model"
-#' @return Function returns the same table that was in input filtered by number
+#' @return Function returns TCRgrapher object filtered by number
 #' of counts and number of neighbors with additional columns. Additional columns
 #' are the following
 #' \itemize{
@@ -166,10 +158,16 @@ parallel_wrapper_beta <- function(DT, cores = 1, chain = "mouseTRB",
 #' \item{"p_adjust"}{"p value with multiple testing correction"}
 #' }
 #' @export
-ALICE_pipeline <- function(DT, Q_val = 6.27, cores = 1, thres_counts = 1,
+ALICE_pipeline <- function(TCRgrObject, Q_val = 6.27, cores = 1, thres_counts = 1,
                            N_neighbors_thres = 1, p_adjust_method = "BH",
-                           chain = 'mouseTRB', stats = 'OLGA', model = '-') {
+                           chain = 'mouseTRB', stats = 'OLGA', model = '-'){
+  if(!("TCRgrapher" %in% attr(TCRgrObject, 'class'))){
+    stop("The function takes TCRgrapher object as an input. See ?TCRgrapher",
+         call. = FALSE)
+  }
+  # TODO other requirements
 
+  DT <- clonoset(TCRgrObject)
   message("checking for unproductive sequences if it hasn't been made earlier")
   DT <- DT[!grepl(cdr3aa, pattern = "*", fixed = T) & ((nchar(cdr3nt) %% 3) == 0)]
 
@@ -236,9 +234,12 @@ ALICE_pipeline <- function(DT, Q_val = 6.27, cores = 1, thres_counts = 1,
 
   DT[, p_adjust := p.adjust(p_val, method = p_adjust_method)]
 
+  # TODO add 'ALICE' to all columns
+
   # deletion of unnecessary columns
   DT <- subset(DT, select = -c(ind))
-  return(DT)
+  clonoset(TCRgrObject) <- DT
+  return(TCRgrObject)
 }
 
 # Additional functions ---------------------------------------------------------
@@ -247,14 +248,20 @@ ALICE_pipeline <- function(DT, Q_val = 6.27, cores = 1, thres_counts = 1,
 #'
 #' Function calculates p-value taking into account abundance of every clonotype
 #'
-#' @param DT output of tcrgrapher function
-#' @return Function returns the same data.table with additional columns:
-#' pval_with_abundance_log2_counts -- recalculated p-value considering
-#' count number of every clonotype. Log2 is used for count normalization;
-#' pval_with_abundance_counts -- recalculated p-value considering
-#' count number of every clonotype. There is no count normalization.
+#' @param TCRgrObject TCRgrapher object -- output of ALICE_pipeline
+#' @return Function returns TCRgrapher object with the same clonotypes table with
+#' additional columns:
+#' \itemize{
+#' \item{pval_with_abundance_log2_counts}{recalculated p-value considering count
+#'  number of every clonotype. Log2 is used for count normalization}
+#' \item{pval_with_abundance_counts}{recalculated p-value considering count number
+#'  of every clonotype. There is no count normalization}
+#'  }
 #' @export
-pval_with_abundance <- function(DT) {
+pval_with_abundance <- function(TCRgrObject) {
+  # TODO check that ALICE analysis was performed
+  # TODO change column names
+  DT <- clonoset(TCRgrObject)
   counts <- DT[,1]
   log_counts <- log2(counts)
   neighbors <- DT[,'D']
@@ -269,5 +276,6 @@ pval_with_abundance <- function(DT) {
        'pval_with_abundance_counts'] <- PDT_f(DT[DT$D == d,
                                                  'D_counts'])* DT[DT$D == d, 'p_val']
   }
-  DT
+  clonoset(TCRgrObject) <- DT
+  return(TCRgrObject)
 }

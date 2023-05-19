@@ -4,17 +4,20 @@
 \alias{pval_with_abundance}
 \title{pval_with_abundance}
 \usage{
-pval_with_abundance(DT)
+pval_with_abundance(TCRgrObject)
 }
 \arguments{
-\item{DT}{output of tcrgrapher function}
+\item{TCRgrObject}{TCRgrapher object -- output of ALICE_pipeline}
 }
 \value{
-Function returns the same data.table with additional columns:
-pval_with_abundance_log2_counts -- recalculated p-value considering
-count number of every clonotype. Log2 is used for count normalization;
-pval_with_abundance_counts -- recalculated p-value considering
-count number of every clonotype. There is no count normalization.
+Function returns TCRgrapher object with the same clonotypes table with
+additional columns:
+\itemize{
+\item{pval_with_abundance_log2_counts}{recalculated p-value considering count
+number of every clonotype. Log2 is used for count normalization}
+\item{pval_with_abundance_counts}{recalculated p-value considering count number
+of every clonotype. There is no count normalization}
+}
 }
 \description{
 Function calculates p-value taking into account abundance of every clonotype

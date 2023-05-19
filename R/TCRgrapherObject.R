@@ -31,7 +31,7 @@ check_path <- function(files_path){
 #' metadata will be produced automatically and will have number of rows equal
 #' to the number of samples in the directory. All files will be merged into one
 #' data.table with additional column "sample_id"  and column "clone_id" with
-#' unique id for every row.. Positions of "count", "cdr3nt", "cdr3aa",
+#' unique id for every row. Positions of "count", "cdr3nt", "cdr3aa",
 #' "V gene", "J gene" clonoset's columns must be specified.
 #'
 #' (3) Specify path to the directory with files and metadata
@@ -44,8 +44,8 @@ check_path <- function(files_path){
 #' metadata column. Positions of "count", "cdr3nt", "cdr3aa", "V gene", "J gene" clonoset's
 #' columns and "file", "sampl_id" metadata's columns must be specified.
 #'
-#' TCRgrEdgeR, TCRgrALICE, TCRgrTCRdist, TCRgrTCRnet are subclasses of TCRgrapher
-#' that store additional data and results of the analysis.
+#' TCRgrapherCounts is a subclass of TCRgrapher that store additional data:
+#' count_table and feature_info table
 #'
 #' @examples
 #' # # (1) Path to the one file without metadata
