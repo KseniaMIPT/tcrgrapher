@@ -175,7 +175,7 @@ column is the second parameter of the edgeR_pipeline function.
 ```R
 library(edgeR)
 # data loading
-TCRgrObject <- TCRgrapher(file_path, 1, 3, 4, 5, 7, metadata_path, 1, 2)
+TCRgrObject <- TCRgrapher(dir_path, 1, 3, 4, 5, 7, metadata_path, 1, 2)
 # create a count table with aggregation by V segments
 TCRgrCounts <- TCRgrapherCounts(TCRgrObject)
 # run EdgeR pipeline 
