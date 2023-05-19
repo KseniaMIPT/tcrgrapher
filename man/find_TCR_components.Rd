@@ -4,19 +4,18 @@
 \alias{find_TCR_components}
 \title{find_TCR_components}
 \usage{
-find_TCR_components(df, g)
+find_TCR_components(clonoset, g)
 }
 \arguments{
-\item{df}{output of tcrgrapher function}
+\item{clonoset}{clonoset table. To get from TCRgrapher object use clonoset(\if{html}{\out{<TCRgrapher object>}})}
 
-\item{g}{make_graph output}
+\item{g}{make_TCR_graph output}
 }
 \value{
-Function returns the same data.table with additional column
-"cluster_id"
+Function returns the same clonoset table with additional column "cluster_id"
 }
 \description{
-Function takes tcrgrapher output and returns the same table with additional
-column "cluster_id". All clusters of neighbours with one mismatch have unique
+Function takes clonoset table and returns the same table with additional
+column "cluster_id". All clusters of neighbors with one mismatch have unique
 id. Function uses "components" function from igraph package.
 }

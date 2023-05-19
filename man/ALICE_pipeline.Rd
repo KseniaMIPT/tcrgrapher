@@ -5,7 +5,7 @@
 \title{ALICE_pipeline}
 \usage{
 ALICE_pipeline(
-  df,
+  DT,
   Q_val = 6.27,
   cores = 1,
   thres_counts = 1,
@@ -17,7 +17,7 @@ ALICE_pipeline(
 )
 }
 \arguments{
-\item{df}{data.table}
+\item{DT}{data.table}
 
 \item{Q_val}{selection factor. 1/Q sequences pass selection in the thymus. The
 default value for mouses 6.27. If a human model is taken and Q is not changed

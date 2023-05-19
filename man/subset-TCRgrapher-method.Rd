@@ -15,5 +15,5 @@ Subseting for TCRgrapher objects}
 }
 \description{
 The function takes subset from both clonotype table and metadata. Samples
-to keep should be specified.
+to keep should be specified. 'clone_id' column will be updated.
 }

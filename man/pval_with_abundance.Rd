@@ -4,10 +4,10 @@
 \alias{pval_with_abundance}
 \title{pval_with_abundance}
 \usage{
-pval_with_abundance(df)
+pval_with_abundance(DT)
 }
 \arguments{
-\item{df}{output of tcrgrapher function}
+\item{DT}{output of tcrgrapher function}
 }
 \value{
 Function returns the same data.table with additional columns:

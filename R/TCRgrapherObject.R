@@ -48,22 +48,21 @@ check_path <- function(files_path){
 #' that store additional data and results of the analysis.
 #'
 #' @examples
-#' # (1) Path to the one file without metadata
-#' library(testthat)
-#' file_path <- testthat::test_path("testdata", "clonosets_vdjtools_format.tsv")
-#' TCRgrObject <- TCRgrapher(file_path, 1, 3, 4, 5, 7) # positions of clonoset's columns
-#' # metadata has the same values in both columns. Let's change one of them
-#' metadata(TCRgrObject)[1,'sample_id'] <- 'sample_1'
+#' # # (1) Path to the one file without metadata
+#' # file_path <- paste0(find.package('tcrgrapher'), "tests/testthat/testdata/clonosets_vdjtools_format.tsv")
+#' # TCRgrObject <- TCRgrapher(file_path, 1, 3, 4, 5, 7) # positions of clonoset's columns
+#' # # metadata has the same values in both columns. Let's change one of them
+#' # metadata(TCRgrObject)[1,'sample_id'] <- 'sample_1'
 #'
-#' # (2) Path to the directory with files without metadata
-#' dir_path <- testthat::test_path("testdata/test_dir_with_clonosets", "")
-#' TCRgrObject <- TCRgrapher(dir_path, 1, 3, 4, 5, 7)
+#' # # (2) Path to the directory with files without metadata
+#' # dir_path <- paste0(find.package('tcrgrapher'), "tests/testthat/testdata/test_dir_with_clonosets")
+#' # TCRgrObject <- TCRgrapher(dir_path, 1, 3, 4, 5, 7)
 #'
-#' # (3) Path to the directory with files and metadata
-#' dir_path <- testthat::test_path("testdata/test_dir_with_clonosets", "")
-#' metadata_path <- testthat::test_path("testdata/metadata.tsv")
-#' TCRgrObject <- TCRgrapher(dir_path, 1, 3, 4, 5, 7, # positions of clonoset's columns
-#'                           metadata_path, 1, 2)      # positions of metadtata's columns
+#' # # (3) Path to the directory with files and metadata
+#' # dir_path <- paste0(find.package('tcrgrapher'), "tests/testthat/testdata/test_dir_with_clonosets")
+#' # metadata_path <- testthat::test_path("testdata/metadata.tsv")
+#' # TCRgrObject <- TCRgrapher(dir_path, 1, 3, 4, 5, 7, # positions of clonoset's columns
+#'                         #  metadata_path, 1, 2)      # positions of metadtata's columns
 #'
 #'
 #' @param files_path Path to the file with a clonoset or path to the directory
@@ -223,7 +222,7 @@ setMethod("show", "TCRgrapher", function(object) {
 #' Subseting for TCRgrapher objects
 #'
 #' The function takes subset from both clonotype table and metadata. Samples
-#' to keep should be specified.
+#' to keep should be specified. 'clone_id' column will be updated.
 #'
 #' @param x TCRgrapher object
 #' @param subset Vector with sample ids that should be kept
@@ -232,5 +231,6 @@ setMethod("show", "TCRgrapher", function(object) {
 setMethod("subset", "TCRgrapher", function(x, samples) {
   x@metadata <- x@metadata[sample_id %in% samples]
   x@clonoset <- x@clonoset[sample_id %in% samples]
+  x@clonoset[, clone_id := 1:.N, ]
   x
 })

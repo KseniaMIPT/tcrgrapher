@@ -4,17 +4,17 @@
 \alias{make_TCR_graph}
 \title{make_TCR_graph}
 \usage{
-make_TCR_graph(df, v_gene = TRUE, j_gene = FALSE)
+make_TCR_graph(clonoset, v_gene = TRUE, j_gene = FALSE)
 }
 \arguments{
-\item{df}{clonoset}
+\item{clonoset}{clonoset clonoset table. To get from TCRgrapher object use clonoset(\if{html}{\out{<TCRgrapher object>}})}
 }
 \value{
 Function returns an igraph graph object
 }
 \description{
-Function makes graph from clonoset table with igraph package. Every node
+Function makes a graph from the clonoset table with the igraph package. Every node
 of the graph is an unique clonotype from the table (one line). Edges
 connects clonotypes with one amino acid mismatch or identical clonotypes if
-they were in separate lines.
+they are in separate lines.
 }

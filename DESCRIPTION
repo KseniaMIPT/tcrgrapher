@@ -22,7 +22,8 @@ Imports:
     stringdist,
     foreach,
     doParallel,
-    parallel
+    parallel,
+    methods
 Suggests:
     igraph,
     edgeR,

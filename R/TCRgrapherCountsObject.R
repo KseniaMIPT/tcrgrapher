@@ -20,10 +20,16 @@ NULL
 #' @param j_gene Boolean value. If 'j_gene' is 'TRUE', clonotypes with the same amino
 #' acid sequences but different J genes are presented in different rows.
 #' Default value is 'FALSE'.
+#' @param cluster_id Boolean value. Default value is 'FALSE'. If 'cluster_id' is 'TRUE',
+#' clonotypes with the same cluster_id will be grouped and will be presented in
+#' one row. In feature_info table feature' column will contain cluster_id and
+#' genes if corresponding parameters are chosen. If 'cluster_id' is already in the
+#' clonotype table it will be taken from there. Otherwise, it will be defined using
+#' 'make_TCR_graph' and 'find_TCR_components' functions. See documentation.
 #' @return Function returns TCRgrapherCounts object that contains clonoset and
 #' metadata from TCRgrapher object, count table and feature info table
 #' @export
-TCRgrapherCounts <- function(TCRgrObject, v_gene = TRUE, j_gene = FALSE){
+TCRgrapherCounts <- function(TCRgrObject, v_gene = TRUE, j_gene = FALSE, cluster_id = FALSE){
   # requirements
   if(!("TCRgrapher" %in% attr(TCRgrObject, 'class'))){
     stop("The function takes TCRgrapher object as an input. See ?TCRgrapher",
@@ -39,7 +45,18 @@ TCRgrapherCounts <- function(TCRgrObject, v_gene = TRUE, j_gene = FALSE){
   }
   metadata <- TCRgrObject@metadata
   clonoset <- TCRgrObject@clonoset
-  grouping <- c('cdr3aa', 'bestVGene', 'bestJGene')[c(TRUE, v_gene, j_gene)]
+  grouping <- c('cdr3aa', 'cluster_id', 'bestVGene', 'bestJGene')[c(!cluster_id, cluster_id, v_gene, j_gene)]
+  # find components if it hasn't been made earlier
+  if(!('cluster_id' %in% colnames(clonoset)) & cluster_id){
+    if (!requireNamespace("igraph", quietly = TRUE)) {
+      stop(
+        "Package \"igraph\" must be installed to find cluster_ids.",
+        call. = FALSE
+      )
+    }
+    g <- make_TCR_graph(clonoset, v_gene = v_gene, j_gene = j_gene)
+    clonoset <- find_TCR_components(clonoset, g)
+  }
 
   formula <- as.formula(paste0(paste(grouping, collapse = ' + '), ' ~ sample_id'))
   count_table <- dcast(clonoset, formula, value.var = 'count', fun.aggregate = sum)
@@ -56,7 +73,7 @@ TCRgrapherCounts <- function(TCRgrObject, v_gene = TRUE, j_gene = FALSE){
   count_table <- count_table[,-(1:length(grouping))]
   feature_info$grouping <- paste(grouping, collapse = ' ')
 
-  new('TCRgrapherCounts', clonoset = TCRgrObject@clonoset,
+  new('TCRgrapherCounts', clonoset = clonoset,
       metadata = TCRgrObject@metadata, count_table = count_table,
       feature_info = feature_info)
 }
@@ -162,29 +179,3 @@ setMethod("subset", "TCRgrapherCounts", function(x, samples) {
   x@feature_info <- x@feature_info[sample_id %in% samples]
   x
 })
-
-# transform_from_clonotypes_to_clusters <- function(TCRgrCounts){
-#   # temporary columns
-#   count_table <- TCRgrCounts@count_table
-#
-#   count_table$cdr3aa <- sapply(strsplit(rownames(count_table), ' '), function(x) x[1])
-#   if(v_gene){
-#     count_table$bestVGene <- sapply(strsplit(rownames(count_table), ' '), function(x) x[2])
-#   } else {
-#     count_table$bestVGene <- ''
-#   }
-#   # functions from igraph_capabilities.R
-#   g <- make_TCR_graph(count_table)
-#   count_table <- find_cluster(count_table, g)
-#   # using aggregation from data.table
-#   count_table <- setDT(count_table)
-#   components_table <- count_table[,.(cdr3aa, bestVGene, cluster_id)]
-#   count_table <- count_table[,-c('cdr3aa', 'bestVGene')]
-#   count_table <- count_table[,lapply(.SD, sum), by='cluster_id']
-#   count_table <- as.data.frame(count_table)
-#   # now we have clusters_id instead of clonotypes!
-#   rownames(count_table) <- count_table$cluster_id
-#   count_table$cluster_id <- NULL
-#   # return TODO
-#   list('count_table'=count_table, 'components_table'=components_table)
-# }

@@ -4,7 +4,12 @@
 \alias{TCRgrapherCounts}
 \title{TCRgrapherCounts object}
 \usage{
-TCRgrapherCounts(TCRgrObject, v_gene = TRUE, j_gene = FALSE)
+TCRgrapherCounts(
+  TCRgrObject,
+  v_gene = TRUE,
+  j_gene = FALSE,
+  cluster_id = FALSE
+)
 }
 \arguments{
 \item{TCRgrObject}{TCRgrapher object. It can be constructed by calling the
@@ -17,6 +22,13 @@ Default value is 'TRUE'.}
 \item{j_gene}{Boolean value. If 'j_gene' is 'TRUE', clonotypes with the same amino
 acid sequences but different J genes are presented in different rows.
 Default value is 'FALSE'.}
+
+\item{cluster_id}{Boolean value. Default value is 'FALSE'. If 'cluster_id' is 'TRUE',
+clonotypes with the same cluster_id will be grouped and will be presented in
+one row. In feature_info table feature' column will contain cluster_id and
+genes if corresponding parameters are chosen. If 'cluster_id' is already in the
+clonotype table it will be taken from there. Otherwise, it will be defined using
+'make_TCR_graph' and 'find_TCR_components' functions. See documentation.}
 }
 \value{
 Function returns TCRgrapherCounts object that contains clonoset and

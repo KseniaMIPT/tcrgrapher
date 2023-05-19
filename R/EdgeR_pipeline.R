@@ -1,30 +1,3 @@
-# create_count_table <- function(dir, metadata, v_gene = TRUE){
-#   count_table <- data.table(cdr3aa='0', bestVGene='0')
-#   for(i in 1:nrow(metadata)){
-#     sample_name <- metadata$file[i]
-#     sample_id <- metadata$sample_id[i]
-#
-#     sample <- fread(paste0(dir, sample_name))
-#     if(!v_gene){
-#       sample$bestVGene <- ''
-#     }
-#     sample <- sample[, .(count = sum(count)), by = .(cdr3aa, bestVGene)]
-#     setnames(sample, "count", sample_id)
-#     count_table <- merge.data.table(count_table, sample,
-#                                     by=c('cdr3aa', 'bestVGene'), all=TRUE)
-#   }
-#   count_table <- count_table[cdr3aa != '0']
-#   count_table[is.na(count_table), ] <- 0
-#   count_table <- as.data.frame(count_table)
-#   if(v_gene){
-#     rownames(count_table) <- paste(count_table$cdr3aa, count_table$bestVGene)
-#   } else {
-#     rownames(count_table) <- count_table$cdr3aa
-#   }
-#   count_table <- count_table[,-(1:2)]
-#   count_table
-# }
-
 # transform_from_clonotypes_to_clusters <- function(count_table, v_gene = TRUE){
 #   # temporary columns
 #   count_table$cdr3aa <- sapply(strsplit(rownames(count_table), ' '), function(x) x[1])
