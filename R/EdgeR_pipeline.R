@@ -34,7 +34,7 @@ edgeR_pipeline <- function(TCRgrCounts, comparison, min.count = 1,
                            normalization_method ="TMM"){
   # Important conditions
   if(!requireNamespace("edgeR", quietly = TRUE)){
-    stop("Package \"edgeR\" must be installed to use this function.",
+    stop("Package \"edgeR\" must be installed and loaded to use this function.",
          call. = FALSE)
   }
   if(!("TCRgrapherCounts" %in% attr(TCRgrCounts, 'class'))){
