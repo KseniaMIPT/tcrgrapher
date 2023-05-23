@@ -95,78 +95,79 @@ subset(your_TCRgrapher_object, vector_with_sample_ids_to_keep)
 ## ALICE pipeline
 
 ```ALICE_pipeline``` The function takes a TCRgrapher object as an input and performs
-neighborhood enrichment analysis using the ALICE algorithm You can find default 
+neighborhood enrichment analysis using the ALICE algorithm. You can find default 
 parameters and possible options below.
 
 ```R
 tcrgrapher(TCRgrObject, Q_val = 6.27, cores = 1, thres_counts = 1, N_neighbors_thres = 1, 
           p_adjust_method = "BH", chain = 'mouseTRB', stats = 'OLGA', model= '-')
 ```
-* TCRgrObject - TCRgrapher object that contains clonotype table
-* Q - Selection factor. 1/Q sequences pass selection in a thymus. The 
-default value for mice is 6.27. If a human model is taken and Q is not changed 
-manually Q = 27 is used
+* TCRgrObject - TCRgrapher object that contains a clonotype table
+* Q - Selection factor. 1/Q sequences pass selection in a thymus. The default 
+value for mice is 6.27. If a human model is taken and Q is not changed manually,
+Q = 27 is used
 * cores - number of used cores, 1 by default
-* thres_counts - Only sequences with a number of counts above this threshold
-are taken into account
+* thres_counts - Only sequences with a number of counts above this threshold are
+taken into account
 * N_neighbors_thres - Only sequences with a number of neighbors above the 
 threshold are used to calculate generation probability
-* p_adjust_method - One of the methods from p.adjust from the stats package. 
-Possible options: "bonferroni", "holm", "hochberg", "hommel", "BH" or "fdr",
-"BY", "none". "BH" is a default method.
-* chain - Statistical model selection. Possible options: "mouseTRB", "humanTRB",
-"humanTRA".
-* stats - Tool that will be used for generation probability calculation.
+* p_adjust_method - One of the methods from p.adjust in the stats package. 
+Possible options: "bonferroni", "holm", "hochberg", "hommel", "BH" or "fdr", "BY",
+"none". "BH" is a default method.
+* chain - statistical model selection. Possible options: "mouseTRB", "humanTRB" 
+and "humanTRA".
+* stats - a tool that will be used for generation probability calculation. 
 Possible options: "OLGA", "SONIA". "SONIA" also calculates Q for every sequence.
-* model - Standard OLGA generation probability model is used by default. To set 
-your one generation probability model, write "set_custom_model_VDJ 
-<path_to_folder_with_model>". A generation probability model is usually IGOR output.
-A folder should contain the following files: V_gene_CDR3_anchors.csv,
-J_gene_CDR3_anchors.csv, model_marginals.txt, model_params.txt. Some models 
-can be found in the folder "model".
+* model - the standard OLGA generation probability model is used by default. 
+To set your generation probability model, write 
+"set_custom_model_VDJ <path_to_folder_with_model>". A generation probability model
+is usually IGOR output. A folder should contain the following files: 
+V_gene_CDR3_anchors.csv, J_gene_CDR3_anchors.csv, model_marginals.txt, and 
+model_params.txt. Some models can be found in the folder "model".
 
-Function returns TCRgrapher object with the same clonotype table that was in input
-filtered by number of counts and number of neighbors with additional columns. 
-Additional columns are the following
-* D - Number of neighbors in clonoset. Neighbor is a similar sequence
-with one mismatch
-* VJ_n_total - Number of unique sequences with given VJ combination
-* Pgen - Probability to be generated computed by OLGA
-* Pgen_sum_corr - The sum of Pgen of all sequences similar to the given with one 
+The function returns a TCRgrapher object with the same clonotype table as the 
+input, filtered by the number of counts and the number of neighbors with 
+additional columns. Additional columns include the following
+* D - The number of clonoset neighbors. Neighbor is a similar sequence with one 
 mismatch
-* Pgen_by_VJ - Conditional probability. Sum of probabilities to be generated 
-with given VJ combination
-* p_val - p value under null hypothesis that number of sequence's
-neighbors is not more than in the random model
+* VJ_n_total - Number of unique sequences with the given VJ combination
+* Pgen - Probability to be generated, computed by OLGA
+* Pgen_sum_corr - The sum of Pgen of all sequences similar to the given with one
+mismatch
+* Pgen_by_VJ - conditional probability. The sum of probabilities to be generated 
+with the given VJ combination
+* p_val - p value under the null hypothesis that the number of sequence's neighbors
+is not more than in the random model
 * p_adjust - p value with multiple testing correction
 
 ## Additional functions for ALICE analysis
 
-```pval_with_abundance(df)``` Function takes output of ALICE_pipeline function and 
-adjusts p-value taking into account abundance of every clonotype. There are two 
-additional columns in the output depending on count normalization: 
+```pval_with_abundance(df)``` The function takes the output of the ALICE_pipeline 
+function and adjusts the p-value, taking into account the abundance of every clonotype.
+There are two additional columns in the output depending on count normalization:
 "pval_with_abundance_log2_counts" - Log2 is used for count normalization; 
 "pval_with_abundance_counts" - no count normalization.
 
 # edgeR analysis
 
-```edgeR_pipeline``` function performs statistical analysis by edgeR to identify significantly
-expanded clonotypes. First, it filters the data using relatively mild conditions
-that better suit TCR repertoire data. Second, it normalize counts and estimate
-dispersion by standard edgeR methods. Finally, it performs all pairwise comparisons
-between groups and compares each group vs all others using glm and QL F-test.
+```edgeR_pipeline``` The function performs statistical analysis by edgeR to 
+identify significantly expanded clonotypes. First, it filters the data using 
+relatively mild conditions that better suit TCR repertoire data. Second, it 
+normalizes counts and estimates dispersion by standard edgeR methods. Finally, 
+it performs all pairwise comparisons between groups and compares each group vs. 
+all others using the GLM and QL F-test.
 
-To use edgeR_pipeline function you should create TCRgrapherCounts object. TCRgrapherCounts
-is a subclass of TCRgrapher with additional slots: count_table and feature_info.
-Count data could be aggregated in the following ways. First, clonotypes with the same
-amino acid sequences and V gene would be merged together using default parameters 
-```TCRgrapherCounts(TCRgrObject)```. Second, clonotypes with the same
-amino acid sequences and VJ combination would be merged together using j_jene parameter
-```TCRgrapherCounts(TCRgrObject, j_gene = TRUE)```. Third, clonotypes with the same
-amino acid sequences regardless VJ would be merged. 
-```TCRgrapherCounts(TCRgrObject, v_gene = FALSE, j_gene = FALSE)```.
-Finally, clonotypes from the same connectivity component found by make_TCR_graph and
-find_TCR_components functions would be groupped together by running 
+To use the edgeR_pipeline function, you should create a TCRgrapherCounts object.
+TCRgrapherCounts is a subclass of TCRgrapher with additional slots: count_table
+and feature_info. Count data could be aggregated in the following ways. First, 
+clonotypes with the same amino acid sequences and V gene would be merged together
+using the default parameters  ```TCRgrapherCounts(TCRgrObject)```. Second, 
+clonotypes with the same amino acid sequences and VJ combination would be merged 
+together using the j_jene parameter ```TCRgrapherCounts(TCRgrObject, j_gene = TRUE)```.
+Third, clonotypes with the same amino acid sequences regardless of VJ would be merged.
+```TCRgrapherCounts(TCRgrObject, v_gene = FALSE, j_gene = FALSE)```. Finally, 
+clonotypes from the same connectivity component found by the make_TCR_graph and 
+find_TCR_components functions would be grouped together by running 
 ```TCRgrapherCounts(TCRgrObject, cluster_id = TRUE)```
 
 Metadata must contain a column that specifies levels of comparison. The name of the
@@ -185,12 +186,12 @@ edgeR_res <- edgeR_pipeline(TCRgrCounts, your_comparison)
 ## Additional functions
 
 ```make_TCR_graph(clonoset, v_gene = TRUE, j_gene = FALSE)``` 
-Function makes graph from clonoset table with igraph package.
-Every node of the graph is an unique clonotype from the table (one line). Edges
-connects clonotypes with one amino acid mismatch or identical clonotypes if they
-were in separate lines. If 'v_gene' and 'j_gene' are TRUE, edges connect only 
-clonotypes with the same V gene or VJ combination.
+The function makes a graph from a clonoset table with the igraph package. Every
+node of the graph is a unique clonotype from the table (one line). Edges connect
+clonotypes with one amino acid mismatch or identical clonotypes if they were in 
+separate lines. If 'v_gene' and 'j_gene' are TRUE, edges connect only clonotypes
+with the same V gene or VJ combination.
 
-```find_TCR_components(clonoset, graph)``` Function takes clonoset table and make_TCR_graph output
-and returns the same clonoset table with additional column "cluster_id". All clusters of neighbors
-with one mismatch have unique id. Function uses "components" function from igraph package.
+```find_TCR_components(clonoset, graph)``` The function takes a clonoset table 
+and make_TCR_graph output and returns the same clonoset table with an additional
+column "cluster_id". All clusters of neighbors with one mismatch have a unique id.
