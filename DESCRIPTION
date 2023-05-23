@@ -27,6 +27,7 @@ Imports:
 Suggests:
     igraph,
     edgeR,
+    reticulate,
     testthat (>= 3.0.0)
 SystemRequirements:
     OLGA (python 2.7/3.6 software)
