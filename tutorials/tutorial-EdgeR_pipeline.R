@@ -27,7 +27,12 @@ TCRgrCounts <- TCRgrapherCounts(TCRgrObject)
 # run EdgeR pipeline
 # There are two comparison levels: before and after vaccination
 edgeR_res <- edgeR_pipeline(TCRgrCounts, 'vaccination')
+unique(edgeR_res$comparison)
 head(edgeR_res)
+
+# example to show more than two comparison levels
+edgeR_res_time <- edgeR_pipeline(TCRgrCounts, 'time')
+unique(edgeR_res_time$comparison)
 
 # To take a subset we should specify samples that we want to take
 samples <-  metadata(TCRgrCounts)[time <= 3, 'sample_id']
