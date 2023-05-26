@@ -19,7 +19,7 @@
 #' proportion of samples in the smallest group that express the gene. Default
 #' value is 0.5.
 #' @param normalization_method method to be used to edgeR::calcNormFactors function
-#' @return data.frame with statistics for every clonotype performed for each pair
+#' @return data.table with statistics for every clonotype performed for each pair
 #' of groups and for every sample vs all others. 'comparison' column shows
 #' comparisons in the format 'Group1 vs Group2'.
 #' In this case, LFC values are negative if the clonotype is expanded in 'Group1' and
@@ -59,6 +59,7 @@ edgeR_pipeline <- function(TCRgrCounts, comparison, min.count = 1,
   }
   # Data preparation
   metadata <- as.data.frame(metadata)
+  metadata[,comparison] <- as.factor(metadata[,comparison])
   rownames(metadata) <- metadata$sample_id
   design <- model.matrix(as.formula(paste('~ 0 +', comparison)), data=metadata)
   sample <- DGEList(counts=count_table)
@@ -75,10 +76,10 @@ edgeR_pipeline <- function(TCRgrCounts, comparison, min.count = 1,
   # All pairwise comparisons by QL F-test
   sign_result <- c()
   comparison_levels <- colnames(design)
-  nb_of_comparisons <- length(comparison_levels)
+  nb_of_comparison_levels <- length(comparison_levels)
   # pairwise comparisons
-  for(i in 1:(nb_of_comparisons-1)){
-    nb_of_rows = nb_of_comparisons - i
+  for(i in 1:(nb_of_comparison_levels-1)){
+    nb_of_rows = nb_of_comparison_levels - i
     comparison_matrix_pairwise <- cbind(matrix(0, nrow = nb_of_rows, ncol = i-1),
                                         matrix(-1, nrow = nb_of_rows, ncol = 1),
                                         diag(nb_of_rows))
@@ -91,14 +92,18 @@ edgeR_pipeline <- function(TCRgrCounts, comparison, min.count = 1,
     }
   }
   # each group vs all others
-  comparison_matrix_vs_all <- matrix(-1/(nb_of_comparisons-1), nb_of_comparisons, nb_of_comparisons)
-  comparison_matrix_vs_all[row(comparison_matrix_vs_all) == col(comparison_matrix_vs_all)] <- 1
-  for(i in 1:nb_of_comparisons){
-    qlf <- glmQLFTest(fit,contrast = comparison_matrix_vs_all[i,])
-    topTags <- topTags(qlf, n = nrow(count_table), p.value = 1)$table
-    topTags$comparison <- paste(comparison_levels[i], 'vs all')
-    topTags$feature <- rownames(topTags)
-    sign_result <- rbind(sign_result, topTags)
+  if(nb_of_comparison_levels > 2){
+    comparison_matrix_vs_all <- matrix(-1/(nb_of_comparison_levels-1), nb_of_comparison_levels, nb_of_comparison_levels)
+    comparison_matrix_vs_all[row(comparison_matrix_vs_all) == col(comparison_matrix_vs_all)] <- 1
+    for(i in 1:nb_of_comparison_levels){
+      qlf <- glmQLFTest(fit,contrast = comparison_matrix_vs_all[i,])
+      topTags <- topTags(qlf, n = nrow(count_table), p.value = 1)$table
+      topTags$comparison <- paste(comparison_levels[i], 'vs all')
+      topTags$feature <- rownames(topTags)
+      sign_result <- rbind(sign_result, topTags)
+    }
   }
+  sign_result <- setDT(sign_result)
+  setcolorder(sign_result, c("feature", setdiff(names(sign_result), "feature")))
   sign_result
 }
