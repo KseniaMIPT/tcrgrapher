@@ -5,7 +5,7 @@
 \title{ALICE_pipeline}
 \usage{
 ALICE_pipeline(
-  df,
+  TCRgrObject,
   Q_val = 6.27,
   cores = 1,
   thres_counts = 1,
@@ -17,9 +17,9 @@ ALICE_pipeline(
 )
 }
 \arguments{
-\item{df}{data.table}
+\item{TCRgrObject}{TCRgrapher object that contains clonoset table}
 
-\item{Q_val}{selection factor. 1/Q sequences pass selection in the thymus. The
+\item{Q_val}{selection factor. 1/Q sequences pass selection in a thymus. The
 default value for mouses 6.27. If a human model is taken and Q is not changed
 manually Q = 27 is used}
 
@@ -31,7 +31,7 @@ are taken into account}
 \item{N_neighbors_thres}{Only sequences with number of neighbors above
 threshold are used to calculate generation probability}
 
-\item{p_adjust_method}{One of the method from p.adjust from stats package
+\item{p_adjust_method}{One of the methods from p.adjust from the stats package
 possible options: "bonferroni", "holm", "hochberg", "hommel", "BH" or "fdr",
 "BY", "none". "BH" is a default method.}
 
@@ -39,17 +39,17 @@ possible options: "bonferroni", "holm", "hochberg", "hommel", "BH" or "fdr",
 "humanTRB", "humanTRA".}
 
 \item{stats}{Tool that will be used for generation probability calculation.
-Possible options: "OLGA", "SONIA". "SONIA" also calculate Q for every sequence.}
+Possible options: "OLGA", "SONIA". "SONIA" also calculates Q for every sequence.}
 
 \item{model}{Standard OLGA generation probability model is used by default.
-To set your one generation probability model write "set_custom_model_VDJ
-<path_to_folder_with_model>". Generation probability model is usually IGOR output.
-Folder should contain the following files: V_gene_CDR3_anchors.csv,
+To set your one generation probability model, write "set_custom_model_VDJ
+<path_to_folder_with_model>". A generation probability model is usually IGOR output.
+A folder should contain the following files: V_gene_CDR3_anchors.csv,
 J_gene_CDR3_anchors.csv, model_marginals.txt, model_params.txt. Some models
-one can find in the folder "model"}
+can be found in the folder "model"}
 }
 \value{
-Function returns the same table that was in input filtered by number
+Function returns TCRgrapher object filtered by number
 of counts and number of neighbors with additional columns. Additional columns
 are the following
 \itemize{
@@ -67,14 +67,6 @@ neighbors is not more than in the random model"}
 }
 }
 \description{
-Main function that takes a table with CDR3 sequences as an input. The table
-should have the following columns (Order of the columns are not important but
-the following names are necessary)
-\itemize{
-\item{"count"}{"Number of unique reads per cdr3 sequence"}
-\item{"cdr3nt"}{"CDR3 nucleotide sequence"}
-\item{"cdr3aa"}{"CDR3 aminoacid sequence"}
-\item{"bestVGene"}{"TRBV segment"}
-\item{"bestJGene"}{"TRBJ segment"}
-}
+The function takes a TCRgrapher object as an input and performs neighborhood
+enrichment analysis using the ALICE algorithm. See ?TCRgrapher.
 }

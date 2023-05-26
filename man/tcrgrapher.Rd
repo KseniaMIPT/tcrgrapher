@@ -51,50 +51,52 @@ data.tables. You can get them by calling metadata(x) or clonoset(x).
 \details{
 There are three ways to initialize an object.
 
-(1) Specify path to the one file without metadata
+(1) Specify the path to the one file without metadata
 
-If path for only one file is specified metadata will be produced automatically
+If the path for only one file is specified, metadata will be produced automatically
 and will contain one row and two columns: "file" and "sample_id".
-Clonoset will have additional column "sample_id" with one unique value.
+Clonoset will have an additional column "sample_id" with one unique value and a
+column "clone_id" with an unique id for every row.
 Positions of "count", "cdr3nt", "cdr3aa", "V gene", "J gene" clonoset's columns must be specified.
 
-(2) Specify path to the directory with files without metadata
+(2) Specify the path to the directory with files without metadata
 
-If path for the directory with files is specified and metadata is not specified
-metadata will be produced automatically and will have number of rows equal
+If the path for the directory with files is specified, and metadata is not specified
+metadata will be produced automatically and will have a number of rows equal
 to the number of samples in the directory. All files will be merged into one
-data.table with additional column "sample_id". Positions of "count", "cdr3nt", "cdr3aa",
+data.table with additional columns "sample_id" and "clone_id" with
+unique ids for every row. Positions of "count", "cdr3nt", "cdr3aa",
 "V gene", "J gene" clonoset's columns must be specified.
 
-(3) Specify path to the directory with files and metadata
+(3) Specify the path to the directory with files and metadata
 
-If path for the directory with files and path to the metadata are specified
-only files from metadata column "file" will be taken into consideration.
-Clonosets will be merged into one data.table with additional column "sample_id".
+If the path for the directory with files and the path to the metadata are specified,
+only files from the metadata column "file" will be taken into consideration.
+Clonosets will be merged into one data.table with additional columns "sample_id"
+and "clone_id" with unique ids for every row.
 Values in the "sample_id" column will be the same as in the "sample_id"
 metadata column. Positions of "count", "cdr3nt", "cdr3aa", "V gene", "J gene" clonoset's
 columns and "file", "sampl_id" metadata's columns must be specified.
 
-TCRgrEdgeR, TCRgrALICE, TCRgrTCRdist, TCRgrTCRnet are subclasses of TCRgrapher
-that store additional data and results of the analysis.
+TCRgrapherCounts is a subclass of TCRgrapher that store additional data:
+count_table and feature_info table
 }
 \examples{
-# (1) Path to the one file without metadata
-library(testthat)
-file_path <- testthat::test_path("testdata", "clonosets_vdjtools_format.tsv")
-TCRgrObject <- TCRgrapher(file_path, 1, 3, 4, 5, 7) # positions of clonoset's columns
-# metadata has the same values in both columns. Let's change one of them
-metadata(TCRgrObject)[1,'sample_id'] <- 'sample_1'
+# # (1) Path to the one file without metadata
+# file_path <- paste0(find.package('tcrgrapher'), "tests/testthat/testdata/clonosets_vdjtools_format.tsv")
+# TCRgrObject <- TCRgrapher(file_path, 1, 3, 4, 5, 7) # positions of clonoset's columns
+# # metadata has the same values in both columns. Let's change one of them
+# metadata(TCRgrObject)[1,'sample_id'] <- 'sample_1'
 
-# (2) Path to the directory with files without metadata
-dir_path <- testthat::test_path("testdata/test_dir_with_clonosets", "")
-TCRgrObject <- TCRgrapher(dir_path, 1, 3, 4, 5, 7)
+# # (2) Path to the directory with files without metadata
+# dir_path <- paste0(find.package('tcrgrapher'), "tests/testthat/testdata/test_dir_with_clonosets")
+# TCRgrObject <- TCRgrapher(dir_path, 1, 3, 4, 5, 7)
 
-# (3) Path to the directory with files and metadata
-dir_path <- testthat::test_path("testdata/test_dir_with_clonosets", "")
-metadata_path <- testthat::test_path("testdata/metadata.tsv")
-TCRgrObject <- TCRgrapher(dir_path, 1, 3, 4, 5, 7, # positions of clonoset's columns
-                          metadata_path, 1, 2)      # positions of metadtata's columns
+# # (3) Path to the directory with files and metadata
+# dir_path <- paste0(find.package('tcrgrapher'), "tests/testthat/testdata/test_dir_with_clonosets")
+# metadata_path <- testthat::test_path("testdata/metadata.tsv")
+# TCRgrObject <- TCRgrapher(dir_path, 1, 3, 4, 5, 7, # positions of clonoset's columns
+                        #  metadata_path, 1, 2)      # positions of metadtata's columns
 
 
 }

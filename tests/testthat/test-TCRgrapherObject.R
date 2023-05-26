@@ -47,7 +47,7 @@ test_that("getter for a clonoset works", {
                          cdr3nt = 'TGTGCCAGCTCACAAGACAGACTAAACACAGAAGTCTTCTTT',
                          cdr3aa = 'CASSQDRLNTEVFF', bestVGene = 'TRBV12-2',
                          d = '', bestJGene = 'TRBJ1-1',
-                         sample = 'tests/testthat/testdata/clonosets_vdjtools_format.tsv',
+                         sample_id = 'testdata/clonosets_vdjtools_format.tsv',
                          clone_id = 1)
   expect_equal(test_clonoset[1,], test_row)
 })
@@ -60,7 +60,7 @@ test_that("setter for a clonoset works", {
                          cdr3nt = 'TGTGCCAGCTCACAAGACAGACTAAACACAGAAGTCTTCTTT',
                          cdr3aa = 'CASSQDRLNTEVFF', bestVGene = 'TRBV12-2',
                          d = '', bestJGene = 'TRBJ1-1',
-                         sample = 'tests/testthat/testdata/clonosets_vdjtools_format.tsv',
+                         sample_id = 'testdata/clonosets_vdjtools_format.tsv',
                          clone_id = 1, test_col = 'test')
   expect_equal(clonoset(TCRgrObject)[1,], test_row)
 })
@@ -76,6 +76,6 @@ test_that("subsetting method works", {
   metadata_path <- testthat::test_path("testdata/metadata.tsv")
   TCRgrObject <- TCRgrapher(file_path, 1, 3, 4, 5, 7, metadata_path, 1, 2)
   TCRgrObject <- subset(TCRgrObject, c('Sample_18', 'Sample_19'))
-  expect_equal(length(unique(TCRgrObject@clonoset$sample)), 2)
+  expect_equal(length(unique(TCRgrObject@clonoset$sample_id)), 2)
   expect_equal(nrow(TCRgrObject@metadata), 2)
 })

@@ -19,31 +19,29 @@ NULL
 
 # Secondary functions -----------------------------------------------------
 
-calculate_nb_of_neighbors_one_side <- function(df) {
+calculate_nb_of_neighbors_one_side <- function(DT) {
   # Every sequence with one mismatch is a neighbor
-  tmp <- stringdistmatrix(df$cdr3aa, df$cdr3aa, method = "hamming")
+  tmp <- stringdistmatrix(DT$cdr3aa, DT$cdr3aa, method = "hamming")
   apply(tmp,
         MARGIN = 1,
         function(x) { sum(x <= 1, na.rm = T) })
 }
 
-calculate_nb_of_neighbors <- function(df) {
+calculate_nb_of_neighbors <- function(DT) {
   # give unique number 'leftgr' to the rows with the same VJ combination and left
   # CDR3aa part
-  df[, leftgr := .GRP, .(substr(cdr3aa, 1, floor(nchar(cdr3aa) / 2)),
-                         bestVGene, bestJGene)]
+  DT[, leftgr := .GRP, .(substr(cdr3aa, 1, floor(nchar(cdr3aa) / 2)), bestVGene, bestJGene)]
   # give unique number 'rightgr' to the rows with the same VJ combination and right
   # CDR3aa part
-  df[, rightgr := .GRP, .(substr(cdr3aa, floor(nchar(cdr3aa) / 2) + 1, nchar(cdr3aa)),
-                          bestVGene, bestJGene)]
+  DT[, rightgr := .GRP, .(substr(cdr3aa, floor(nchar(cdr3aa) / 2) + 1, nchar(cdr3aa)), bestVGene, bestJGene)]
 
-  df[, D_left := calculate_nb_of_neighbors_one_side(.SD), .(leftgr)]
-  df[, D_right := calculate_nb_of_neighbors_one_side(.SD), .(rightgr)]
-  df[, D_id := .N, .(cdr3aa)]
-  df[, D := (D_left + D_right - D_id - 1), ]
-  df <- subset(df, select = -c(rightgr, leftgr, D_left, D_right, D_id))
-  df[D < 0, D := 0, ]
-  df
+  DT[, D_left := calculate_nb_of_neighbors_one_side(.SD), .(leftgr)]
+  DT[, D_right := calculate_nb_of_neighbors_one_side(.SD), .(rightgr)]
+  DT[, D_id := .N, .(cdr3aa)]
+  DT[, D := (D_left + D_right - D_id - 1), ]
+  DT <- subset(DT, select = -c(rightgr, leftgr, D_left, D_right, D_id))
+  DT[D < 0, D := 0, ]
+  DT
 }
 
 all_other_variants_one_mismatch_regexp <- function(str) {
@@ -58,12 +56,12 @@ all_other_variants_one_mismatch_regexp <- function(str) {
   )))
 }
 
-parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
+parallel_wrapper_beta <- function(DT, cores = 1, chain = "mouseTRB",
                                   stats = 'OLGA', model='-') {
   # Calculate generation probability with OLGA or SONIA
 
   # add ind column for sequence combining
-  if (!("ind" %in% colnames(df))) df[, ind := 1:.N, ]
+  if (!("ind" %in% colnames(DT))) DT[, ind := 1:.N, ]
 
   tmp_names <- paste0("tmp", 1:cores, ".tsv")
   tmp_names_out <- paste0("tmp_out", 1:cores, ".tsv")
@@ -72,10 +70,10 @@ parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 
   for (f in c(paste0(path, tmp_names), paste0(path,tmp_names_out))) if (file.exists(f)) file.remove(f)
 
-  dft <- split(df, sort((1:nrow(df) - 1) %% cores + 1))
+  DTt <- split(DT, sort((1:nrow(DT) - 1) %% cores + 1))
 
-  for (i in 1:length(dft)) {
-    write.table(as.data.frame(dft[[i]][, .(cdr3aa, bestVGene, bestJGene, ind), ]),
+  for (i in 1:length(DTt)) {
+    write.table(as.data.frame(DTt[[i]][, .(cdr3aa, bestVGene, bestJGene, ind), ]),
                 quote = F, row.names = F, sep = "\t", file = paste0(path, tmp_names[i]), col.names = F
     )
   }
@@ -106,31 +104,23 @@ parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
   stats_output <- rbindlist(lapply(paste0(path, tmp_names_out), fread))
 
   if(stats == 'OLGA'){
-    df$Pgen <- stats_output$V2
+    DT$Pgen <- stats_output$V2
   }else if (stats == 'SONIA'){
-    df$Pgen <- stats_output$Pgen
-    df$Q <- stats_output$Q
-    df$Ppost <- stats_output$Ppost
+    DT$Pgen <- stats_output$Pgen
+    DT$Q <- stats_output$Q
+    DT$Ppost <- stats_output$Ppost
   }
-  df
+  DT
 }
 
 # Main function -----------------------------------------------------------
 #' ALICE_pipeline
 #'
-#' Main function that takes a table with CDR3 sequences as an input. The table
-#' should have the following columns (Order of the columns are not important but
-#' the following names are necessary)
-#' \itemize{
-#' \item{"count"}{"Number of unique reads per cdr3 sequence"}
-#' \item{"cdr3nt"}{"CDR3 nucleotide sequence"}
-#' \item{"cdr3aa"}{"CDR3 aminoacid sequence"}
-#' \item{"bestVGene"}{"TRBV segment"}
-#' \item{"bestJGene"}{"TRBJ segment"}
-#' }
+#' The function takes a TCRgrapher object as an input and performs neighborhood
+#' enrichment analysis using the ALICE algorithm. See ?TCRgrapher.
 #'
-#' @param df data.table
-#' @param Q_val selection factor. 1/Q sequences pass selection in the thymus. The
+#' @param TCRgrObject TCRgrapher object that contains clonoset table
+#' @param Q_val selection factor. 1/Q sequences pass selection in a thymus. The
 #' default value for mouses 6.27. If a human model is taken and Q is not changed
 #' manually Q = 27 is used
 #' @param cores number of used cores, 1 by default
@@ -138,20 +128,20 @@ parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 #' are taken into account
 #' @param N_neighbors_thres Only sequences with number of neighbors above
 #' threshold are used to calculate generation probability
-#' @param p_adjust_method One of the method from p.adjust from stats package
+#' @param p_adjust_method One of the methods from p.adjust from the stats package
 #' possible options: "bonferroni", "holm", "hochberg", "hommel", "BH" or "fdr",
 #' "BY", "none". "BH" is a default method.
 #' @param chain Statistical model selection. Possible options: "mouseTRB",
 #' "humanTRB", "humanTRA".
 #' @param stats Tool that will be used for generation probability calculation.
-#' Possible options: "OLGA", "SONIA". "SONIA" also calculate Q for every sequence.
+#' Possible options: "OLGA", "SONIA". "SONIA" also calculates Q for every sequence.
 #' @param model Standard OLGA generation probability model is used by default.
-#' To set your one generation probability model write "set_custom_model_VDJ
-#' <path_to_folder_with_model>". Generation probability model is usually IGOR output.
-#' Folder should contain the following files: V_gene_CDR3_anchors.csv,
+#' To set your one generation probability model, write "set_custom_model_VDJ
+#' <path_to_folder_with_model>". A generation probability model is usually IGOR output.
+#' A folder should contain the following files: V_gene_CDR3_anchors.csv,
 #' J_gene_CDR3_anchors.csv, model_marginals.txt, model_params.txt. Some models
-#' one can find in the folder "model"
-#' @return Function returns the same table that was in input filtered by number
+#' can be found in the folder "model"
+#' @return Function returns TCRgrapher object filtered by number
 #' of counts and number of neighbors with additional columns. Additional columns
 #' are the following
 #' \itemize{
@@ -168,12 +158,18 @@ parallel_wrapper_beta <- function(df, cores = 1, chain = "mouseTRB",
 #' \item{"p_adjust"}{"p value with multiple testing correction"}
 #' }
 #' @export
-ALICE_pipeline <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
+ALICE_pipeline <- function(TCRgrObject, Q_val = 6.27, cores = 1, thres_counts = 1,
                            N_neighbors_thres = 1, p_adjust_method = "BH",
-                           chain = 'mouseTRB', stats = 'OLGA', model = '-') {
+                           chain = 'mouseTRB', stats = 'OLGA', model = '-'){
+  if(!("TCRgrapher" %in% attr(TCRgrObject, 'class'))){
+    stop("The function takes TCRgrapher object as an input. See ?TCRgrapher",
+         call. = FALSE)
+  }
+  # TODO other requirements
 
+  DT <- clonoset(TCRgrObject)
   message("checking for unproductive sequences if it hasn't been made earlier")
-  df <- df[!grepl(cdr3aa, pattern = "*", fixed = T) & ((nchar(cdr3nt) %% 3) == 0)]
+  DT <- DT[!grepl(cdr3aa, pattern = "*", fixed = T) & ((nchar(cdr3nt) %% 3) == 0)]
 
   model_marginals <- list('mouseTRB'=OLGAVJ_MOUSE_TRB,
                           'humanTRB'=OLGAVJ_HUMAN_TRB,
@@ -203,44 +199,47 @@ ALICE_pipeline <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
   }
 
   message('filtering sequences by number of counts')
-  df <- df[count >= thres_counts,]
-  stopifnot(nrow(df) != 0)
+  DT <- DT[count >= thres_counts,]
+  stopifnot(nrow(DT) != 0)
   message('filtering V and J for present in model')
-  df <- df[bestVGene %in% rownames(OLGAVJ) & bestJGene %in% colnames(OLGAVJ)]
-  stopifnot(nrow(df) != 0)
+  DT <- DT[bestVGene %in% rownames(OLGAVJ) & bestJGene %in% colnames(OLGAVJ)]
+  stopifnot(nrow(DT) != 0)
   message('calculating number of neighbors for every sequence')
-  df <- calculate_nb_of_neighbors(df)
-  df[, VJ_n_total := .N, .(bestVGene, bestJGene)]
+  DT <- calculate_nb_of_neighbors(DT)
+  DT[, VJ_n_total := .N, .(bestVGene, bestJGene)]
   message('filtering sequences by number of neighbors')
-  df <- df[D >= N_neighbors_thres][, ind := 1:.N, ]
-  stopifnot(nrow(df) != 0)
+  DT <- DT[D >= N_neighbors_thres][, ind := 1:.N, ]
+  stopifnot(nrow(DT) != 0)
   message('generating all possible sequences with one mismatch')
-  df_with_mismatch <- df[, .(bestVGene, bestJGene,
+  DT_with_mismatch <- DT[, .(bestVGene, bestJGene,
                              cdr3aa = all_other_variants_one_mismatch_regexp(cdr3aa)
   ), ind]
   message('generation probability calculation')
-  df <- parallel_wrapper_beta(df = df, cores = cores, chain = chain,
+  DT <- parallel_wrapper_beta(DT = DT, cores = cores, chain = chain,
                               stats = stats, model=model)
-  df_with_mismatch <- parallel_wrapper_beta(df = df_with_mismatch, cores = cores,
+  DT_with_mismatch <- parallel_wrapper_beta(DT = DT_with_mismatch, cores = cores,
                                             chain = chain,  stats = stats, model=model)
   if(stats == 'OLGA'){
     # Pgen - probability to be generated computed by OLGA
     # Pgen_sum - sum of Pgen of all sequences similar to the given with one mismatch
-    df$Pgen_sum <- df_with_mismatch[, sum(Pgen), ind]$V1
+    DT$Pgen_sum <- DT_with_mismatch[, sum(Pgen), ind]$V1
     # Pgen_sum_corr - Pgen_sum without probabilities of the main sequence
-    df[, Pgen_sum_corr := Pgen_sum - Pgen * (nchar(cdr3aa) - 2), ]
-    df[, p_val := ppois(D-1, lambda = Q_val * VJ_n_total * Pgen_sum_corr, lower.tail = F)]
+    DT[, Pgen_sum_corr := Pgen_sum - Pgen * (nchar(cdr3aa) - 2), ]
+    DT[, p_val := ppois(D-1, lambda = Q_val * VJ_n_total * Pgen_sum_corr, lower.tail = F)]
   } else if (stats == 'SONIA'){
-    df$Ppost_sum <- df_with_mismatch[, sum(Ppost), ind]$V1
-    df[, Ppost_sum_corr := Ppost_sum - Ppost * (nchar(cdr3aa) - 2), ]
-    df[, p_val := ppois(D-1, lambda =  VJ_n_total * Ppost_sum_corr, lower.tail = F)]
+    DT$Ppost_sum <- DT_with_mismatch[, sum(Ppost), ind]$V1
+    DT[, Ppost_sum_corr := Ppost_sum - Ppost * (nchar(cdr3aa) - 2), ]
+    DT[, p_val := ppois(D-1, lambda =  VJ_n_total * Ppost_sum_corr, lower.tail = F)]
   }
 
-  df[, p_adjust := p.adjust(p_val, method = p_adjust_method)]
+  DT[, p_adjust := p.adjust(p_val, method = p_adjust_method)]
+
+  # TODO add 'ALICE' to all columns
 
   # deletion of unnecessary columns
-  df <- subset(df, select = -c(ind))
-  return(df)
+  DT <- subset(DT, select = -c(ind))
+  clonoset(TCRgrObject) <- DT
+  return(TCRgrObject)
 }
 
 # Additional functions ---------------------------------------------------------
@@ -249,28 +248,34 @@ ALICE_pipeline <- function(df, Q_val = 6.27, cores = 1, thres_counts = 1,
 #'
 #' Function calculates p-value taking into account abundance of every clonotype
 #'
-#' @param df output of tcrgrapher function
-#' @return Function returns the same data.table with additional columns:
+#' @param TCRgrObject TCRgrapher object -- output of ALICE_pipeline
+#' @return Function returns TCRgrapher object with the same clonotypes table with
+#' additional columns:
 #' \itemize{
-#' \item{"pval_with_abundance_log2_counts"}{"Recalculated p-value considering
-#' count number of every clonotype. Log2 is used for count normalization"}
-#' \item{"pval_with_abundance_counts"}{"Recalculated p-value considering
-#' count number of every clonotype. There is no count normalization"}
+#' \item{pval_with_abundance_log2_counts}{recalculated p-value considering count
+#'  number of every clonotype. Log2 is used for count normalization}
+#' \item{pval_with_abundance_counts}{recalculated p-value considering count number
+#'  of every clonotype. There is no count normalization}
+#'  }
 #' @export
-pval_with_abundance <- function(df) {
-  counts <- df[,1]
+pval_with_abundance <- function(TCRgrObject) {
+  # TODO check that ALICE analysis was performed
+  # TODO change column names
+  DT <- clonoset(TCRgrObject)
+  counts <- DT[,1]
   log_counts <- log2(counts)
-  neighbors <- df[,'D']
-  df$pval_with_abundance <- -1
+  neighbors <- DT[,'D']
+  DT$pval_with_abundance <- -1
   for(d in unique(neighbors)){
-    PDF_f <- approxfun(density((log_counts)^d))
-    df[df$D == d,
-       'pval_with_abundance_log2_counts'] <- PDF_f(df[df$D == d,
-                                                      'D_log2_counts']) * df[df$D == d, 'p_val']
-    PDF_f <- approxfun(density((counts)^d))
-    df[df$D == d,
-       'pval_with_abundance_counts'] <- PDF_f(df[df$D == d,
-                                                 'D_counts'])* df[df$D == d, 'p_val']
+    PDT_f <- approxfun(density((log_counts)^d))
+    DT[DT$D == d,
+       'pval_with_abundance_log2_counts'] <- PDT_f(DT[DT$D == d,
+                                                      'D_log2_counts']) * DT[DT$D == d, 'p_val']
+    PDT_f <- approxfun(density((counts)^d))
+    DT[DT$D == d,
+       'pval_with_abundance_counts'] <- PDT_f(DT[DT$D == d,
+                                                 'D_counts'])* DT[DT$D == d, 'p_val']
   }
-  df
+  clonoset(TCRgrObject) <- DT
+  return(TCRgrObject)
 }
