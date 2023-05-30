@@ -42,6 +42,7 @@ edgeR_pipeline <- function(TCRgrCounts, comparison, min.count = 1,
          call. = FALSE)
   }
 
+  setDTthreads(threads = 0)
   count_table <- TCRgrCounts@count_table
   metadata <- TCRgrCounts@metadata
 

@@ -54,8 +54,8 @@ TCRgrapherCounts <- function(TCRgrObject, v_gene = TRUE, j_gene = FALSE, cluster
         call. = FALSE
       )
     }
-    g <- make_TCR_graph(clonoset, v_gene = v_gene, j_gene = j_gene)
-    clonoset <- find_TCR_components(clonoset, g)
+    #g <- make_TCR_graph(clonoset, v_gene = v_gene, j_gene = j_gene)
+    clonoset <- find_TCR_components_by_bfs(clonoset)
   }
 
   formula <- as.formula(paste0(paste(grouping, collapse = ' + '), ' ~ sample_id'))

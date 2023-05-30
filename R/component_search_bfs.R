@@ -5,7 +5,7 @@ NULL
 
 #' @param clonoset clonoset
 #' @param src clone_id of the source clonotype
-#'
+#' @export
 bfs_for_TCRs <- function(clonoset, src, comp_id, v_gene = TRUE, j_gene = FALSE){
   if(!('cluster_id' %in% colnames(clonoset))){
     clonoset[, cluster_id := -1]
@@ -38,10 +38,10 @@ bfs_for_TCRs <- function(clonoset, src, comp_id, v_gene = TRUE, j_gene = FALSE){
   clonoset
 }
 
-find_TCR_components_by_bfs <- function(TCRgrObject, v_gene = TRUE, j_gene = FALSE){
+#' @export
+find_TCR_components_by_bfs <- function(clonoset, v_gene = TRUE, j_gene = FALSE){
   src <- 1
   comp_id <- 1
-  clonoset <- clonoset(TCRgrObject)
   clonoset[, cluster_id := -1]
   pb <- txtProgressBar(min = 0, max = log(nrow(clonoset)), style = 3)
   while(sum(clonoset[,cluster_id] == -1) != 0){
@@ -50,6 +50,5 @@ find_TCR_components_by_bfs <- function(TCRgrObject, v_gene = TRUE, j_gene = FALS
     comp_id <- comp_id + 1
     setTxtProgressBar(pb, log(src))
   }
-  clonoset(TCRgrObject) <- clonoset
-  TCRgrObject
+  clonoset
 }
