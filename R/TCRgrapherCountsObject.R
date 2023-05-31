@@ -70,7 +70,7 @@ TCRgrapherCounts <- function(TCRgrObject, v_gene = TRUE, j_gene = FALSE, cluster
     feature_info <- cbind(clonoset, feature = Reduce(paste, clonoset[,grouping, with=FALSE]))
   }
 
-  count_table <- count_table[,-(1:length(grouping))]
+  count_table <- subset(count_table, select = (length(grouping) + 1):(ncol(count_table)))
   feature_info$grouping <- paste(grouping, collapse = ' ')
 
   new('TCRgrapherCounts', clonoset = clonoset,
