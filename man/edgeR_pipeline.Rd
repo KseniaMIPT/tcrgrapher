@@ -36,7 +36,7 @@ value is 0.5.}
 amino acid clonotype and each column corresponds to the sample.}
 }
 \value{
-data.frame with statistics for every clonotype performed for each pair
+data.table with statistics for every clonotype performed for each pair
 of groups and for every sample vs all others. 'comparison' column shows
 comparisons in the format 'Group1 vs Group2'.
 In this case, LFC values are negative if the clonotype is expanded in 'Group1' and
