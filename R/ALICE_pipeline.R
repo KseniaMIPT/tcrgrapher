@@ -159,7 +159,7 @@ parallel_wrapper_beta <- function(DT, cores = 1, chain = "mouseTRB",
 #' }
 #' @export
 ALICE_pipeline <- function(TCRgrObject, Q_val = 6.27, cores = 1, thres_counts = 1,
-                           N_neighbors_thres = 1, p_adjust_method = "BH",
+                           N_neighbors_thres = 0, p_adjust_method = "BH",
                            chain = 'mouseTRB', stats = 'OLGA', model = '-'){
   if(!("TCRgrapher" %in% attr(TCRgrObject, 'class'))){
     stop("The function takes TCRgrapher object as an input. See ?TCRgrapher",
