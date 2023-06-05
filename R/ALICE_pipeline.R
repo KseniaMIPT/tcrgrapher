@@ -224,6 +224,8 @@ ALICE_pipeline <- function(TCRgrObject, Q_val = 6.27, cores = 1, thres_counts = 
     # Pgen_sum - sum of Pgen of all sequences similar to the given with one mismatch
     DT$Pgen_sum <- DT_with_mismatch[, sum(Pgen), ind]$V1
     # Pgen_sum_corr - Pgen_sum without probabilities of the main sequence
+    # I removed the correction y VJ combination from Pogorelyy's script because
+    # olga canculates conditional probability by V and J segments.
     DT[, Pgen_sum_corr := Pgen_sum - Pgen * (nchar(cdr3aa) - 2), ]
     DT[, p_val := ppois(D-1, lambda = Q_val * VJ_n_total * Pgen_sum_corr, lower.tail = F)]
   } else if (stats == 'SONIA'){
