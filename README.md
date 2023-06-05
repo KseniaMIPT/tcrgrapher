@@ -99,7 +99,7 @@ neighborhood enrichment analysis using the ALICE algorithm. You can find default
 parameters and possible options below.
 
 ```R
-tcrgrapher(TCRgrObject, Q_val = 6.27, cores = 1, thres_counts = 1, N_neighbors_thres = 1, 
+ALICE_pipeline(TCRgrObject, Q_val = 6.27, cores = 1, thres_counts = 1, N_neighbors_thres = 1, 
           p_adjust_method = "BH", chain = 'mouseTRB', stats = 'OLGA', model= '-')
 ```
 * TCRgrObject - TCRgrapher object that contains a clonotype table
