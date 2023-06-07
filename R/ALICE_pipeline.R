@@ -304,24 +304,24 @@ pval_with_abundance <- function(clonoset) {
   for(nb in sort(all_numbers_of_neighbors)){
     # log2
     PDF_f <- approxfun(density(log_counts^nb))
-    clonoset[ALICE.D == nb,
+    try(clonoset[ALICE.D == nb,
              ALICE.pval_with_abundance_log2_counts := PDF_f(clonoset[ALICE.D == nb,
                                                                      log2_counts]) * clonoset[ALICE.D == nb,
-                                                                                              ALICE.p_value]]
-    clonoset[ALICE.D == nb,
+                                                                                              ALICE.p_value]])
+    try(clonoset[ALICE.D == nb,
             ALICE.log_pval_with_abundance_log2_counts := log(PDF_f(clonoset[ALICE.D == nb,
                                                                     log2_counts])) + clonoset[ALICE.D == nb,
-                                                                                             ALICE.log_p_value]]
+                                                                                             ALICE.log_p_value]])
     # just counts
     PDF_f <- approxfun(density(counts^nb))
-    clonoset[ALICE.D == nb,
+    try(clonoset[ALICE.D == nb,
              ALICE.pval_with_abundance_counts := PDF_f(clonoset[ALICE.D == nb,
                                                                 count]) * clonoset[ALICE.D == nb,
-                                                                                   ALICE.p_value]]
-    clonoset[ALICE.D == nb,
+                                                                                   ALICE.p_value]])
+    try(clonoset[ALICE.D == nb,
              ALICE.log_pval_with_abundance_counts := log(PDF_f(clonoset[ALICE.D == nb,
                                                                 count])) + clonoset[ALICE.D == nb,
-                                                                                   ALICE.log_p_value]]
+                                                                                   ALICE.log_p_value]])
   }
   return(clonoset)
 }
