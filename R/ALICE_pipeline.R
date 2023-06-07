@@ -250,9 +250,10 @@ ALICE_pipeline <- function(TCRgrObject, Q_val = 6.27, cores = 1, thres_counts = 
 
 #' pval_with_abundance
 #'
-#' Function calculates p-value taking into account abundance of every clonotype
+#' Function calculates p-value taking into account the abundance of every clonotype
 #'
-#' @param DT clonoset after analysis with the ALICE pipeline. To get it, use clonoset(TCRgrapher object)
+#' @param clonoset clonoset after the analysis with the ALICE pipeline.
+#' To get it, use clonoset(TCRgrapher object)
 #' @return Function returns the same clonoset with additional columns:
 #' \itemize{
 #' \item{pval_with_abundance_log2_counts}{recalculated p-value considering count
@@ -261,22 +262,25 @@ ALICE_pipeline <- function(TCRgrObject, Q_val = 6.27, cores = 1, thres_counts = 
 #'  of every clonotype. There is no count normalization}
 #'  }
 #' @export
-pval_with_abundance <- function(DT) {
-  # TODO check that ALICE analysis was performed
-  # TODO change column names
-  counts <- DT[,1]
+pval_with_abundance <- function(clonoset) {
+  # check that ALICE analysis was performed
+  if(!(c('count', 'ALICE.D', 'ALICE.p_value') %in% colnames(clonoset))){
+    stop("A clonoset must include ALICE.D and ALICE.p_value columns",
+         call. = FALSE)
+  }
+  counts <- clonoset[,count]
   log_counts <- log2(counts)
-  neighbors <- DT[,'D']
-  DT$pval_with_abundance <- -1
+  neighbors <- clonoset[,'ALICE.D']
+  clonoset$pval_with_abundance <- -1
   for(d in unique(neighbors)){
     PDT_f <- approxfun(density((log_counts)^d))
-    DT[DT$D == d,
-       'pval_with_abundance_log2_counts'] <- PDT_f(DT[DT$D == d,
-                                                      'D_log2_counts']) * DT[DT$D == d, 'p_val']
+    clonoset[clonoset$ALICE.D == d,
+       'pval_with_abundance_log2_counts'] <- PDT_f(clonoset[clonoset$ALICE.D == d,
+                                                      'D_log2_counts']) * clonoset[clonoset$ALICE.D == d, 'ALICE.p_value']
     PDT_f <- approxfun(density((counts)^d))
-    DT[DT$D == d,
-       'pval_with_abundance_counts'] <- PDT_f(DT[DT$D == d,
-                                                 'D_counts'])* DT[DT$D == d, 'p_val']
+    clonoset[clonoset$ALICE.D == d,
+       'pval_with_abundance_counts'] <- PDT_f(clonoset[clonoset$ALICE.D == d,
+                                                 'D_counts'])* clonoset[clonoset$ALICE.D == d, 'ALICE.p_value']
   }
-  return(DT)
+  return(clonoset)
 }
