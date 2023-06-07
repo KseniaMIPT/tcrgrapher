@@ -250,7 +250,10 @@ ALICE_pipeline <- function(TCRgrObject, Q_val = 6.27, cores = 1, thres_counts = 
 
 #' pval_with_abundance
 #'
-#' Function calculates p-value taking into account the abundance of every clonotype
+#' The function calculates the p-value, taking into account the abundance of every
+#' clonotype. The method is described in Pogorelyy et al. 2019. In the case of
+#' very large datasets with high numbers of neighbors, it may not be possible to
+#' calculate the corrected p-value, especially pval_with_abundance_counts.
 #'
 #' @param clonoset clonoset after the analysis with the ALICE pipeline.
 #' To get it, use clonoset(TCRgrapher object)
@@ -264,26 +267,30 @@ ALICE_pipeline <- function(TCRgrObject, Q_val = 6.27, cores = 1, thres_counts = 
 #' @export
 pval_with_abundance <- function(clonoset) {
   # check that ALICE analysis was performed
-  if(!(c('count', 'ALICE.D', 'ALICE.p_value') %in% colnames(clonoset))){
+  if(!(all(c('count', 'ALICE.D', 'ALICE.p_value') %in% colnames(clonoset)))){
     stop("A clonoset must include ALICE.D and ALICE.p_value columns",
          call. = FALSE)
   }
   counts <- clonoset[,count]
   log_counts <- log2(counts)
   clonoset[, log2_counts := log2(count),]
-  all_numbers_of_neighbors <- unique(clonoset[,'ALICE.D'])
+  all_numbers_of_neighbors <- unique(clonoset[,ALICE.D])
+  all_numbers_of_neighbors <- all_numbers_of_neighbors[all_numbers_of_neighbors != 0]
 
-  for(d in all_numbers_of_neighbors){
-    PDT_f <- approxfun(density((log_counts)^d))
-    clonoset[ALICE.D == d,
-             pval_with_abundance_log2_counts := PDT_f(clonoset[ALICE.D == d,
-                                                               log2_counts]) * clonoset[ALICE.D == d,
-                                                                                        ALICE.p_value], ]
-    PDT_f <- approxfun(density((counts)^d))
-    clonoset[ALICE.D == d,
-       pval_with_abundance_counts := PDT_f(clonoset[ALICE.D == d,
-                                                 count]) * clonoset[ALICE.D == d,
-                                                                    ALICE.p_value], ]
+  clonoset[ALICE.D == 0, ALICE.pval_with_abundance_log2_counts := 1]
+  clonoset[ALICE.D == 0, ALICE.pval_with_abundance_counts := 1]
+
+  for(nb in sort(all_numbers_of_neighbors)){
+    PDF_f <- approxfun(density(log_counts^nb))
+    clonoset[ALICE.D == nb,
+             ALICE.pval_with_abundance_log2_counts := PDF_f(clonoset[ALICE.D == nb,
+                                                                     log2_counts]) * clonoset[ALICE.D == nb,
+                                                                                              ALICE.p_value]]
+    PDF_f <- approxfun(density(counts^nb))
+    clonoset[ALICE.D == nb,
+             ALICE.pval_with_abundance_counts := PDF_f(clonoset[ALICE.D == nb,
+                                                                count]) * clonoset[ALICE.D == nb,
+                                                                                   ALICE.p_value]]
   }
   return(clonoset)
 }
