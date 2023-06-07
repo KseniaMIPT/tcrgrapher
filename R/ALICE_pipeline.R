@@ -270,17 +270,20 @@ pval_with_abundance <- function(clonoset) {
   }
   counts <- clonoset[,count]
   log_counts <- log2(counts)
-  neighbors <- clonoset[,'ALICE.D']
-  clonoset$pval_with_abundance <- -1
-  for(d in unique(neighbors)){
+  clonoset[, log2_counts := log2(count),]
+  all_numbers_of_neighbors <- unique(clonoset[,'ALICE.D'])
+
+  for(d in all_numbers_of_neighbors){
     PDT_f <- approxfun(density((log_counts)^d))
-    clonoset[clonoset$ALICE.D == d,
-       'pval_with_abundance_log2_counts'] <- PDT_f(clonoset[clonoset$ALICE.D == d,
-                                                      'D_log2_counts']) * clonoset[clonoset$ALICE.D == d, 'ALICE.p_value']
+    clonoset[ALICE.D == d,
+             pval_with_abundance_log2_counts := PDT_f(clonoset[ALICE.D == d,
+                                                               log2_counts]) * clonoset[ALICE.D == d,
+                                                                                        ALICE.p_value], ]
     PDT_f <- approxfun(density((counts)^d))
-    clonoset[clonoset$ALICE.D == d,
-       'pval_with_abundance_counts'] <- PDT_f(clonoset[clonoset$ALICE.D == d,
-                                                 'D_counts'])* clonoset[clonoset$ALICE.D == d, 'ALICE.p_value']
+    clonoset[ALICE.D == d,
+       pval_with_abundance_counts := PDT_f(clonoset[ALICE.D == d,
+                                                 count]) * clonoset[ALICE.D == d,
+                                                                    ALICE.p_value], ]
   }
   return(clonoset)
 }
