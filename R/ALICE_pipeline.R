@@ -236,10 +236,12 @@ ALICE_pipeline <- function(TCRgrObject, Q_val = 6.27, cores = 1, thres_counts = 
 
   DT[, p_adjust := p.adjust(p_val, method = p_adjust_method)]
 
-  # TODO add 'ALICE' to all columns
-
   # deletion of unnecessary columns
-  DT <- subset(DT, select = -c(ind))
+  DT <- subset(DT, select = -c(ind, Pgen_sum, Pgen_sum_corr))
+
+  setnames(DT, c('D', 'VJ_n_total', 'Pgen', 'p_val', 'p_adjust'),
+           c('ALICE.D', 'ALICE.VJ_n_total', 'ALICE.Pgen', 'ALICE.p_value', 'ALICE.p_adjust'))
+
   clonoset(TCRgrObject) <- DT
   return(TCRgrObject)
 }
@@ -250,9 +252,8 @@ ALICE_pipeline <- function(TCRgrObject, Q_val = 6.27, cores = 1, thres_counts = 
 #'
 #' Function calculates p-value taking into account abundance of every clonotype
 #'
-#' @param TCRgrObject TCRgrapher object -- output of ALICE_pipeline
-#' @return Function returns TCRgrapher object with the same clonotypes table with
-#' additional columns:
+#' @param DT clonoset after analysis with the ALICE pipeline. To get it, use clonoset(TCRgrapher object)
+#' @return Function returns the same clonoset with additional columns:
 #' \itemize{
 #' \item{pval_with_abundance_log2_counts}{recalculated p-value considering count
 #'  number of every clonotype. Log2 is used for count normalization}
@@ -260,10 +261,9 @@ ALICE_pipeline <- function(TCRgrObject, Q_val = 6.27, cores = 1, thres_counts = 
 #'  of every clonotype. There is no count normalization}
 #'  }
 #' @export
-pval_with_abundance <- function(TCRgrObject) {
+pval_with_abundance <- function(DT) {
   # TODO check that ALICE analysis was performed
   # TODO change column names
-  DT <- clonoset(TCRgrObject)
   counts <- DT[,1]
   log_counts <- log2(counts)
   neighbors <- DT[,'D']
@@ -278,6 +278,5 @@ pval_with_abundance <- function(TCRgrObject) {
        'pval_with_abundance_counts'] <- PDT_f(DT[DT$D == d,
                                                  'D_counts'])* DT[DT$D == d, 'p_val']
   }
-  clonoset(TCRgrObject) <- DT
-  return(TCRgrObject)
+  return(DT)
 }
