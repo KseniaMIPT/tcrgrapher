@@ -145,17 +145,15 @@ parallel_wrapper_beta <- function(DT, cores = 1, chain = "mouseTRB",
 #' of counts and number of neighbors with additional columns. Additional columns
 #' are the following
 #' \itemize{
-#' \item{"D"}{"Number of neighbors in clonoset. Neighbor is a similar sequence
+#' \item{"ALICE.D"}{"Number of neighbors in clonoset. Neighbor is a similar sequence
 #' with one mismatch"}
-#' \item{"VJ_n_total"}{"Number of unique sequences with given VJ combination"}
-#' \item{"Pgen"}{"Probability to be generated computed by OLGA"}
-#' \item{"Pgen_sum_corr"}{"Sum of Pgen of all sequences similar to the given
-#' with one mismatch"}
-#' \item{"Pgen_by_VJ"}{"Conditional probability. Sum of probabilities to be
-#' generated with given VJ combination"}
-#' \item{"p_val"}{"p value under null hypothesis that number of sequence's
+#' \item{"ALICE.VJ_n_total"}{"Number of unique sequences with given VJ combination"}
+#' \item{"ALICE.Pgen"}{"Probability to be generated computed by OLGA"}
+#' \item{"ALICE.p_value"}{"p value under null hypothesis that number of sequence's
 #' neighbors is not more than in the random model"}
-#' \item{"p_adjust"}{"p value with multiple testing correction"}
+#' \item{"ALICE.p_adjust"}{"p value with multiple testing correction"}
+#' \item{"ALICE.log_p_value"}{"log of p_value. p values are usually very small
+#' and can be rounded to zero"}
 #' }
 #' @export
 ALICE_pipeline <- function(TCRgrObject, Q_val = 6.27, cores = 1, thres_counts = 1,
@@ -227,11 +225,29 @@ ALICE_pipeline <- function(TCRgrObject, Q_val = 6.27, cores = 1, thres_counts = 
     # I removed the correction y VJ combination from Pogorelyy's script because
     # olga canculates conditional probability by V and J segments.
     DT[, Pgen_sum_corr := Pgen_sum - Pgen * (nchar(cdr3aa) - 2), ]
-    DT[, p_val := ppois(D-1, lambda = Q_val * VJ_n_total * Pgen_sum_corr, lower.tail = F)]
+    DT[, p_val := ppois(D-1,
+                        # normalize for conditioning on observing a variant
+                        lambda = (Q_val * VJ_n_total * Pgen_sum_corr) / (1 - exp(-(Q_val * VJ_n_total * Pgen_sum_corr))),
+                        lower.tail = F)]
+    # p values are toooo small
+    DT[, log_p_val := ppois(D-1,
+                        # normalize for conditioning on observing a variant
+                        lambda = (Q_val * VJ_n_total * Pgen_sum_corr) / (1 - exp(-(Q_val * VJ_n_total * Pgen_sum_corr))),
+                        lower.tail = F,
+                        log.p = TRUE)]
   } else if (stats == 'SONIA'){
     DT$Ppost_sum <- DT_with_mismatch[, sum(Ppost), ind]$V1
     DT[, Ppost_sum_corr := Ppost_sum - Ppost * (nchar(cdr3aa) - 2), ]
-    DT[, p_val := ppois(D-1, lambda =  VJ_n_total * Ppost_sum_corr, lower.tail = F)]
+    DT[, p_val := ppois(D-1,
+                        # normalize for conditioning on observing a variant
+                        lambda =  (VJ_n_total * Ppost_sum_corr) / (1 - exp(-(VJ_n_total * Ppost_sum_corr))),
+                        lower.tail = F)]
+    # p values are toooo small
+    DT[, log_p_val := ppois(D-1,
+                        # normalize for conditioning on observing a variant
+                        lambda =  (VJ_n_total * Ppost_sum_corr) / (1 - exp(-(VJ_n_total * Ppost_sum_corr))),
+                        lower.tail = F,
+                        log.p = TRUE)]
   }
 
   DT[, p_adjust := p.adjust(p_val, method = p_adjust_method)]
@@ -239,8 +255,9 @@ ALICE_pipeline <- function(TCRgrObject, Q_val = 6.27, cores = 1, thres_counts = 
   # deletion of unnecessary columns
   DT <- subset(DT, select = -c(ind, Pgen_sum, Pgen_sum_corr))
 
-  setnames(DT, c('D', 'VJ_n_total', 'Pgen', 'p_val', 'p_adjust'),
-           c('ALICE.D', 'ALICE.VJ_n_total', 'ALICE.Pgen', 'ALICE.p_value', 'ALICE.p_adjust'))
+  setnames(DT, c('D', 'VJ_n_total', 'Pgen', 'p_val', 'p_adjust', 'log_p_val'),
+           c('ALICE.D', 'ALICE.VJ_n_total', 'ALICE.Pgen', 'ALICE.p_value',
+             'ALICE.p_adjust', 'ALICE.log_p_value'))
 
   clonoset(TCRgrObject) <- DT
   return(TCRgrObject)
@@ -263,6 +280,8 @@ ALICE_pipeline <- function(TCRgrObject, Q_val = 6.27, cores = 1, thres_counts = 
 #'  number of every clonotype. Log2 is used for count normalization}
 #' \item{pval_with_abundance_counts}{recalculated p-value considering count number
 #'  of every clonotype. There is no count normalization}
+#'  \item{log_pval_with_abundance_log2_counts}{log of pval_with_abundance_log2_counts}
+#' \item{log_pval_with_abundance_counts}{log of pval_with_abundance_counts}
 #'  }
 #' @export
 pval_with_abundance <- function(clonoset) {
@@ -281,16 +300,26 @@ pval_with_abundance <- function(clonoset) {
   clonoset[ALICE.D == 0, ALICE.pval_with_abundance_counts := 1]
 
   for(nb in sort(all_numbers_of_neighbors)){
+    # log2
     PDF_f <- approxfun(density(log_counts^nb))
     clonoset[ALICE.D == nb,
              ALICE.pval_with_abundance_log2_counts := PDF_f(clonoset[ALICE.D == nb,
                                                                      log2_counts]) * clonoset[ALICE.D == nb,
                                                                                               ALICE.p_value]]
+    clonoset[ALICE.D == nb,
+            ALICE.log_pval_with_abundance_log2_counts := log(PDF_f(clonoset[ALICE.D == nb,
+                                                                    log2_counts])) + clonoset[ALICE.D == nb,
+                                                                                             ALICE.log_p_value]]
+    # just counts
     PDF_f <- approxfun(density(counts^nb))
     clonoset[ALICE.D == nb,
              ALICE.pval_with_abundance_counts := PDF_f(clonoset[ALICE.D == nb,
                                                                 count]) * clonoset[ALICE.D == nb,
                                                                                    ALICE.p_value]]
+    clonoset[ALICE.D == nb,
+             ALICE.log_pval_with_abundance_counts := log(PDF_f(clonoset[ALICE.D == nb,
+                                                                count])) + clonoset[ALICE.D == nb,
+                                                                                   ALICE.log_p_value]]
   }
   return(clonoset)
 }
