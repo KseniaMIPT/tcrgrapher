@@ -140,15 +140,15 @@ with the given VJ combination
 is not more than in the random model
 * p_adjust - p value with multiple testing correction
 
-## Additional functions for ALICE analysis
+### Additional functions for ALICE analysis
 
-```pval_with_abundance(df)``` The function takes the output of the ALICE_pipeline 
+```pval_with_abundance(clonoset)``` The function takes the output of the ALICE_pipeline 
 function and adjusts the p-value, taking into account the abundance of every clonotype.
 There are two additional columns in the output depending on count normalization:
 "pval_with_abundance_log2_counts" - Log2 is used for count normalization; 
 "pval_with_abundance_counts" - no count normalization.
 
-# edgeR analysis
+## edgeR analysis
 
 ```edgeR_pipeline``` The function performs statistical analysis by edgeR to 
 identify significantly expanded clonotypes. First, it filters the data using 
@@ -183,7 +183,7 @@ TCRgrCounts <- TCRgrapherCounts(TCRgrObject)
 edgeR_res <- edgeR_pipeline(TCRgrCounts, your_comparison)
 ```
 
-## Additional functions
+### Additional functions
 
 ```make_TCR_graph(clonoset, v_gene = TRUE, j_gene = FALSE)``` 
 The function makes a graph from a clonoset table with the igraph package. Every
@@ -194,4 +194,8 @@ with the same V gene or VJ combination.
 
 ```find_TCR_components(clonoset, graph)``` The function takes a clonoset table 
 and make_TCR_graph output and returns the same clonoset table with an additional
+column "cluster_id". All clusters of neighbors with one mismatch have a unique id.
+
+```find_TCR_components_by_bfs(clonoset)``` The function takes a clonoset table
+and returns the same clonoset table with an additional 
 column "cluster_id". All clusters of neighbors with one mismatch have a unique id.
