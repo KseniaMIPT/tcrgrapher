@@ -276,6 +276,10 @@ ALICE_pipeline <- function(TCRgrObject, Q_val = 6.27, cores = 1, thres_counts = 
 #'
 #' @param clonoset clonoset after the analysis with the ALICE pipeline.
 #' To get it, use clonoset(TCRgrapher object)
+#' @param by_counts A logical value indicates whether to calculate corrected
+#' p-values using counts or not
+#' @param by_log2_counts A logical value indicates whether to calculate corrected
+#' p-values using log2 counts or not
 #' @return Function returns the same clonoset with additional columns:
 #' \itemize{
 #' \item{pval_with_abundance_log2_counts}{recalculated p-value considering count
@@ -286,7 +290,7 @@ ALICE_pipeline <- function(TCRgrObject, Q_val = 6.27, cores = 1, thres_counts = 
 #' \item{log_pval_with_abundance_counts}{log of pval_with_abundance_counts}
 #'  }
 #' @export
-pval_with_abundance <- function(clonoset) {
+pval_with_abundance <- function(clonoset, by_counts = TRUE, by_log2_counts = TRUE) {
   # check that ALICE analysis was performed
   if(!(all(c('count', 'ALICE.D', 'ALICE.p_value') %in% colnames(clonoset)))){
     stop("A clonoset must include ALICE.D and ALICE.p_value columns",
@@ -303,25 +307,29 @@ pval_with_abundance <- function(clonoset) {
 
   for(nb in sort(all_numbers_of_neighbors)){
     # log2
-    PDF_f <- approxfun(density(log_counts^nb))
-    try(clonoset[ALICE.D == nb,
-             ALICE.pval_with_abundance_log2_counts := PDF_f(clonoset[ALICE.D == nb,
-                                                                     log2_counts]) * clonoset[ALICE.D == nb,
-                                                                                              ALICE.p_value]])
-    try(clonoset[ALICE.D == nb,
-            ALICE.log_pval_with_abundance_log2_counts := log(PDF_f(clonoset[ALICE.D == nb,
-                                                                    log2_counts])) + clonoset[ALICE.D == nb,
-                                                                                             ALICE.log_p_value]])
+    if(by_counts){
+      PDF_f <- approxfun(density(log_counts^nb))
+      clonoset[ALICE.D == nb,
+               ALICE.pval_with_abundance_log2_counts := PDF_f(clonoset[ALICE.D == nb,
+                                                                       log2_counts]) * clonoset[ALICE.D == nb,
+                                                                                                ALICE.p_value]]
+      clonoset[ALICE.D == nb,
+               ALICE.log_pval_with_abundance_log2_counts := log(PDF_f(clonoset[ALICE.D == nb,
+                                                                               log2_counts])) + clonoset[ALICE.D == nb,
+                                                                                                         ALICE.log_p_value]]
+    }
     # just counts
-    PDF_f <- approxfun(density(counts^nb))
-    try(clonoset[ALICE.D == nb,
-             ALICE.pval_with_abundance_counts := PDF_f(clonoset[ALICE.D == nb,
-                                                                count]) * clonoset[ALICE.D == nb,
-                                                                                   ALICE.p_value]])
-    try(clonoset[ALICE.D == nb,
-             ALICE.log_pval_with_abundance_counts := log(PDF_f(clonoset[ALICE.D == nb,
-                                                                count])) + clonoset[ALICE.D == nb,
-                                                                                   ALICE.log_p_value]])
+    if(by_log2_counts){
+      PDF_f <- approxfun(density(counts^nb))
+      clonoset[ALICE.D == nb,
+               ALICE.pval_with_abundance_counts := PDF_f(clonoset[ALICE.D == nb,
+                                                                  count]) * clonoset[ALICE.D == nb,
+                                                                                     ALICE.p_value]]
+      clonoset[ALICE.D == nb,
+               ALICE.log_pval_with_abundance_counts := log(PDF_f(clonoset[ALICE.D == nb,
+                                                                          count])) + clonoset[ALICE.D == nb,
+                                                                                              ALICE.log_p_value]]
+    }
   }
   return(clonoset)
 }
