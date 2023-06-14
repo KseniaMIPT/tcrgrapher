@@ -9,7 +9,7 @@ ALICE_pipeline(
   Q_val = 6.27,
   cores = 1,
   thres_counts = 1,
-  N_neighbors_thres = 1,
+  N_neighbors_thres = 0,
   p_adjust_method = "BH",
   chain = "mouseTRB",
   stats = "OLGA",
@@ -53,17 +53,15 @@ Function returns TCRgrapher object filtered by number
 of counts and number of neighbors with additional columns. Additional columns
 are the following
 \itemize{
-\item{"D"}{"Number of neighbors in clonoset. Neighbor is a similar sequence
+\item{"ALICE.D"}{"Number of neighbors in clonoset. Neighbor is a similar sequence
 with one mismatch"}
-\item{"VJ_n_total"}{"Number of unique sequences with given VJ combination"}
-\item{"Pgen"}{"Probability to be generated computed by OLGA"}
-\item{"Pgen_sum_corr"}{"Sum of Pgen of all sequences similar to the given
-with one mismatch"}
-\item{"Pgen_by_VJ"}{"Conditional probability. Sum of probabilities to be
-generated with given VJ combination"}
-\item{"p_val"}{"p value under null hypothesis that number of sequence's
+\item{"ALICE.VJ_n_total"}{"Number of unique sequences with given VJ combination"}
+\item{"ALICE.Pgen"}{"Probability to be generated computed by OLGA"}
+\item{"ALICE.p_value"}{"p value under null hypothesis that number of sequence's
 neighbors is not more than in the random model"}
-\item{"p_adjust"}{"p value with multiple testing correction"}
+\item{"ALICE.p_adjust"}{"p value with multiple testing correction"}
+\item{"ALICE.log_p_value"}{"log of p_value. p values are usually very small
+and can be rounded to zero"}
 }
 }
 \description{
