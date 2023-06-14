@@ -18,7 +18,7 @@ def tcrdist_radii(df, cores, organism, chain):
     # TODO
     print('Sorry, there is no such model')
   ts = get_stratified_gene_usage_frequency(ts = ts, replace = True)
-  
+
   if chain == 'beta':
     df['v_b_gene'] = df['bestVGene'] + '*01'
     df['j_b_gene'] = df['bestJGene'] + '*01'
@@ -29,9 +29,10 @@ def tcrdist_radii(df, cores, organism, chain):
     df['j_a_gene'] = df['bestJGene'] + '*01'
     df['cdr3_a_aa'] = df['cdr3aa']
     cell_df = df[['count', 'freq', 'cdr3_a_aa', 'v_a_gene', 'j_a_gene']]
-    
+
   tr = TCRrep(
     cell_df = cell_df,
+    deduplicate = False,
     chains = [chain],
     organism = organism,
     compute_distances=True)
@@ -53,5 +54,5 @@ def tcrdist_radii(df, cores, organism, chain):
     chain = chain,
     ctrl_bkgd = 10**-5
     )
-  tr.clone_df['radius'] = radii
-  tr.clone_df
+    
+  return(radii)
