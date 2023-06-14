@@ -17,7 +17,7 @@ calc_TCRdist3_radius <- function(TCRgrObject, cores, organism = 'mouse',
     clonoset$freq <- clonoset$count / sum(clonoset$count)
     message('Frequency values were calculated from count column')
   }
-  source_python(system.file('TCRdist3.py', package = 'tcrgrapher'))
+  source_python(system.file('Python/TCRdist3.py', package = 'tcrgrapher'))
   res <- tcrdist_radii(clonoset, cores, organism, chain)
   clonoset(TCRgrObject)$tcrdist3.radius <- res$radius
   TCRgrObject
