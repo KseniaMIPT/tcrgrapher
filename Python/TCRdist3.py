@@ -4,13 +4,19 @@
 from tcrdist.repertoire import TCRrep
 from tcrdist.centers import calc_radii
 from tcrdist.background import get_stratified_gene_usage_frequency
-from tcrdist.sample import _default_sampler_olga
+# from tcrdist.sample import _default_sampler_olga
+from tcrdist.sample import _default_tcrsampler_olga_mouse_beta
 import pandas as pd
 import os
 
 def tcrdist_radii(df, cores, organism, chain):
   
-  ts = _default_sampler_olga(organism = organism, chain = chain)
+  #ts = _default_sampler_olga(organism = organism, chain = chain)
+  if organism == 'mouse' and chain == 'beta':
+    ts = _default_tcrsampler_olga_mouse_beta()
+  else:
+    # TODO
+    print('Sorry, there is no such model')
   ts = get_stratified_gene_usage_frequency(ts = ts, replace = True)
   
   if chain == 'beta':
@@ -40,7 +46,7 @@ def tcrdist_radii(df, cores, organism, chain):
     compute_distances = False
     )
     
-  tr.cpus = cores
+  tr.cpus = int(cores)
   radii, thresholds, ecdfs = calc_radii(
     tr = tr, 
     tr_bkgd = trb,

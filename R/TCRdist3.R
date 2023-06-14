@@ -6,7 +6,7 @@
 #' @param TCRgrObject See ?TCRgrapher
 #' @param cores the number of cores to use
 #' @export
-calc_TCRdist3_radius <- function(TCRgrObject, cores, organism = 'mouse',
+calc_TCRdist3_radius <- function(TCRgrObject, cores = 1, organism = 'mouse',
                                  chain = 'beta'){
   if(!requireNamespace("reticulate", quietly = TRUE)){
     stop("Package \"reticulate\" must be installed and loaded to use this function.",
