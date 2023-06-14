@@ -12,8 +12,7 @@ def tcrdist_radii(df, cores, organism, chain):
   
   ts = _default_sampler_olga(organism = organism, chain = chain)
   ts = get_stratified_gene_usage_frequency(ts = ts, replace = True)
-    
-  df = pd.read_csv(input_path, sep='\t')
+  
   if chain == 'beta':
     df['v_b_gene'] = df['bestVGene'] + '*01'
     df['j_b_gene'] = df['bestJGene'] + '*01'

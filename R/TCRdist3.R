@@ -1,11 +1,10 @@
-#' TCRdist3_radius
+#' calc_TCRdist3_radius
 #'
 #' The function takes TCRgrapherObject as an input and finds the optimal radius
 #' with tcrdist3 python package.
 #'
 #' @param TCRgrObject See ?TCRgrapher
 #' @param cores the number of cores to use
-#' @importFrom reticulate source_python
 #' @export
 calc_TCRdist3_radius <- function(TCRgrObject, cores, organism = 'mouse',
                                  chain = 'beta'){
