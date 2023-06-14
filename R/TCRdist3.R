@@ -5,8 +5,10 @@
 #'
 #' @param TCRgrObject See ?TCRgrapher
 #' @param cores the number of cores to use
+#' @importFrom reticulate source_python
 #' @export
-TCRdist3_radius <- function(TCRgrObject, cores){
+calc_TCRdist3_radius <- function(TCRgrObject, cores, organism = 'mouse',
+                                 chain = 'beta'){
   if(!requireNamespace("reticulate", quietly = TRUE)){
     stop("Package \"reticulate\" must be installed and loaded to use this function.",
          call. = FALSE)
@@ -17,7 +19,7 @@ TCRdist3_radius <- function(TCRgrObject, cores){
     message('Frequency values were calculated from count column')
   }
   source_python(system.file('TCRdist3.py', package = 'tcrgrapher'))
-  res <- tcrdist_radii(clonoset, cores)
+  res <- tcrdist_radii(clonoset, cores, organism, chain)
   clonoset(TCRgrObject)$tcrdist3.radius <- res$radius
   TCRgrObject
 }
