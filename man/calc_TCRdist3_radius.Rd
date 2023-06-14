@@ -2,9 +2,14 @@
 % Please edit documentation in R/TCRdist3.R
 \name{calc_TCRdist3_radius}
 \alias{calc_TCRdist3_radius}
-\title{TCRdist3_radius}
+\title{calc_TCRdist3_radius}
 \usage{
-calc_TCRdist3_radius(TCRgrObject, cores, organism = "mouse", chain = "beta")
+calc_TCRdist3_radius(
+  TCRgrObject,
+  cores = 1,
+  organism = "mouse",
+  chain = "beta"
+)
 }
 \arguments{
 \item{TCRgrObject}{See ?TCRgrapher}

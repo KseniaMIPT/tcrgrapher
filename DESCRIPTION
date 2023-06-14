@@ -1,6 +1,6 @@
 Package: tcrgrapher
 Title: R package for identifying condition-associated T cell clones
-Version: 0.0.0.9006
+Version: 0.0.0.9007
 Authors@R: 
     person(given = "Kseniia",
            family = "Lupyr",
@@ -23,11 +23,11 @@ Imports:
     foreach,
     doParallel,
     parallel,
-    methods,
-    reticulate
+    methods
 Suggests:
     igraph,
     edgeR,
+    reticulate,
     testthat (>= 3.0.0)
 SystemRequirements:
     OLGA (python 2.7/3.6 software)
