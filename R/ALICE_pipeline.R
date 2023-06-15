@@ -307,7 +307,7 @@ pval_with_abundance <- function(clonoset, by_counts = TRUE, by_log2_counts = TRU
 
   for(nb in sort(all_numbers_of_neighbors)){
     # log2
-    if(by_counts){
+    if(by_log2_counts){
       PDF_f <- approxfun(density(log_counts^nb))
       clonoset[ALICE.D == nb,
                ALICE.pval_with_abundance_log2_counts := PDF_f(clonoset[ALICE.D == nb,
@@ -319,7 +319,7 @@ pval_with_abundance <- function(clonoset, by_counts = TRUE, by_log2_counts = TRU
                                                                                                          ALICE.log_p_value]]
     }
     # just counts
-    if(by_log2_counts){
+    if(by_counts){
       PDF_f <- approxfun(density(counts^nb))
       clonoset[ALICE.D == nb,
                ALICE.pval_with_abundance_counts := PDF_f(clonoset[ALICE.D == nb,

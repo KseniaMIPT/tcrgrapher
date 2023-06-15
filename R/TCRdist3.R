@@ -1,13 +1,19 @@
 #' calc_TCRdist3_radius
 #'
-#' The function takes TCRgrapherObject as an input and finds the optimal radius
+#' The function takes TCRgrapher object as an input and finds the optimal radius
 #' with tcrdist3 python package.
 #'
 #' @param TCRgrObject See ?TCRgrapher
-#' @param cores the number of cores to use
+#' @param cores the number of cores to use. The default value is 1.
+#' @param organism Possible options: mouse, human. The default value is "mouse"
+#' @param chain Possible options: alpha, beta. The default value is "beta"
+#' @return TCRgrapher object. A clonoset contains additional column "tcrdist3.radius"
 #' @export
 calc_TCRdist3_radius <- function(TCRgrObject, cores = 1, organism = 'mouse',
                                  chain = 'beta'){
+  message('Python package tcrdist3 must be installed. Installation: "pip install
+          git+https://github.com/kmayerb/tcrdist3.git@0.2.2". See documentation
+          https://tcrdist3.readthedocs.io/en/latest/')
   if(!requireNamespace("reticulate", quietly = TRUE)){
     stop("Package \"reticulate\" must be installed and loaded to use this function.",
          call. = FALSE)

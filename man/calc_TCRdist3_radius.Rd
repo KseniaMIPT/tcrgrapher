@@ -14,9 +14,16 @@ calc_TCRdist3_radius(
 \arguments{
 \item{TCRgrObject}{See ?TCRgrapher}
 
-\item{cores}{the number of cores to use}
+\item{cores}{the number of cores to use. The default value is 1.}
+
+\item{organism}{Possible options: mouse, human. The default value is "mouse"}
+
+\item{chain}{Possible options: alpha, beta. The default value is "beta"}
+}
+\value{
+TCRgrapher object. A clonoset contains additional column "tcrdist3.radius"
 }
 \description{
-The function takes TCRgrapherObject as an input and finds the optimal radius
+The function takes TCRgrapher object as an input and finds the optimal radius
 with tcrdist3 python package.
 }
