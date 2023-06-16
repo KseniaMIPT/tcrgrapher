@@ -22,8 +22,8 @@
 #' @return data.table with statistics for every clonotype performed for each pair
 #' of groups and for every sample vs all others. 'comparison' column shows
 #' comparisons in the format 'Group1 vs Group2'.
-#' In this case, LFC values are negative if the clonotype is expanded in 'Group1' and
-#' positive if it is expanded in 'Group2'.
+#' In this case, LFC values are positive if the clonotype is expanded in 'Group1' and
+#' negative if it is expanded in 'Group2'.
 #' @examples
 #' # find significantly expanded clonotypes after vaccination
 #' # my_metadata table contains column 'vaccination_status' with groups of comparison
@@ -82,8 +82,8 @@ edgeR_pipeline <- function(TCRgrCounts, comparison, min.count = 1,
   for(i in 1:(nb_of_comparison_levels-1)){
     nb_of_rows = nb_of_comparison_levels - i
     comparison_matrix_pairwise <- cbind(matrix(0, nrow = nb_of_rows, ncol = i-1),
-                                        matrix(-1, nrow = nb_of_rows, ncol = 1),
-                                        diag(nb_of_rows))
+                                        matrix(1, nrow = nb_of_rows, ncol = 1),
+                                        -1*diag(nb_of_rows))
     for(j in 1:nb_of_rows){
       qlf <- glmQLFTest(fit,contrast = comparison_matrix_pairwise[j,])
       topTags <- topTags(qlf, n = nrow(count_table), p.value = 1)$table
@@ -94,8 +94,8 @@ edgeR_pipeline <- function(TCRgrCounts, comparison, min.count = 1,
   }
   # each group vs all others
   if(nb_of_comparison_levels > 2){
-    comparison_matrix_vs_all <- matrix(1/(nb_of_comparison_levels-1), nb_of_comparison_levels, nb_of_comparison_levels)
-    comparison_matrix_vs_all[row(comparison_matrix_vs_all) == col(comparison_matrix_vs_all)] <- -1
+    comparison_matrix_vs_all <- matrix(-1/(nb_of_comparison_levels-1), nb_of_comparison_levels, nb_of_comparison_levels)
+    comparison_matrix_vs_all[row(comparison_matrix_vs_all) == col(comparison_matrix_vs_all)] <- 1
     for(i in 1:nb_of_comparison_levels){
       qlf <- glmQLFTest(fit,contrast = comparison_matrix_vs_all[i,])
       topTags <- topTags(qlf, n = nrow(count_table), p.value = 1)$table

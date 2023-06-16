@@ -39,8 +39,8 @@ amino acid clonotype and each column corresponds to the sample.}
 data.table with statistics for every clonotype performed for each pair
 of groups and for every sample vs all others. 'comparison' column shows
 comparisons in the format 'Group1 vs Group2'.
-In this case, LFC values are negative if the clonotype is expanded in 'Group1' and
-positive if it is expanded in 'Group2'.
+In this case, LFC values are positive if the clonotype is expanded in 'Group1' and
+negative if it is expanded in 'Group2'.
 }
 \description{
 Function performs statistical analysis by edgeR to identify significantly
