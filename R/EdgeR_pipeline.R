@@ -94,7 +94,9 @@ edgeR_pipeline <- function(TCRgrCounts, comparison, min.count = 1,
   }
   # each group vs all others
   if(nb_of_comparison_levels > 2){
-    comparison_matrix_vs_all <- matrix(-1/(nb_of_comparison_levels-1), nb_of_comparison_levels, nb_of_comparison_levels)
+    comparison_matrix_vs_all <- matrix(-1/(nb_of_comparison_levels-1),
+                                       nb_of_comparison_levels,
+                                       nb_of_comparison_levels)
     comparison_matrix_vs_all[row(comparison_matrix_vs_all) == col(comparison_matrix_vs_all)] <- 1
     for(i in 1:nb_of_comparison_levels){
       qlf <- glmQLFTest(fit,contrast = comparison_matrix_vs_all[i,])
