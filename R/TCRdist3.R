@@ -14,7 +14,7 @@ calc_TCRdist3_radius <- function(TCRgrObject, cores = 1, organism = 'mouse',
   message('Python package tcrdist3 must be installed. Installation: "pip install
           git+https://github.com/kmayerb/tcrdist3.git@0.2.2". See documentation
           https://tcrdist3.readthedocs.io/en/latest/')
-  if(!requireNamespace("reticulate", quietly = TRUE)){
+  if(!requireNamespace("reticulate", quietly = FALSE)){
     stop("Package \"reticulate\" must be installed and loaded to use this function.",
          call. = FALSE)
   }
