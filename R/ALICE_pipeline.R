@@ -250,10 +250,9 @@ ALICE_pipeline <- function(TCRgrObject, Q_val = 6.27, cores = 1, thres_counts = 
                         log.p = TRUE)]
   }
 
-  DT[is.na(ALICE.p_value), 'ALICE.p_value'] <- 1
-  DT[is.na(ALICE.log_p_value), 'ALICE.log_p_value'] <- 0
+  DT[is.na(p_val), 'p_val'] <- 1
+  DT[is.na(log_p_val), 'log_p_val'] <- 0
   DT[, p_adjust := p.adjust(p_val, method = p_adjust_method)]
-
   # deletion of unnecessary columns
   DT <- subset(DT, select = -c(ind, Pgen_sum, Pgen_sum_corr))
 
