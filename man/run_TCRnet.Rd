@@ -5,10 +5,9 @@
 \title{run_TCRnet}
 \usage{
 run_TCRnet(
-  input_path,
-  output_path,
+  TCRgrObject,
+  background_path,
   command = "vdjtools",
-  background = "olga_gen_mouseTRB",
   search_scope = c(1, 0, 1),
   grouping = "vj"
 )
@@ -17,15 +16,12 @@ run_TCRnet(
 \item{command}{A command or a path to run on the command line. The default
 value is 'vdjtools'. For example, the user can specify 'java -jar /your_path/vdjtools-1.2.1.jar'}
 
-\item{background}{A user may specify a path to the background sample.
-The package includes several background samples. The default value is
-'olga_gen_mouseTRB' which corresponds to the olga generated sample of mouse TRB chains.
-The result was pooled by amino acid sequences, V and J segments.}
-
 \item{search_scope}{A vector with three numbers: allowed number of substitutions (s),
 indels (id) and total number of mismatches (t). The default value is c(1,0,1)}
 
 \item{grouping}{The default value is 'vj'. Possible values: 'vj', 'vjl', 'v', 'dummy'}
+
+\item{background}{A path to the background sample}
 }
 \description{
 The function runs TCRnet (CalcDegreeStats command from vdjtools). VDJtools must
