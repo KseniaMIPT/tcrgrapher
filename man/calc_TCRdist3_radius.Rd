@@ -8,7 +8,8 @@ calc_TCRdist3_radius(
   TCRgrObject,
   cores = 1,
   organism = "mouse",
-  chain = "beta"
+  chain = "beta",
+  max_radius = 50
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ calc_TCRdist3_radius(
 \item{organism}{Possible options: mouse, human. The default value is "mouse"}
 
 \item{chain}{Possible options: alpha, beta. The default value is "beta"}
+
+\item{max_radius}{Only distances that are less than or equal to max_radius are stored}
 }
 \value{
 TCRgrapher object. A clonoset contains additional column "tcrdist3.radius"

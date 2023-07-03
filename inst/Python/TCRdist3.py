@@ -9,20 +9,16 @@ from tcrdist.sample import _default_tcrsampler_olga_human_beta
 from tcrdist.sample import _default_tcrsampler_olga_human_alpha
 import pandas as pd
 
-def tcrdist_radii(df, cores, organism, chain, my_max_radius):
-  
-  #ts = _default_sampler_olga(organism = organism, chain = chain)
+def choose_sampler(organism, chain):
   if organism == 'mouse' and chain == 'beta':
     ts = _default_tcrsampler_olga_mouse_beta()
-  elif organism == 'mouse' and chain == 'alfa':
-    print('There is no such model')
   elif organism == 'human' and chain == 'beta':
     ts = _default_tcrsampler_olga_human_beta()
   elif organism == 'human' and chain == 'alpha':
     ts = _default_tcrsampler_olga_human_alpha()
+  return(ts)
 
-  ts = get_stratified_gene_usage_frequency(ts = ts, replace = True)
-
+def process_clonoset(df, chain):
   if chain == 'beta':
     df['v_b_gene'] = df['bestVGene'] + '*01'
     df['j_b_gene'] = df['bestJGene'] + '*01'
@@ -33,6 +29,12 @@ def tcrdist_radii(df, cores, organism, chain, my_max_radius):
     df['j_a_gene'] = df['bestJGene'] + '*01'
     df['cdr3_a_aa'] = df['cdr3aa']
     cell_df = df[['count', 'freq', 'cdr3_a_aa', 'v_a_gene', 'j_a_gene']]
+  return(cell_df)
+
+def tcrdist_radii(df, cores, organism, chain, my_max_radius):
+  ts = choose_sampler(organism, chain)
+  ts = get_stratified_gene_usage_frequency(ts = ts, replace = True)
+  cell_df = process_clonoset(df, chain)
 
   tr = TCRrep(
     cell_df = cell_df,
@@ -58,7 +60,7 @@ def tcrdist_radii(df, cores, organism, chain, my_max_radius):
     chain = chain,
     ctrl_bkgd = 10**-5,
     use_sparse = True, 
-    max_radius=my_max_radius
+    max_radius=int(my_max_radius)
     )
     
   return(radii)
