@@ -7,10 +7,11 @@
 #' @param cores the number of cores to use. The default value is 1.
 #' @param organism Possible options: mouse, human. The default value is "mouse"
 #' @param chain Possible options: alpha, beta. The default value is "beta"
+#' @param max_radius Only distances that are less than or equal to max_radius are stored
 #' @return TCRgrapher object. A clonoset contains additional column "tcrdist3.radius"
 #' @export
 calc_TCRdist3_radius <- function(TCRgrObject, cores = 1, organism = 'mouse',
-                                 chain = 'beta'){
+                                 chain = 'beta', max_radius = 50){
   message('Python package tcrdist3 must be installed. Installation: "pip install
           git+https://github.com/kmayerb/tcrdist3.git@0.2.2". See documentation
           https://tcrdist3.readthedocs.io/en/latest/')
@@ -24,7 +25,7 @@ calc_TCRdist3_radius <- function(TCRgrObject, cores = 1, organism = 'mouse',
     message('Frequency values were calculated from count column')
   }
   source_python(system.file('Python/TCRdist3.py', package = 'tcrgrapher'))
-  res <- tcrdist_radii(clonoset, cores, organism, chain)
+  res <- tcrdist_radii(clonoset, cores, organism, chain, max_radius)
   clonoset(TCRgrObject)$tcrdist3.radius <- res
   TCRgrObject
 }

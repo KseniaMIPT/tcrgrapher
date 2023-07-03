@@ -9,7 +9,7 @@ from tcrdist.sample import _default_tcrsampler_olga_human_beta
 from tcrdist.sample import _default_tcrsampler_olga_human_alpha
 import pandas as pd
 
-def tcrdist_radii(df, cores, organism, chain):
+def tcrdist_radii(df, cores, organism, chain, my_max_radius):
   
   #ts = _default_sampler_olga(organism = organism, chain = chain)
   if organism == 'mouse' and chain == 'beta':
@@ -56,7 +56,9 @@ def tcrdist_radii(df, cores, organism, chain):
     tr = tr, 
     tr_bkgd = trb,
     chain = chain,
-    ctrl_bkgd = 10**-5
+    ctrl_bkgd = 10**-5,
+    use_sparse = True, 
+    max_radius=my_max_radius
     )
     
   return(radii)
