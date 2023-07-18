@@ -193,6 +193,15 @@ TCRgrObject <- run_TCRNET(TCRgrObject, background_path, command = 'vdjtools')
 ?run_TCRNET
 ```
 
+## TCRdist3 pipeline
+
+```R
+TCRgrObject <- calc_TCRdist3_radius(TCRgrObject)
+
+# documentation
+?calc_TCRdist3_radius
+```
+
 ## Additional functions
 
 ```make_TCR_graph(clonoset, v_gene = TRUE, j_gene = FALSE)``` 
