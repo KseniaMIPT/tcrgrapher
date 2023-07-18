@@ -1,6 +1,6 @@
 #' run_TCRNET
 #'
-#' The function runs TCRnet (CalcDegreeStats command from vdjtools). VDJtools must
+#' The function runs TCRNET (CalcDegreeStats command from vdjtools). VDJtools must
 #' be installed. See documentation at https://vdjtools-doc.readthedocs.io/en/master/
 #'
 #' @param command A command or a path to run on the command line. The default

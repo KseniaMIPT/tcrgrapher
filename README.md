@@ -99,8 +99,9 @@ neighborhood enrichment analysis using the ALICE algorithm. You can find default
 parameters and possible options below.
 
 ```R
-ALICE_pipeline(TCRgrObject, Q_val = 6.27, cores = 1, thres_counts = 1, N_neighbors_thres = 1, 
-          p_adjust_method = "BH", chain = 'mouseTRB', stats = 'OLGA', model= '-')
+TCRgrObject <- ALICE_pipeline(TCRgrObject, Q_val = 6.27, cores = 1, thres_counts = 1,
+                              N_neighbors_thres = 1, p_adjust_method = "BH", 
+                              chain = 'mouseTRB', stats = 'OLGA', model= '-')
 ```
 * TCRgrObject - TCRgrapher object that contains a clonotype table
 * Q - Selection factor. 1/Q sequences pass selection in a thymus. The default 
@@ -183,7 +184,16 @@ TCRgrCounts <- TCRgrapherCounts(TCRgrObject)
 edgeR_res <- edgeR_pipeline(TCRgrCounts, your_comparison)
 ```
 
-### Additional functions
+## TCRNET pipeline
+
+```R
+TCRgrObject <- run_TCRNET(TCRgrObject, background_path, command = 'vdjtools')
+
+# documentation
+?run_TCRNET
+```
+
+## Additional functions
 
 ```make_TCR_graph(clonoset, v_gene = TRUE, j_gene = FALSE)``` 
 The function makes a graph from a clonoset table with the igraph package. Every
