@@ -4,7 +4,14 @@
 \alias{bfs_for_TCRs}
 \title{bfs_for_TCRs}
 \usage{
-bfs_for_TCRs(clonoset, src, comp_id, v_gene = TRUE, j_gene = FALSE)
+bfs_for_TCRs(
+  clonoset,
+  src,
+  comp_id,
+  v_gene = TRUE,
+  j_gene = FALSE,
+  edges = c()
+)
 }
 \arguments{
 \item{clonoset}{To get clonoset use clonoset(your_TCR_grapher_object)}
@@ -14,10 +21,12 @@ bfs_for_TCRs(clonoset, src, comp_id, v_gene = TRUE, j_gene = FALSE)
 \item{comp_id}{cluster_id for the visited vertexes. All other vertexes will have
 -1 cluster_id if there are none. If some cluster_ids have already been set,
 they will be kept.}
+
+\item{edges}{matrix to which new edges will be added}
 }
 \value{
-The function returns the clonoset where all neighrors of the source
-clonotype have the given id.
+The function returns a list with a clonoset where all neighbors of the source
+clonotype have the given id. The second item of the list is the matrix with edges.
 }
 \description{
 The function searches for all neighbors of the source (src) clonotype. A neighbor

@@ -14,6 +14,6 @@ Subseting for TCRgrapher objects}
 \item{subset}{Vector with sample ids that should be kept}
 }
 \description{
-The function takes subset from both clonotype table and metadata. Samples
-to keep should be specified. 'clone_id' column will be updated.
+The function takes subset from clonotype table, metadata and edges if they are
+present. Samples to keep should be specified. 'clone_id' column will be updated.
 }

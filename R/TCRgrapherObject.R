@@ -47,6 +47,12 @@ check_path <- function(files_path){
 #' TCRgrapherCounts is a subclass of TCRgrapher that store additional data:
 #' count_table and feature_info table
 #'
+#' use clonoset(<your_object>) to see clonoset table
+#' use metadata(<your_object>) to see metadata table
+#' use edges(<your_object>) to see edges if they are present
+#' use subset(<your_object>, <your sample_ids>) to take a subset
+#'
+#'
 #' @examples
 #' # # (1) Path to the one file without metadata
 #' # file_path <- paste0(find.package('tcrgrapher'), "tests/testthat/testdata/clonosets_vdjtools_format.tsv")
@@ -162,6 +168,22 @@ setMethod("metadata<-", "TCRgrapher", function(x, value) {
 })
 
 #' @export
+setGeneric("edges", function(x) standardGeneric("edges"))
+
+#' @export
+setMethod("edges", "TCRgrapher", function(x) x@edges)
+
+#' @export
+setGeneric("edges<-", function(x, value) standardGeneric("edges<-"))
+
+#' @export
+setMethod("edges<-", "TCRgrapher", function(x, value) {
+  x@edges <- value
+  validObject(x)
+  x
+})
+
+#' @export
 TCRgrValidity <- function(object){
   if(!is.data.table(object@clonoset)){
     return("Clonoset must be a data.table")
@@ -197,6 +219,11 @@ TCRgrValidity <- function(object){
   if(!is.character(object@clonoset$bestJGene)){
     return("bestJGene column must contain character values")
   }
+  if(ncol(object@edges) == 2){
+    if(!all(c(object@edges[,1], object@edges[,2]) %in% object@clonoset$clone_id)){
+      return("Edges must connect nodes that are present in the clone_id column")
+    }
+  }
   return(TRUE)
 }
 
@@ -205,13 +232,21 @@ setValidity("TCRgrapher", TCRgrValidity)
 
 #' @export
 setMethod("show", "TCRgrapher", function(object) {
+  if(ncol(object@edges) != 2){
+    text_for_edges <- "  edges are not defined\n"
+  } else {
+    text_for_edges <- paste(" ", nrow(object@edges) ,"edges\n\n")
+  }
   cat(is(object)[[1]], "\n\n",
       "  metadata: ", nrow(object@metadata), " rows and ",
       ncol(object@metadata), " columns\n",
       "  clonoset: ", nrow(object@clonoset), " rows and ",
-      ncol(object@clonoset), " columns\n\n",
+      ncol(object@clonoset), " columns\n",
+      text_for_edges,
       "use clonoset(<your_object>) to see clonoset table \n",
       "use metadata(<your_object>) to see metadata table \n",
+      "use edges(<your_object>) to see edges if they are present \n",
+      "use subset(<your_object>, <your sample_ids>) to take a subset\n",
       sep = ""
   )
 })
@@ -221,8 +256,8 @@ setMethod("show", "TCRgrapher", function(object) {
 
 #' Subseting for TCRgrapher objects
 #'
-#' The function takes subset from both clonotype table and metadata. Samples
-#' to keep should be specified. 'clone_id' column will be updated.
+#' The function takes subset from clonotype table, metadata and edges if they are
+#' present. Samples to keep should be specified. 'clone_id' column will be updated.
 #'
 #' @param x TCRgrapher object
 #' @param subset Vector with sample ids that should be kept
@@ -232,5 +267,8 @@ setMethod("subset", "TCRgrapher", function(x, samples) {
   x@metadata <- x@metadata[sample_id %in% samples]
   x@clonoset <- x@clonoset[sample_id %in% samples]
   x@clonoset[, clone_id := 1:.N, ]
+  if(ncol(x@edges == 2)){
+    x@edges <- x@edges[x@edges[,1] %in% x@clonoset$clone_id & x@edges[,2] %in% x@clonoset$clone_id,]
+  }
   x
 })

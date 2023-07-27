@@ -1,12 +1,12 @@
 Package: tcrgrapher
-Title: R package for identifying condition-associated T cell clones
-Version: 0.0.0.9009
+Title: R package for identifying condition-associated T cell clonotypes
+Version: 0.0.0.9010
 Authors@R: 
     person(given = "Kseniia",
            family = "Lupyr",
            role = c("aut", "cre"),
            email = "kseniia.lupyr@gmail.ru")
-Description: R package for identifying condition associated T cell clones
+Description: R package for identifying condition associated T cell clonotypes
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -30,4 +30,6 @@ SystemRequirements:
     olga (python 2.7/3.6 software)
     sonia (python 2.7/3.6 software)
     tcrdist3 (python 3.8 software)
+    IGoR (v1.3.0)
+    vdjtools (v1.2.1 java software)
 Config/testthat/edition: 3

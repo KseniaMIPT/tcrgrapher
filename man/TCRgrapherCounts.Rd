@@ -25,17 +25,24 @@ Default value is 'FALSE'.}
 
 \item{cluster_id}{Boolean value. Default value is 'FALSE'. If 'cluster_id' is 'TRUE',
 clonotypes with the same cluster_id will be grouped and will be presented in
-one row. In feature_info table feature' column will contain cluster_id and
+one row. In feature_info table feature column will contain cluster_id and
 genes if corresponding parameters are chosen. If 'cluster_id' is already in the
 clonotype table it will be taken from there. Otherwise, it will be defined using
-'make_TCR_graph' and 'find_TCR_components' functions. See documentation.}
+'find_TCR_components_by_bfs' function. In this case edges will be updated.
+See documentation ?find_TCR_components_by_bfs.}
 }
 \value{
 Function returns TCRgrapherCounts object that contains clonoset and
-metadata from TCRgrapher object, count table and feature info table
+metadata from TCRgrapher object, count table, feature info table and edges matrix
+if cluster_id == 'TRUE'.
 }
 \description{
 Function takes a TCRgrapher object as an input and creates a count table
 where each row corresponds to an unique amino acid sequence and each column
 corresponds to the sample.
+}
+\details{
+use count_table(<your_object>) to see a count table
+use feature_info(<your_object>) to see a feature info table
+use edges(<your_object>) to see edges if they are present
 }

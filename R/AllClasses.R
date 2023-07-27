@@ -3,7 +3,8 @@
 setClass('TCRgrapher',
          slots = c(
            clonoset  = 'data.table',
-           metadata = 'data.table'
+           metadata = 'data.table',
+           edges = 'matrix'
          ))
 
 setClass('TCRgrapherCounts',

@@ -12,6 +12,10 @@ NULL
 #' where each row corresponds to an unique amino acid sequence and each column
 #' corresponds to the sample.
 #'
+#' use count_table(<your_object>) to see a count table
+#' use feature_info(<your_object>) to see a feature info table
+#' use edges(<your_object>) to see edges if they are present
+#'
 #' @param TCRgrObject TCRgrapher object. It can be constructed by calling the
 #' TCRgrapher( ) function.
 #' @param v_gene Boolean value. If 'v_gene' is 'TRUE', clonotypes with the same amino
@@ -22,12 +26,14 @@ NULL
 #' Default value is 'FALSE'.
 #' @param cluster_id Boolean value. Default value is 'FALSE'. If 'cluster_id' is 'TRUE',
 #' clonotypes with the same cluster_id will be grouped and will be presented in
-#' one row. In feature_info table feature' column will contain cluster_id and
+#' one row. In feature_info table feature column will contain cluster_id and
 #' genes if corresponding parameters are chosen. If 'cluster_id' is already in the
 #' clonotype table it will be taken from there. Otherwise, it will be defined using
-#' 'make_TCR_graph' and 'find_TCR_components' functions. See documentation.
+#' 'find_TCR_components_by_bfs' function. In this case edges will be updated.
+#' See documentation ?find_TCR_components_by_bfs.
 #' @return Function returns TCRgrapherCounts object that contains clonoset and
-#' metadata from TCRgrapher object, count table and feature info table
+#' metadata from TCRgrapher object, count table, feature info table and edges matrix
+#' if cluster_id == 'TRUE'.
 #' @export
 TCRgrapherCounts <- function(TCRgrObject, v_gene = TRUE, j_gene = FALSE, cluster_id = FALSE){
   # requirements
@@ -47,6 +53,7 @@ TCRgrapherCounts <- function(TCRgrObject, v_gene = TRUE, j_gene = FALSE, cluster
   clonoset <- TCRgrObject@clonoset
   grouping <- c('cdr3aa', 'cluster_id', 'bestVGene', 'bestJGene')[c(!cluster_id, cluster_id, v_gene, j_gene)]
   # find components if it hasn't been made earlier
+  edges <- matrix()
   if(!('cluster_id' %in% colnames(clonoset)) & cluster_id){
     if (!requireNamespace("igraph", quietly = TRUE)) {
       stop(
@@ -54,8 +61,10 @@ TCRgrapherCounts <- function(TCRgrObject, v_gene = TRUE, j_gene = FALSE, cluster
         call. = FALSE
       )
     }
-    #g <- make_TCR_graph(clonoset, v_gene = v_gene, j_gene = j_gene)
-    clonoset <- find_TCR_components_by_bfs(clonoset)
+    bfs_output <- find_TCR_components_by_bfs(TCRgrObject)
+    clonoset <- bfs_output@clonoset
+    # TO DO smthing with edges output
+    edges <- bfs_output@edges
   }
 
   formula <- as.formula(paste0(paste(grouping, collapse = ' + '), ' ~ sample_id'))
@@ -75,7 +84,7 @@ TCRgrapherCounts <- function(TCRgrObject, v_gene = TRUE, j_gene = FALSE, cluster
 
   new('TCRgrapherCounts', clonoset = clonoset,
       metadata = TCRgrObject@metadata, count_table = count_table,
-      feature_info = feature_info)
+      feature_info = feature_info, edges = edges)
 }
 
 #' @export
@@ -177,5 +186,8 @@ setMethod("subset", "TCRgrapherCounts", function(x, samples) {
   x@clonoset <- x@clonoset[sample_id %in% samples]
   x@count_table <- take_subset_from_count_table(x@count_table, samples)
   x@feature_info <- x@feature_info[sample_id %in% samples]
+  if(ncol(x@edges == 2)){
+    x@edges <- x@edges[x@edges[,1] %in% x@clonoset$clone_id & x@edges[,2] %in% x@clonoset$clone_id,]
+  }
   x
 })

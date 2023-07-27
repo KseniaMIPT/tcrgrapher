@@ -1,7 +1,6 @@
 # tcrgrapher
 
-R package for identifying condition associated T cell clones from a single 
-repertoire.
+R package for identifying condition associated T cell clonotypes
 
 ## Installation
 
@@ -10,27 +9,6 @@ install.packages('devtools')
 library(devtools)
 # to install the develop version
 devtools::install_github("KseniaMIPT/tcrgrapher@develop")
-```
-
-To calculate generation probability, TCRgrapher can use OLGA or SONIA. 
-
-For detailed information about OLGA, please visit
-https://github.com/statbiophys/OLGA.
-
-OLGA can be installed using pip or pip3.
-
-```python
-pip install olga
-```
-
-For detailed information about SONIA, please visit
-https://github.com/statbiophys/SONIA
-
-SONIA is a Python 2.7/3.6 software. It is available on PyPI and can be 
-downloaded and installed through pip:
-
-```python
-pip install sonia
 ```
 
 ## Data loading
@@ -83,16 +61,39 @@ TCRgrObject <- TCRgrapher(dir_path, 1, 3, 4, 5, 7, # positions of clonoset's col
 ```
 ```R
 # get metadata
-metadata(your_TCRgrapher_object)
+metadata(TCRgrObject)
 # get clonoset
-clonoset(your_TCRgrapher_object)
+clonoset(TCRgrObject)
 # add column
-clonoset(your_TCRgrapher_object)$col <- your_vector
+clonoset(TCRgrObject)$col <- your_vector
 # subsetting (correct subsetting is important for edgeR analysis)
-subset(your_TCRgrapher_object, vector_with_sample_ids_to_keep)
+subset(TCRgrObject, vector_with_sample_ids_to_keep)
+# get edges if htey are present
+edges(TCRgrObject)
 ```
 
 ## ALICE pipeline
+
+To calculate generation probability, TCRgrapher can use OLGA or SONIA. 
+
+For detailed information about OLGA, please visit
+https://github.com/statbiophys/OLGA.
+
+OLGA can be installed using pip or pip3.
+
+```python
+pip install olga
+```
+
+For detailed information about SONIA, please visit
+https://github.com/statbiophys/SONIA
+
+SONIA is a Python 2.7/3.6 software. It is available on PyPI and can be 
+downloaded and installed through pip:
+
+```python
+pip install sonia
+```
 
 ```ALICE_pipeline``` The function takes a TCRgrapher object as an input and performs
 neighborhood enrichment analysis using the ALICE algorithm. You can find default 
@@ -175,13 +176,33 @@ Metadata must contain a column that specifies levels of comparison. The name of 
 column is the second parameter of the edgeR_pipeline function.
 
 ```R
+# EdgeR installation
+if (!require("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+
+BiocManager::install("edgeR")
+
+# documentation
+?TCRgrapherCounts
+
 library(edgeR)
 # data loading
 TCRgrObject <- TCRgrapher(dir_path, 1, 3, 4, 5, 7, metadata_path, 1, 2)
 # create a count table with aggregation by V segments
-TCRgrCounts <- TCRgrapherCounts(TCRgrObject)
+TCRgrCounts <- TCRgrapherCounts(TCRgrObject) # v_gene = TRUE by default
 # run EdgeR pipeline 
 edgeR_res <- edgeR_pipeline(TCRgrCounts, your_comparison)
+
+# grouping by V segmentss and clusters
+TCRgrCounts_cl <- TCRgrapherCounts(TCRgrObject, cluster_id == TRUE)
+edgeR_res_cl <- edgeR_pipeline(TCRgrCounts_cl, your_comparison)
+
+# to see the composition of the clusters
+feature_info(TCRgrCounts_cl)
+# to see count table
+count_table(TCRgrCounts_cl)
+# to see edges
+edges(TCRgrCounts_cl)
 ```
 
 ## TCRNET pipeline
@@ -196,6 +217,8 @@ TCRgrObject <- run_TCRNET(TCRgrObject, background_path, command = 'vdjtools')
 ## TCRdist3 pipeline
 
 ```R
+library(reticulate)
+
 TCRgrObject <- calc_TCRdist3_radius(TCRgrObject)
 
 # documentation
@@ -210,11 +233,27 @@ node of the graph is a unique clonotype from the table (one line). Edges connect
 clonotypes with one amino acid mismatch or identical clonotypes if they were in 
 separate lines. If 'v_gene' and 'j_gene' are TRUE, edges connect only clonotypes
 with the same V gene or VJ combination.
+For more information ?make_TCR_graph
 
 ```find_TCR_components(clonoset, graph)``` The function takes a clonoset table 
 and make_TCR_graph output and returns the same clonoset table with an additional
 column "cluster_id". All clusters of neighbors with one mismatch have a unique id.
+For more information ?find_TCR_components
 
-```find_TCR_components_by_bfs(clonoset)``` The function takes a clonoset table
-and returns the same clonoset table with an additional 
-column "cluster_id". All clusters of neighbors with one mismatch have a unique id.
+```find_TCR_components_by_bfs(TCRgrObject)``` The function searches for connectivity
+components of the graph, where every node is a clonotype with a unique clone_id 
+and edges connect clonotypes that differ by one amino acid mismatch. It returns 
+the same TCRgrapher object with list of edges and with additional column cluster_id
+in the clonoset table. The fastest way to find TCR components. For more information 
+?find_TCR_components_by_bfs
+
+```bfs_for_TCRs``` The function searches for all neighbors of the source (src) 
+clonotype. A neighbor is a clonotype that differs by one amino acid mismatch.
+For more information ?bfs_for_TCRs
+
+```make_gen_model``` The function uses the IGoR software to infer a new generation
+model. IGoR should be installed. The recommended version is v1.3.0. The function 
+takes the path to the file with non-functional nucleotide CDR3 sequences and writes
+a generation model based on these sequences to the working directory. For more 
+information ?make_gen_model. To use more features, one can use IGoR directly. 
+See the documentation at https://qmarcou.github.io/IGoR/#version.

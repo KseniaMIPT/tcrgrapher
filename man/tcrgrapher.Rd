@@ -80,6 +80,11 @@ columns and "file", "sampl_id" metadata's columns must be specified.
 
 TCRgrapherCounts is a subclass of TCRgrapher that store additional data:
 count_table and feature_info table
+
+use clonoset(<your_object>) to see clonoset table
+use metadata(<your_object>) to see metadata table
+use edges(<your_object>) to see edges if they are present
+use subset(<your_object>, \if{html}{\out{<your sample_ids>}}) to take a subset
 }
 \examples{
 # # (1) Path to the one file without metadata

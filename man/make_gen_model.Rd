@@ -34,10 +34,10 @@ If "mouse" is set, the default TCRgrapher genomic template is used. See Details.
 }
 \description{
 The function uses the IGoR software to infer a new generation model. IGoR should
-be installed. The recommended version is v1.3.0. The function takes path to the
-file with non-functional nucleotide CDR3 sequences and writes genration model
-besed on these sequences to the working directory. To use more features, one can use
-IGoR directly. See documentation at https://qmarcou.github.io/IGoR/#version
+be installed. The recommended version is v1.3.0. The function takes the path to
+the file with non-functional nucleotide CDR3 sequences and writes a generation
+model based on these sequences to the working directory. To use more features,
+one can use IGoR directly. See the documentation at https://qmarcou.github.io/IGoR/#version.
 }
 \details{
 Additional details...How tcgrapher genomic template was made...# TODO

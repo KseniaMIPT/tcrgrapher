@@ -12,10 +12,11 @@ NULL
 #' @param comp_id cluster_id for the visited vertexes. All other vertexes will have
 #' -1 cluster_id if there are none. If some cluster_ids have already been set,
 #' they will be kept.
-#' @return The function returns the clonoset where all neighrors of the source
-#' clonotype have the given id.
+#' @param edges matrix to which new edges will be added
+#' @return The function returns a list with a clonoset where all neighbors of the source
+#' clonotype have the given id. The second item of the list is the matrix with edges.
 #' @export
-bfs_for_TCRs <- function(clonoset, src, comp_id, v_gene = TRUE, j_gene = FALSE){
+bfs_for_TCRs <- function(clonoset, src, comp_id, v_gene = TRUE, j_gene = FALSE, edges = c()){
   if(!('cluster_id' %in% colnames(clonoset))){
     clonoset[, cluster_id := -1]
   }
@@ -41,36 +42,47 @@ bfs_for_TCRs <- function(clonoset, src, comp_id, v_gene = TRUE, j_gene = FALSE){
         clonoset[n, cluster_id := comp_id]
         clonoset[cur, cluster_id := comp_id]
         queue <- c(queue, n)
+        edges <- rbind(edges, c(cur, n))
       }
     }
   }
-  clonoset
+  return(list(clonoset, edges))
 }
 
 #' find_TCR_components_by_bfs
 #'
 #' The function searches for connectivity components of the graph, where every node is a
 #' clonotype with a unique clone_id and edges connect clonotypes that differ by one
-#' amino acid mismatch.
+#' amino acid mismatch. It returns the same TCRgrapher object with list of edges and
+#' with additional column cluster_id in the clonoset table.
 #'
-#' @param clonoset To get clonoset use clonoset(your_TCR_grapher_object)
+#' @param TCRgrObject input object
 #' @param v_gene Boolean value. If 'v_gene' is 'TRUE', only clonotypes with the
 #' same V genes will be part of one connectivity component. Default value is 'TRUE'.
 #' @param j_gene Boolean value. If 'j_gene' is 'TRUE', only clonotypes with the
 #' same J genes will be part of one connectivity component. Default value is 'FALSE'.
-#' @return The function returns the clonoset with the new column "cluster_id", where
-#' every connectivity component has a unique value.
+#' @return The function returns TCRgrapher object. The clonoset has the new column "cluster_id", where
+#' every connectivity component has a unique value. TCRgrapher  object contains
+#' found edges. To see them use edges(<your object>)
 #' @export
-find_TCR_components_by_bfs <- function(clonoset, v_gene = TRUE, j_gene = FALSE){
+find_TCR_components_by_bfs <- function(TCRgrObject, v_gene = TRUE, j_gene = FALSE){
+  clonoset <- TCRgrObject@clonoset
   src <- 1
   comp_id <- 1
   clonoset[, cluster_id := -1]
+  edges <- c()
   pb <- txtProgressBar(min = 0, max = log(nrow(clonoset)), style = 3)
   while(sum(clonoset[,cluster_id] == -1) != 0){
-    clonoset <- bfs_for_TCRs(clonoset, src, comp_id, v_gene, j_gene)
+    output_bfs <- bfs_for_TCRs(clonoset, src, comp_id, v_gene, j_gene, edges)
+    clonoset <- output_bfs[[1]]
+    edges <- output_bfs[[2]]
     src <- clonoset[cluster_id == -1, clone_id][1]
     comp_id <- comp_id + 1
     setTxtProgressBar(pb, log(src))
   }
-  clonoset
+
+  TCRgrObject@clonoset <- clonoset
+  TCRgrObject@edges <- as.matrix(edges)
+  TCRgrObject
+  #return(list(clonoset, edges))
 }

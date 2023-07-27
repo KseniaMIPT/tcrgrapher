@@ -85,7 +85,7 @@ edgeR_pipeline <- function(TCRgrCounts, comparison, min.count = 1,
                                         matrix(1, nrow = nb_of_rows, ncol = 1),
                                         -1*diag(nb_of_rows))
     for(j in 1:nb_of_rows){
-      qlf <- glmQLFTest(fit,contrast = comparison_matrix_pairwise[j,])
+      qlf <- glmQLFTest(fit, contrast = comparison_matrix_pairwise[j,])
       topTags <- topTags(qlf, n = nrow(count_table), p.value = 1)$table
       topTags$comparison <- paste(comparison_levels[i], 'vs', comparison_levels[i+j])
       topTags$feature <- rownames(topTags)

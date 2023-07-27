@@ -26,6 +26,6 @@ calc_TCRdist3_radius <- function(TCRgrObject, cores = 1, organism = 'mouse',
   }
   source_python(system.file('Python/TCRdist3.py', package = 'tcrgrapher'))
   res <- tcrdist_radii(clonoset, cores, organism, chain, max_radius)
-  clonoset(TCRgrObject)$tcrdist3.radius <- res
+  clonoset(TCRgrObject)$tcrdist3.radius <- as.numeric(res)
   return(TCRgrObject)
 }
