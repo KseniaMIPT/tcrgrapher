@@ -48,7 +48,8 @@ def tcrdist_radii(df, cores, organism, chain, my_max_radius):
   trb = TCRrep(
     cell_df = df_vj_background.copy(),
     organism = organism, 
-    chains = [chain], 
+    chains = [chain],
+    # TODO add genes
     db_file = 'alphabeta_gammadelta_db.tsv',
     compute_distances = False
     )
