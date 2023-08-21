@@ -8,7 +8,7 @@ R package for identifying condition associated T cell clonotypes
 install.packages('devtools')
 library(devtools)
 # to install the develop version
-devtools::install_github("KseniaMIPT/tcrgrapher@develop")
+devtools::install_github("KseniaMIPT/tcrgrapher")
 ```
 
 ## Data loading
