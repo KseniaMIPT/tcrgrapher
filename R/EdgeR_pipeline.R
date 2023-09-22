@@ -1,6 +1,6 @@
 #' edgeR_pipeline
 #'
-#' Function performs statistical analysis by edgeR to identify significantly
+#' The function performs statistical analysis by edgeR to identify significantly
 #' expanded clonotypes. First, it filters the data using relatively mild conditions
 #' that better suit TCR repertoire data. Second, it normalize counts and estimate
 #' dispersion by standard edgeR methods. Finally, it performs all pairwise comparisons
@@ -109,4 +109,30 @@ edgeR_pipeline <- function(TCRgrCounts, comparison, min.count = 1,
   sign_result <- setDT(sign_result)
   setcolorder(sign_result, c("feature", setdiff(names(sign_result), "feature")))
   sign_result
+}
+
+#' filter_edgeR_res
+#'
+#' The function takes "vs all" comparisons and checks if all pairwise comparisons
+#' are consistent with the given "vs all" comparison. 'the_worst_pairwise_p' column
+#' shows the worst p value in all pairwise comparisons.
+#'
+#' @param res_dt the output of edgeR_pipeline function
+#' @return subset of res_dt with only 'vs all' comparisons and additional columns
+#' @export
+filter_edgeR_res <- function(res_dt){
+  res_dt_to_check <- res_dt[str_detect(res_dt$comparison, 'vs all'),]
+  res_dt_to_check$consistent <- FALSE
+  res_dt_to_check$the_worst_pairwise_p <- 1
+  for(i in 1:nrow(res_dt_to_check)){
+    feature_t <- res_dt_to_check[i,feature]
+    level <- unlist(str_split(res_dt_to_check[i, comparison], ' vs all'))[1]
+    dt_t <- res_dt[feature == feature_t]
+    dt_t <- dt_t[str_detect(dt_t$comparison, level),]
+    up_level <- sapply(str_split(dt_t$comparison, ' vs '), function(x) x[[1]])
+    res_dt_to_check[i, 'consistent'] <- nrow(dt_t[up_level == level & logFC > 0]) + nrow(dt_t[up_level != level & logFC < 0]) == nrow(dt_t)
+    dt_t <- dt_t[!str_detect(dt_t$comparison, 'vs all')]
+    res_dt_to_check[i, 'the_worst_pairwise_p'] <- max(dt_t$PValue)
+  }
+  return(res_dt_to_check)
 }

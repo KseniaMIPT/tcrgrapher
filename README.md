@@ -30,6 +30,11 @@ Positions of "count", "cdr3nt", "cdr3aa", "V gene", "J gene" clonoset's columns 
 ```R
 # See ?TCRgrapher
 TCRgrObject <- TCRgrapher(file_path, 1, 3, 4, 5, 7) # positions of clonoset's columns
+
+# if you have MIXCR data, you need to delete scores from V and J columns
+TCRgrObject <- TCRgrapher(file_path, 4, 16, 18, 8, 10)
+clonoset(TCRgrObject)$bestVGene <- sapply(str_split(clonoset(TCRgrObject)$bestVGene, '\\*'), function(x) x[[1]])
+clonoset(TCRgrObject)$bestJGene <- sapply(str_split(clonoset(TCRgrObject)$bestJGene, '\\*'), function(x) x[[1]])
 ```
 
 (2) Specify the path to the directory with files without metadata
@@ -203,6 +208,12 @@ feature_info(TCRgrCounts_cl)
 count_table(TCRgrCounts_cl)
 # to see edges
 edges(TCRgrCounts_cl)
+
+# to find 'vs all' comparisons that are consistent with pairwise comparisons
+edgeR_res_filtered <- filter_edgeR_res(edgeR_res)
+edgeR_res_p_all_filter <- edgeR_res_p_all_filter[consistent == TRUE &
+                                                       the_worst_pairwise_p < 0.5 &
+                                                       FDR < 0.1 &]
 ```
 
 ## TCRNET pipeline

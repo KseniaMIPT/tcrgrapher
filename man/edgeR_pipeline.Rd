@@ -43,7 +43,7 @@ In this case, LFC values are positive if the clonotype is expanded in 'Group1' a
 negative if it is expanded in 'Group2'.
 }
 \description{
-Function performs statistical analysis by edgeR to identify significantly
+The function performs statistical analysis by edgeR to identify significantly
 expanded clonotypes. First, it filters the data using relatively mild conditions
 that better suit TCR repertoire data. Second, it normalize counts and estimate
 dispersion by standard edgeR methods. Finally, it performs all pairwise comparisons
