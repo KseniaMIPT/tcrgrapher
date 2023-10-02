@@ -45,7 +45,7 @@ take_min_pval_gliph2 <- function(gliph2_clusters, TCRgrObject){
 #' if k-mers were present.
 #' @export
 run_GLIPH2 <- function(TCRgrObject, gliph2_path, control = 'TCRgrapher',
-                       kmer_min_depth = 100000000){
+                       kmer_min_depth = '100000000'){
   # convert to gliph2 format
   data <- clonoset(TCRgrObject)
   data$cond <- 'Subject:condition'
