@@ -62,7 +62,6 @@ run_GLIPH2 <- function(TCRgrObject, gliph2_path, control = 'TCRgrapher',
   } else if(control == 'GLIPH2'){
     control <- system.file('extdata/GLIPH2_control_server/', package = "tcrgrapher", mustWork = TRUE)
   }
-
   text = paste0('out_prefix=output\n',
                 '\ncdr3_file=', input_file, '\n',
                 'refer_file=', control, 'ref_CD48_ms.txt\n',
@@ -79,16 +78,27 @@ run_GLIPH2 <- function(TCRgrObject, gliph2_path, control = 'TCRgrapher',
   script_path <- paste0(path, '/script_gliph2.txt')
   write(text, file = script_path)
 
+  # rm old files if they exist
+  old_files <- c('output_parameter.txt', 'output_cluster.csv', 'output_HLA.csv',
+                 'output_score.txt', 'output_cluster.txt', 'script_gliph2.txt',
+                 'input.tsv', 'output_kmer.log', 'output_kmer.txt')
+  path_files <- list.files(path)
+  for(file in old_files){
+    if(file %in% path_files){
+      system(paste0('rm ', path, '/', file))
+    }
+  }
+  # run gliph2
   system(paste0(gliph2_path, ' -c ', script_path))
+  # read output
   output_dt <- read.delim(paste0(path, '/output_cluster.csv'), sep=',')
   output_dt <- setDT(output_dt)
-
+  # column with global scores
   output_dt_global <- output_dt[str_detect(type, 'global')]
   output_dt_kmers <- output_dt[!str_detect(type, 'global')]
-
   clonoset(TCRgrObject)$min_gliph2_fisher_score_global <-
     take_min_pval_gliph2(output_dt_global, TCRgrObject)
-
+  # columns with kmers scores
   if(nrow(output_dt_kmers) != 0){
     for(k in unique(nchar(output_dt_kmers$pattern))){
       output_dt_kmer <- output_dt_kmers[nchar(pattern) == k]
