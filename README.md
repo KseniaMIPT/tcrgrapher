@@ -268,3 +268,11 @@ takes the path to the file with non-functional nucleotide CDR3 sequences and wri
 a generation model based on these sequences to the working directory. For more 
 information ?make_gen_model. To use more features, one can use IGoR directly. 
 See the documentation at https://qmarcou.github.io/IGoR/#version.
+
+# References
+
+1.	Pogorelyy, M. V. et al. Detecting T cell receptors involved in immune responses from single repertoire snapshots. PLoS Biol. 17, e3000314 (2019).
+2.	Sethna, Z., Elhanati, Y., Callan, C. G., Walczak, A. M. & Mora, T. OLGA: fast computation of generation probabilities of B- and T-cell receptor amino acid sequences and motifs. Bioinformatics 35, 2974–2981 (2019).
+3.	Pogorelyy, M. V. & Shugay, M. A Framework for Annotation of Antigen Specificities in High-Throughput T-Cell Repertoire Sequencing Studies. Front. Immunol. 10, 2159 (2019).
+4.	Mayer-Blackwell, K. et al. TCR meta-clonotypes for biomarker discovery with tcrdist3: identification of public, HLA-restricted SARS-CoV-2 associated TCR features. bioRxiv (2021) doi:10.1101/2020.12.24.424260.
+5.	Huang, H., Wang, C., Rubelt, F., Scriba, T. J. & Davis, M. M. Analyzing the Mycobacterium tuberculosis immune response by T-cell receptor clustering with GLIPH2 and genome-wide antigen screening. Nat. Biotechnol. 38, 1194–1202 (2020).
