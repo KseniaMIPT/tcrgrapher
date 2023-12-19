@@ -191,29 +191,57 @@ BiocManager::install("edgeR")
 ?TCRgrapherCounts
 
 library(edgeR)
-# data loading
+# load the data
 TCRgrObject <- TCRgrapher(dir_path, 1, 3, 4, 5, 7, metadata_path, 1, 2)
 # create a count table with aggregation by V segments
 TCRgrCounts <- TCRgrapherCounts(TCRgrObject) # v_gene = TRUE by default
 # run EdgeR pipeline 
 edgeR_res <- edgeR_pipeline(TCRgrCounts, your_comparison)
 
-# grouping by V segmentss and clusters
+# group by V segmentss and clusters
 TCRgrCounts_cl <- TCRgrapherCounts(TCRgrObject, cluster_id == TRUE)
 edgeR_res_cl <- edgeR_pipeline(TCRgrCounts_cl, your_comparison)
 
-# to see the composition of the clusters
+# see the composition of the clusters
 feature_info(TCRgrCounts_cl)
-# to see count table
+# see count table
 count_table(TCRgrCounts_cl)
-# to see edges
+# see edges
 edges(TCRgrCounts_cl)
 
-# to find 'vs all' comparisons that are consistent with pairwise comparisons
+# find 'vs all' comparisons that are consistent with pairwise comparisons
 edgeR_res_filtered <- filter_edgeR_res(edgeR_res)
 edgeR_res_p_all_filter <- edgeR_res_p_all_filter[consistent == TRUE &
                                                        the_worst_pairwise_p < 0.5 &
                                                        FDR < 0.1 &]
+```
+
+## Wilcox pipeline for searching of expanded clonotypes
+
+The pipeline is similar to the edgeR_piplene but uses wilcox test for group comparison.
+It is not sensitive for the outliers. For more details see ?wilcox_pipeline and ?filter_wilcox_res.
+
+Typical actions:
+
+```R
+library(stats)
+
+# data loading in case of mixcr
+TCRgrObject <- TCRgrapher(dir_path, 4, 16, 18, 8, 10, metadata_path, 1, 2)
+clonoset(TCRgrObject)$bestVGene <- sapply(str_split(clonoset(TCRgrObject)$bestVGene, '\\*'), function(x) x[[1]])
+clonoset(TCRgrObject)$bestJGene <- sapply(str_split(clonoset(TCRgrObject)$bestJGene, '\\*'), function(x) x[[1]])
+# create a count table for clusters of clonotypes and aggregation by V segments
+TCRgrCounts <- TCRgrapherCounts(TCRgrObject, cluster_id = TRUE) # v_gene = TRUE by default
+# run wilcox_pipeline
+wilcox_res <- wilcox_pipeline(TCRgrCounts, your_comparison)
+# find 'vs all' comparisons that are consistent with pairwise comparisons
+wilcox_res_filtered <- filter_wilcox_res(wilcox_res)
+# filter by p_value
+wilcox_res_filtered <- wilcox_res_filtered[p_value_greater < 0.1]
+# create a heatmap using ComplexHeatmap library
+library(ComplexHeatmap)
+ph <- heatmap_expanded(TCRgrCounts, wilcox_res_filtered)
+ph
 ```
 
 ## TCRNET pipeline
