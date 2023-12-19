@@ -8,7 +8,7 @@ run_GLIPH2(
   TCRgrObject,
   gliph2_path,
   control = "TCRgrapher",
-  kmer_min_depth = 1e+08
+  kmer_min_depth = "100000000"
 )
 }
 \arguments{

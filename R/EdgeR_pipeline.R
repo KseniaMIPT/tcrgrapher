@@ -6,9 +6,8 @@
 #' dispersion by standard edgeR methods. Finally, it performs all pairwise comparisons
 #' between groups and compares each group vs all others using glm and QL F-test.
 #'
-#' @param count_table a data frame where each row corresponds to unique
-#' amino acid clonotype and each column corresponds to the sample.
-#' @param comparison name of the column that specifies levels of comparison in the metadata
+#' @param TCRgrCounts a TCRgrapherCounts object. For more details see ?TCRgrapherCounts
+#' @param comparison a name of the column that specifies levels of comparison in the metadata
 #' @param min.count parameter from edgeR::filterByExpr function. Minimum count
 #' required for at least some samples. Default value is 1.
 #' @param min.total.count parameter from edgeR::filterByExpr function.
@@ -135,4 +134,107 @@ filter_edgeR_res <- function(res_dt){
     res_dt_to_check[i, 'the_worst_pairwise_p'] <- max(dt_t$PValue)
   }
   return(res_dt_to_check)
+}
+
+#' wilcox_pipeline
+#'
+#' The function performs all pairwise comparisons between groups and compares
+#' each group vs all others using wilcox test to identify significantly
+#' expanded clonotypes of clusters of clonotypes.
+#'
+#' @param TCRgrCounts a TCRgrapherCounts object. For more details see ?TCRgrapherCounts
+#' @param comparison a name of the column that specifies levels of comparison in the metadata
+#' @return data.table with statistics for every clonotype or cluster of clonotypes
+#' performed for each pair of groups and for every group vs. all others.
+#' 'comparison' column shows comparisons in the format 'Group1 vs Group2'.
+#' P-values correspond to the alternative hypothesis that the median of the first
+#' group is higher than the median of the second group.
+#' @export
+wilcox_pipeline <- function(TCRgrObject, comparison){
+  if(!requireNamespace("stats", quietly = TRUE)){
+    stop("Package \"stats\" must be installed and loaded to use this function.",
+         call. = FALSE)
+  }
+  metadata <- as.data.frame(metadata(TCRgrObject))
+  counts <- count_table(TCRgrObject)
+  sign_result <- c()
+  # pairwise comparisons
+  pairs <- combn(unique(metadata[,comparison]), 2)
+  for(i in 1:ncol(pairs)){
+    pair <- pairs[,i]
+    curr_comparison <- (metadata[,comparison] == pair[1])*1 + (metadata[,comparison] == pair[2])*(-1)
+    for(feature in rownames(counts)){
+      p_val_t <- wilcox.test(as.numeric(counts[feature, curr_comparison == 1]),
+                             as.numeric(counts[feature, curr_comparison == -1]),
+                             alternative = 'greater')$p.value
+      comparison_t <- paste(pair[1], 'vs', pair[2])
+      sign_result <- rbind(sign_result, cbind(feature, comparison_t, p_val_t))
+    }
+  }
+  # each group vs all others
+  if(length(unique(metadata[,comparison])) > 2){
+    comp_levels <- unique(metadata[,comparison])
+    for(i in 1:length(comp_levels)){
+      curr_comparison <- (metadata[,comparison] == comp_levels[i])*1 + (metadata[,comparison] != comp_levels[i])*(-1)
+      for(feature in rownames(counts)){
+        p_val_t <- wilcox.test(as.numeric(counts[feature, curr_comparison == 1]),
+                               as.numeric(counts[feature, curr_comparison == -1]),
+                               alternative = 'greater')$p.value
+        comparison_t <- paste(comp_levels[i], 'vs all')
+        sign_result <- rbind(sign_result, cbind(feature, comparison_t, p_val_t))
+      }
+    }
+  }
+  colnames(sign_result) <- c('feature', 'comparison', 'p_value_greater')
+  sign_result
+}
+
+#' filter_wilcox_res
+#'
+#' The function takes "vs all" comparisons and checks if all pairwise comparisons
+#' are consistent with the given "vs all" comparison.
+#'
+#' @param res_dt the output of wilcox_pipeline function
+#' @return subset of res_dt with only 'vs all' comparisons and additional column
+#' 'consistent'
+#' @export
+filter_wilcox_res <- function(res_dt){
+  res_dt_to_check <- res_dt[str_detect(res_dt$comparison, 'vs all'),]
+  res_dt_to_check$consistent <- FALSE
+  for(i in 1:nrow(res_dt_to_check)){
+    feature_t <- res_dt_to_check[i,feature]
+    level <- unlist(str_split(res_dt_to_check[i, comparison], ' vs all'))[1]
+    dt_t <- res_dt[feature == feature_t]
+    dt_t <- dt_t[str_detect(dt_t$comparison, level),]
+    up_level <- sapply(str_split(dt_t$comparison, ' vs '), function(x) x[[1]])
+    res_dt_to_check[i, 'consistent'] <- nrow(dt_t[up_level == level & p_value_greater < 0.5]) + nrow(dt_t[up_level != level & p_value_greater > 0.5]) == nrow(dt_t)
+    dt_t <- dt_t[!str_detect(dt_t$comparison, 'vs all')]
+  }
+  return(res_dt_to_check)
+}
+
+#' heatmap_expanded
+#'
+#' The function takes an output of edgeR_pipeline or wilcox_pipeline functions
+#' and creates a heatmap using the ComplexHeatmap library. It is recommended
+#' to use filter_edgeR_res or filter_wilcox_res previously and filter results by
+#' some threshold.
+#' @param TCRgrCounts TCRgrapherCounts object. For more details see ?TCRgrapherCounts
+#' @param expanded_test_res table with features (clonotypes or clusters of clonotypes)
+#' to draw. It could be an output of edgeR_pipeline or wilcox_pipeline.
+#' @export
+heatmap_expanded <- function(TCRgrCounts, expanded_test_res){
+  if(!requireNamespace("ComplexHeatmap", quietly = TRUE)){
+    stop("Package \"ComplexHeatmap\" must be installed and loaded to use this function.",
+         call. = FALSE)
+  }
+  count_table <- count_table(TCRgrCounts)
+  count_table <- count_table[unique(expanded_test_res$feature),]
+  data <- log(count_table)
+  colnames(data) <- substring(colnames(data), 9, nchar(colnames(data)))
+  data[data == -Inf] <- -1
+  data <- as.matrix(data)
+  pht <- ComplexHeatmap::pheatmap(data, cluster_cols = FALSE,
+                                  column_split = metadata(TCRgrCounts)$sample.Antigene)
+  pht
 }

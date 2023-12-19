@@ -15,7 +15,9 @@ edgeR_pipeline(
 )
 }
 \arguments{
-\item{comparison}{name of the column that specifies levels of comparison in the metadata}
+\item{TCRgrCounts}{a TCRgrapherCounts object. For more details see ?TCRgrapherCounts}
+
+\item{comparison}{a name of the column that specifies levels of comparison in the metadata}
 
 \item{min.count}{parameter from edgeR::filterByExpr function. Minimum count
 required for at least some samples. Default value is 1.}
@@ -31,9 +33,6 @@ proportion of samples in the smallest group that express the gene. Default
 value is 0.5.}
 
 \item{normalization_method}{method to be used to edgeR::calcNormFactors function}
-
-\item{count_table}{a data frame where each row corresponds to unique
-amino acid clonotype and each column corresponds to the sample.}
 }
 \value{
 data.table with statistics for every clonotype performed for each pair
