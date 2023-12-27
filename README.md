@@ -239,6 +239,10 @@ wilcox_res_filtered <- filter_wilcox_res(wilcox_res)
 # filter by p_value
 wilcox_res_filtered <- wilcox_res_filtered[p_value_greater < 0.1]
 # create a heatmap using ComplexHeatmap library
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("ComplexHeatmap")
 library(ComplexHeatmap)
 ph <- heatmap_expanded(TCRgrCounts, wilcox_res_filtered)
 ph
