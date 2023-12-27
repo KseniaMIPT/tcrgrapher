@@ -221,9 +221,10 @@ filter_wilcox_res <- function(res_dt){
 #' some threshold.
 #' @param TCRgrCounts TCRgrapherCounts object. For more details see ?TCRgrapherCounts
 #' @param expanded_test_res table with features (clonotypes or clusters of clonotypes)
+#' @param comparison a name of the column that specifies levels of comparison in the metadata
 #' to draw. It could be an output of edgeR_pipeline or wilcox_pipeline.
 #' @export
-heatmap_expanded <- function(TCRgrCounts, expanded_test_res){
+heatmap_expanded <- function(TCRgrCounts, expanded_test_res, comparison){
   if(!requireNamespace("ComplexHeatmap", quietly = TRUE)){
     stop("Package \"ComplexHeatmap\" must be installed and loaded to use this function.",
          call. = FALSE)
@@ -231,10 +232,10 @@ heatmap_expanded <- function(TCRgrCounts, expanded_test_res){
   count_table <- count_table(TCRgrCounts)
   count_table <- count_table[unique(expanded_test_res$feature),]
   data <- log(count_table)
-  colnames(data) <- substring(colnames(data), 9, nchar(colnames(data)))
+  colnames(data) <- colnames(data)
   data[data == -Inf] <- -1
   data <- as.matrix(data)
   pht <- ComplexHeatmap::pheatmap(data, cluster_cols = FALSE,
-                                  column_split = metadata(TCRgrCounts)$sample.Antigene)
+                                  column_split = metadata(TCRgrCounts)[,comparison])
   pht
 }
