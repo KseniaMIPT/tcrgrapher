@@ -235,7 +235,8 @@ heatmap_expanded <- function(TCRgrCounts, expanded_test_res, comparison){
   colnames(data) <- colnames(data)
   data[data == -Inf] <- -1
   data <- as.matrix(data)
+  metadata <- as.data.frame(metadata(TCRgrObject))
   pht <- ComplexHeatmap::pheatmap(data, cluster_cols = FALSE,
-                                  column_split = metadata(TCRgrCounts)[,comparison])
+                                  column_split = metadata[, comparison])
   pht
 }
