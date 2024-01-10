@@ -4,12 +4,14 @@
 \alias{heatmap_expanded}
 \title{heatmap_expanded}
 \usage{
-heatmap_expanded(TCRgrCounts, expanded_test_res)
+heatmap_expanded(TCRgrCounts, expanded_test_res, comparison)
 }
 \arguments{
 \item{TCRgrCounts}{TCRgrapherCounts object. For more details see ?TCRgrapherCounts}
 
-\item{expanded_test_res}{table with features (clonotypes or clusters of clonotypes)
+\item{expanded_test_res}{table with features (clonotypes or clusters of clonotypes)}
+
+\item{comparison}{a name of the column that specifies levels of comparison in the metadata
 to draw. It could be an output of edgeR_pipeline or wilcox_pipeline.}
 }
 \description{

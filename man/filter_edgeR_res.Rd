@@ -4,10 +4,12 @@
 \alias{filter_edgeR_res}
 \title{filter_edgeR_res}
 \usage{
-filter_edgeR_res(res_dt)
+filter_edgeR_res(res_dt, comparison)
 }
 \arguments{
 \item{res_dt}{the output of edgeR_pipeline function}
+
+\item{comparison}{a name of the column that specifies levels of comparison}
 }
 \value{
 subset of res_dt with only 'vs all' comparisons and additional columns
