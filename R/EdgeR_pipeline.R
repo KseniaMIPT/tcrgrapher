@@ -117,9 +117,10 @@ edgeR_pipeline <- function(TCRgrCounts, comparison, min.count = 1,
 #' shows the worst p value in all pairwise comparisons.
 #'
 #' @param res_dt the output of edgeR_pipeline function
+#' @param comparison  a name of the column that specifies levels of comparison
 #' @return subset of res_dt with only 'vs all' comparisons and additional columns
 #' @export
-filter_edgeR_res <- function(res_dt){
+filter_edgeR_res <- function(res_dt, comparison){
   res_dt_to_check <- res_dt[str_detect(res_dt$comparison, 'vs all'),]
   res_dt_to_check$consistent <- FALSE
   res_dt_to_check$the_worst_pairwise_p <- 1
@@ -195,10 +196,12 @@ wilcox_pipeline <- function(TCRgrObject, comparison){
 #' are consistent with the given "vs all" comparison.
 #'
 #' @param res_dt the output of wilcox_pipeline function
+#' @param comparison a name of the column that specifies levels of comparison
 #' @return subset of res_dt with only 'vs all' comparisons and additional column
 #' 'consistent'
 #' @export
-filter_wilcox_res <- function(res_dt){
+filter_wilcox_res_t <- function(res_dt, comparison){
+  res_dt <- setDT(as.data.frame(res_dt))
   res_dt_to_check <- res_dt[str_detect(res_dt$comparison, 'vs all'),]
   res_dt_to_check$consistent <- FALSE
   for(i in 1:nrow(res_dt_to_check)){
@@ -232,7 +235,7 @@ heatmap_expanded <- function(TCRgrCounts, expanded_test_res, comparison){
   count_table <- count_table(TCRgrCounts)
   count_table <- count_table[unique(expanded_test_res$feature),]
   data <- log(count_table)
-  colnames(data) <- colnames(data)
+  colnames(data) <- colnames(count_table)
   data[data == -Inf] <- -1
   data <- as.matrix(data)
   metadata <- as.data.frame(metadata(TCRgrObject))
