@@ -200,7 +200,7 @@ wilcox_pipeline <- function(TCRgrObject, comparison){
 #' @return subset of res_dt with only 'vs all' comparisons and additional column
 #' 'consistent'
 #' @export
-filter_wilcox_res_t <- function(res_dt, comparison){
+filter_wilcox_res <- function(res_dt, comparison){
   res_dt <- setDT(as.data.frame(res_dt))
   res_dt_to_check <- res_dt[str_detect(res_dt$comparison, 'vs all'),]
   res_dt_to_check$consistent <- FALSE
