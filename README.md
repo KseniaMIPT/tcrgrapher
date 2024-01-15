@@ -2,6 +2,10 @@
 
 R package for identifying condition associated T cell clonotypes
 
+![Summary](Summary.png)
+
+TCR repertoires and metadata, if it is presented, are stored in the S4 TCRgrapher object. A search for specific TCR identification can be performed by ALICE, TCRNET, GLIPH2 and tcrdist3. The output is the same object with additional columns in the repertoire. The edgeR pipeline uses the TCRgrapherCounts object as an input, which is an extension of the TCRgrapher object. The TCRgrapherCounts constructor creates a count table where each column corresponds to one sample and each row corresponds to a unique feature. The feature can be a unique amino acid sequence or a combination of amino acid sequences and V or V and J segments. It can also be a connectivity component of the graph where every node is a feature and edges connect neighbors. The output file provides all pairwise comparisons between groups and a comparison of every group with all others. The picture is created with BioRender.com.
+
 ## Installation
 
 ```R
