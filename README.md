@@ -11,7 +11,6 @@ TCR repertoires and metadata, if it is presented, are stored in the S4 TCRgraphe
 ```R
 install.packages('devtools')
 library(devtools)
-# to install the develop version
 devtools::install_github("KseniaMIPT/tcrgrapher")
 ```
 
