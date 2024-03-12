@@ -4,12 +4,15 @@
 \alias{filter_wilcox_res}
 \title{filter_wilcox_res}
 \usage{
-filter_wilcox_res(res_dt, comparison)
+filter_wilcox_res(res_dt, comparison, pval_threshold = 0.1)
 }
 \arguments{
 \item{res_dt}{the output of wilcox_pipeline function}
 
 \item{comparison}{a name of the column that specifies levels of comparison}
+
+\item{pval_threshold}{Only comparisons where all pairwise p-value are less than
+pval_threshold will be marked as 'consisteny'. The default value is 0.1}
 }
 \value{
 subset of res_dt with only 'vs all' comparisons and additional column

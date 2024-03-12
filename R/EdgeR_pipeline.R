@@ -199,6 +199,22 @@ wilcox_pipeline <- function(TCRgrObject, comparison){
 #' @param comparison a name of the column that specifies levels of comparison
 #' @param pval_threshold Only comparisons where all pairwise p-value are less than
 #' pval_threshold will be marked as 'consisteny'. The default value is 0.1
+#     TCRgrapher: R package for identifying condition associated T cell clonotypes
+#     Copyright (C) 2024 Kseniia Lupyr
+#
+#     This program is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 #' @return subset of res_dt with only 'vs all' comparisons and additional column
 #' 'consistent'
 #' @export
