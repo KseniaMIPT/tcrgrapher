@@ -197,10 +197,12 @@ wilcox_pipeline <- function(TCRgrObject, comparison){
 #'
 #' @param res_dt the output of wilcox_pipeline function
 #' @param comparison a name of the column that specifies levels of comparison
+#' @param pval_threshold Only comparisons where all pairwise p-value are less than
+#' pval_threshold will be marked as 'consisteny'. The default value is 0.1
 #' @return subset of res_dt with only 'vs all' comparisons and additional column
 #' 'consistent'
 #' @export
-filter_wilcox_res <- function(res_dt, comparison){
+filter_wilcox_res <- function(res_dt, comparison, pval_threshold = 0.1){
   res_dt <- setDT(as.data.frame(res_dt))
   res_dt_to_check <- res_dt[str_detect(res_dt$comparison, 'vs all'),]
   res_dt_to_check$consistent <- FALSE
@@ -210,7 +212,7 @@ filter_wilcox_res <- function(res_dt, comparison){
     dt_t <- res_dt[feature == feature_t]
     dt_t <- dt_t[str_detect(dt_t$comparison, level),]
     up_level <- sapply(str_split(dt_t$comparison, ' vs '), function(x) x[[1]])
-    res_dt_to_check[i, 'consistent'] <- nrow(dt_t[up_level == level & p_value_greater < 0.5]) + nrow(dt_t[up_level != level & p_value_greater > 0.5]) == nrow(dt_t)
+    res_dt_to_check[i, 'consistent'] <- nrow(dt_t[up_level == level & p_value_greater < pval_threshold]) + nrow(dt_t[up_level != level & p_value_greater > (1-pval_threshold)]) == nrow(dt_t)
     dt_t <- dt_t[!str_detect(dt_t$comparison, 'vs all')]
   }
   return(res_dt_to_check)
