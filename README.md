@@ -158,6 +158,36 @@ There are two additional columns in the output depending on count normalization:
 "pval_with_abundance_log2_counts" - Log2 is used for count normalization; 
 "pval_with_abundance_counts" - no count normalization.
 
+## TCRNET pipeline
+
+```R
+TCRgrObject <- run_TCRNET(TCRgrObject, background_path, command = 'vdjtools')
+
+# documentation
+?run_TCRNET
+```
+
+## TCRdist3 pipeline
+
+```R
+library(reticulate)
+
+TCRgrObject <- calc_TCRdist3_radius(TCRgrObject)
+
+# documentation
+?calc_TCRdist3_radius
+```
+
+## GLIPH2 pipeline
+
+```R
+TCRgrObject <- run_GLIPH2(TCRgrObject, '/path_to_gliph2/irtools.centos',
+                          control = 'GLIPH2', kmer_min_depth = 3)
+                          
+# documentation
+?run_GLIPH2
+```
+
 ## edgeR analysis
 
 ```edgeR_pipeline``` The function performs statistical analysis by edgeR to 
@@ -249,26 +279,6 @@ BiocManager::install("ComplexHeatmap")
 library(ComplexHeatmap)
 ph <- heatmap_expanded(TCRgrCounts, wilcox_res_filtered)
 ph
-```
-
-## TCRNET pipeline
-
-```R
-TCRgrObject <- run_TCRNET(TCRgrObject, background_path, command = 'vdjtools')
-
-# documentation
-?run_TCRNET
-```
-
-## TCRdist3 pipeline
-
-```R
-library(reticulate)
-
-TCRgrObject <- calc_TCRdist3_radius(TCRgrObject)
-
-# documentation
-?calc_TCRdist3_radius
 ```
 
 ## Additional functions
