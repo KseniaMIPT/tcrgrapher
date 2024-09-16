@@ -158,6 +158,7 @@ wilcox_pipeline <- function(TCRgrObject, comparison){
   }
   metadata <- as.data.frame(metadata(TCRgrObject))
   counts <- count_table(TCRgrObject)
+  counts <- counts[,metadata$sample_id]
   sign_result <- c()
   # pairwise comparisons
   pairs <- combn(unique(metadata[,comparison]), 2)
