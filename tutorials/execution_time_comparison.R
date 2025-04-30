@@ -6,36 +6,29 @@ source('/home/klupyr/soft/ALICE/ALICE.R')
 Sys.setenv(PATH="/home/klupyr/.conda/envs/statbiophys/bin/")
 
 S1d15<-fread("sample/S1_d15_V9_J2_7.tsv")
-# S1d0<-fread("sample/S1_d0_V9_J2_7.tsv")
 S1<-list(d15=S1d15)
 
-# ALICE 16 cores
-start.time <- Sys.time()
-S1_alice<-ALICE_pipeline_OLGA(DTlist=S1,cores=16)
-end.time <- Sys.time()
-time.taken_16_ALICE_no_OLGA <- end.time - start.time
-print(time.taken_16_ALICE_no_OLGA)
+S2 <- do.call("rbind", replicate(10, S1, simplify = FALSE))
+S3 <- do.call("rbind", replicate(100, S1, simplify = FALSE))
 
-# ALCIE 1 core
-start.time <- Sys.time()
-S1_alice<-ALICE_pipeline_OLGA(DTlist=S1,cores=1)
-end.time <- Sys.time()
-time.taken_1_ALICE_no_OLGA <- end.time - start.time
-print(time.taken_1_ALICE_no_OLGA)
+samples <- list(S1, S2, S3)
 
-# ALICE 16 cores with OLGA
-start.time <- Sys.time()
-S1_alice<-ALICE_pipeline_OLGA(DTlist=S1,cores=16)
-end.time <- Sys.time()
-time.taken_16_ALICE <- end.time - start.time
-print(time.taken_16_ALICE)
+# Original ALICE script
+dt <- c()
+for(nb_of_cores in c(1, 16)){
+  for(size_of_sample in 1:3){
+    if((nb_of_cores == 1 & size_of_sample == 1) | (nb_of_cores == 16)){
+      sample_t <- samples[[size_of_sample]]
 
-# ALCIE 1 core with OLGA
-start.time <- Sys.time()
-S1_alice<-ALICE_pipeline_OLGA(DTlist=S1,cores=1)
-end.time <- Sys.time()
-time.taken_1_ALICE <- end.time - start.time
-print(time.taken_1_ALICE)
+      start.time <- Sys.time()
+      S1_alice<-ALICE_pipeline_OLGA(DTlist=sample_t,cores=nb_of_cores)
+      end.time <- Sys.time()
+      time.taken <- end.time - start.time
+      dt <- rbind(dt, c(nb_of_cores, size_of_sample, 'ALICE OLGA', time.taken))
+    }
+  }
+}
+write.table(dt, file = '~/time_ALICE.tsv', sep = '\t', quote = F, row.names = F)
 
 # libraries
 library(tcrgrapher)
