@@ -1,6 +1,14 @@
 # tcrgrapher
 
-R package for identifying condition associated T cell clonotypes
+TCRgrapher is an R package for identifying antigen-associated T cell receptors (TCRs) using diverse analytical strategies. The package has two major functionalities:
+
+[1] Identification from Bulk TCR Repertoire Data:
+Detect antigen-associated TCRs using neighborhood enrichment algorithms
+
+[2] Identification from CFSE Data:
+Analyze CFSE-labeled T cell data to reveal antigen-specific TCR.
+ 
+TCRgrapher simplifies the use of ALICE, TCRNET, GLIPH2, and tcrdist3 optimal radius for antigen-specific TCR identification. ALICE implementation in TCRgrapher offers a user-friendly interface for human, mouse and any custom models specified by the user. We have fully parallelized and optimized the ALICE pipeline with OLGA.
 
 ![Summary](Summary.png)
 
@@ -251,7 +259,7 @@ edgeR_res_p_all_filter <- edgeR_res_p_all_filter[consistent == TRUE &
 
 ## Wilcox pipeline for searching of expanded clonotypes
 
-The pipeline is similar to the edgeR_piplene but uses wilcox test for group comparison.
+The pipeline is similar to the edgeR_piplene but uses wilcox test for group comparison. This pipeline is recommended.
 It is not sensitive for the outliers. For more details see ?wilcox_pipeline and ?filter_wilcox_res.
 
 Typical actions:
