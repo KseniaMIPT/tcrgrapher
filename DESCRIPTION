@@ -1,6 +1,6 @@
 Package: tcrgrapher
 Title: R package for identifying condition-associated T cell clonotypes
-Version: 1.0
+Version: 1.0.0
 Authors@R: 
     person(given = "Kseniia",
            family = "Lupyr",
