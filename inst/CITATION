@@ -1,0 +1,11 @@
+citHeader("To cite tcrgrapher in publications use:")
+
+citEntry(
+  entry    = "Article",
+  title    = "Neighborhood enrichment for the identification of antigen-specific T-cell receptors",
+  author   = "Kseniia R Lupyr, Pavel V Shelyakin, Konstantin A Sobyanin, Ruslan A Martynov, Vladimir S Popov, Sevastyan O Rabdano, Olga S Nikitina, Yurii G Yanushevich, Ilya A Kofiadi, Dmitry B Staroverov, Mikhail Shugay, Dmitriy M Chudakov, Olga V Britanova",
+  journal  = "Briefings in Bioinformatics",
+  year     = "2025",
+  volume   = "26",
+  doi      = "https://doi.org/10.1093/bib/bbaf495"
+)
