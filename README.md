@@ -245,7 +245,7 @@ TCRgrCounts <- TCRgrapherCounts(TCRgrObject) # v_gene = TRUE by default
 edgeR_res <- edgeR_pipeline(TCRgrCounts, your_comparison)
 
 # group by V segmentss and clusters
-TCRgrCounts_cl <- TCRgrapherCounts(TCRgrObject, cluster_id == TRUE)
+TCRgrCounts_cl <- TCRgrapherCounts(TCRgrObject, cluster_id =TRUE)
 edgeR_res_cl <- edgeR_pipeline(TCRgrCounts_cl, your_comparison)
 
 # see the composition of the clusters
